@@ -1,0 +1,12 @@
+<TextureAtlas imagePath='wand.png'>
+  <SubTexture name='350deg.png' x='0' y='0' width='233' height='233'/>
+  <SubTexture name='315deg.png' x='233' y='0' width='233' height='233'/>
+  <SubTexture name='270deg.png' x='466' y='0' width='233' height='233'/>
+  <SubTexture name='225deg.png' x='699' y='0' width='233' height='233'/>
+  <SubTexture name='190deg.png' x='0' y='233' width='233' height='233'/>
+  <SubTexture name='170deg.png' x='233' y='233' width='233' height='233'/>
+  <SubTexture name='135deg.png' x='466' y='233' width='233' height='233'/>
+  <SubTexture name='090deg.png' x='699' y='233' width='233' height='233'/>
+  <SubTexture name='045deg.png' x='0' y='466' width='233' height='233'/>
+  <SubTexture name='010deg.png' x='233' y='466' width='233' height='233'/>
+</TextureAtlas>

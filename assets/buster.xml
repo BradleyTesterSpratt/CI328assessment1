@@ -1,0 +1,35 @@
+<TextureAtlas imagePath='buster.png'>
+  <SubTexture name='frontWalkRight5.png' x='0' y='0' width='136' height='233'/>
+  <SubTexture name='frontWalkRight4.png' x='136' y='0' width='136' height='233'/>
+  <SubTexture name='frontWalkRight3.png' x='272' y='0' width='136' height='233'/>
+  <SubTexture name='frontWalkRight2.png' x='408' y='0' width='136' height='233'/>
+  <SubTexture name='frontWalkRight1.png' x='544' y='0' width='136' height='233'/>
+  <SubTexture name='frontWalkLeft5.png' x='680' y='0' width='136' height='233'/>
+  <SubTexture name='frontWalkLeft4.png' x='0' y='233' width='136' height='233'/>
+  <SubTexture name='frontWalkLeft3.png' x='136' y='233' width='136' height='233'/>
+  <SubTexture name='frontWalkLeft2.png' x='272' y='233' width='136' height='233'/>
+  <SubTexture name='frontWalkLeft1.png' x='408' y='233' width='136' height='233'/>
+  <SubTexture name='frontWalk2.png' x='544' y='233' width='136' height='233'/>
+  <SubTexture name='frontWalk1.png' x='680' y='233' width='136' height='233'/>
+  <SubTexture name='frontIdle1.png' x='0' y='466' width='136' height='233'/>
+  <SubTexture name='frontHit1.png' x='136' y='466' width='136' height='233'/>
+  <SubTexture name='backWalkRight5.png' x='272' y='466' width='136' height='233'/>
+  <SubTexture name='backWalkRight4.png' x='408' y='466' width='136' height='233'/>
+  <SubTexture name='backWalkRight3.png' x='544' y='466' width='136' height='233'/>
+  <SubTexture name='backWalkRight2.png' x='680' y='466' width='136' height='233'/>
+  <SubTexture name='backWalkRight1.png' x='0' y='699' width='136' height='233'/>
+  <SubTexture name='backWalkLeft5.png' x='136' y='699' width='136' height='233'/>
+  <SubTexture name='backWalkLeft4.png' x='272' y='699' width='136' height='233'/>
+  <SubTexture name='backWalkLeft3.png' x='408' y='699' width='136' height='233'/>
+  <SubTexture name='backWalkLeft2.png' x='544' y='699' width='136' height='233'/>
+  <SubTexture name='backWalkLeft1.png' x='680' y='699' width='136' height='233'/>
+  <SubTexture name='backWalk4.png' x='0' y='932' width='136' height='233'/>
+  <SubTexture name='backWalk3.png' x='136' y='932' width='136' height='233'/>
+  <SubTexture name='backWalk2.png' x='272' y='932' width='136' height='233'/>
+  <SubTexture name='backWalk1.png' x='408' y='932' width='136' height='233'/>
+  <SubTexture name='backIdle4.png' x='544' y='932' width='136' height='233'/>
+  <SubTexture name='backIdle3.png' x='680' y='932' width='136' height='233'/>
+  <SubTexture name='backIdle2.png' x='0' y='1165' width='136' height='233'/>
+  <SubTexture name='backIdle1.png' x='136' y='1165' width='136' height='233'/>
+  <SubTexture name='backHit1.png' x='272' y='1165' width='136' height='233'/>
+</TextureAtlas>

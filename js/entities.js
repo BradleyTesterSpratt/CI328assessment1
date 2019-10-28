@@ -53,7 +53,7 @@ class EntityFactory {
     updateAllExists() {
         this.group.children.iterate(function (sprite) {
             if (sprite)
-                sprite.updateControls();
+                sprite.updateControls(20);
         })
     }
 
@@ -84,16 +84,16 @@ class EnemyControl extends Control {
 
 class World {
     constructor(game) {
-        this.bg = game.add.image(0, 0, 'background_img');
-        this.bg.setOrigin(0, 0);
+        // this.bg = game.add.image(0, 0, 'background_img');
+        // this.bg.setOrigin(0, 0);
 
         this.player = new Player();
         this.player.onDeath(gameOver);
 
-        this.bulletFactory = new EntityFactory('bullet_img');
-        this.enemyFactory = new EntityFactory('enemy_sp');
+        // this.bulletFactory = new EntityFactory('bullet_img');
+        // this.enemyFactory = new EntityFactory('enemy_sp');
         
-        this.numEnemies = 0;
+        // this.numEnemies = 0;
     }
 
     spawnEnemy(x, y) {
@@ -107,17 +107,17 @@ class World {
 
     update() {
         //  Scroll the background, reset it when it reaches the bottom
-        this.bg.y += 2;
+        // this.bg.y += 2;
 
-        if (this.bg.y >= 0) {
-            this.bg.y = -phaser.config.height;
-        }
-
-        this.enemyFactory.updateAllExists();
+        // if (this.bg.y >= 0) {
+        //     this.bg.y = -phaser.config.height;
+        // }
+        // this.player.updateWand(90);
+        // this.enemyFactory.updateAllExists();
     }
 
     cleanup() {
-        this.enemyFactory.destroyAllExists();
-        this.bulletFactory.destroyAllExists();
+        // this.enemyFactory.destroyAllExists();
+        // this.bulletFactory.destroyAllExists();
     }
 }
