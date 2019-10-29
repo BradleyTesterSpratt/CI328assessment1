@@ -62,34 +62,34 @@ class Player {
 
   updateWand(angle) {
     switch(true) {
-      case (-180 <= angle && angle <= -135):
+      case ((157 < angle && angle <= 180) || (-180 <= angle && angle <= -158)):
         this.sprites[1].setTexture('wand_sp', '270deg.png');
         break;
-      case (-135 < angle && angle <= -90):
+      case (-158 < angle && angle <= -113):
         this.sprites[1].setTexture('wand_sp', '315deg.png');
         break;
-      case (-90 < angle && angle < -60):
+      case (-113 < angle && angle < -90):
         this.sprites[1].setTexture('wand_sp', '350deg.png');
         break;
-      case (-60 <= angle && angle <= -30):
+      case (-90 <= angle && angle <= -67):
         this.sprites[1].setTexture('wand_sp', '010deg.png');
         break;
-      case (-30 < angle && angle <= 0):
+      case (-67 < angle && angle <= -22):
         this.sprites[1].setTexture('wand_sp', '045deg.png');
         break;
-      case (0 < angle && angle <= 50):
+      case (-22 < angle && angle <= 23):
         this.sprites[1].setTexture('wand_sp', '090deg.png');
         break;
-      case (50 < angle && angle <= 90):
+      case (23 < angle && angle <= 67):
         this.sprites[1].setTexture('wand_sp', '135deg.png');
         break;
-      case (90 < angle && angle <= 120):
+      case (67 < angle && angle <= 90):
         this.sprites[1].setTexture('wand_sp', '170deg.png');
         break;
-      case (120 < angle && angle <= 150):
+      case (90 < angle && angle <= 112):
         this.sprites[1].setTexture('wand_sp', '190deg.png');
         break;
-      case (150 < angle && angle <= 180):
+      case (112 < angle && angle <= 157):
         this.sprites[1].setTexture('wand_sp', '225deg.png');
         break;
       default:
