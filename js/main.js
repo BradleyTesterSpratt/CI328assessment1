@@ -42,7 +42,7 @@ function preload() {
 
     this.load.image('background_img', 'assets/gameBg.png');
     this.load.image('bullet_img', 'assets/bullet.png');
-    this.load.atlasXML('enemy_sp', 'assets/enemy512x512x16.png', 'assets/enemy512x512x16.xml');
+    this.load.atlasXML('class_one', 'assets/class_one.png', 'assets/class_one.xml');
     this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
     this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
     this.load.audio('intro', 'assets/audio/start.mp3');
@@ -187,7 +187,7 @@ function create() {
           prefix: 'backIdle',
           suffix: '.png',
           start: 1,
-          end: 1
+          end: 4
         })
       });
 
@@ -229,10 +229,10 @@ function resumeGameFromInput() {
     
 //     const x = Phaser.Math.Between(50, 150);
 
-//     // attempt to display a wave of 3 new enemies
-//     world.spawnEnemy(x, -50);
-//     world.spawnEnemy(170, -50);
-//     world.spawnEnemy(340 - x, -50);
+    // attempt to display a wave of 3 new enemies
+    // world.spawnEnemy(x, -50);
+    // world.spawnEnemy(170, -50);
+    // world.spawnEnemy(340 - x, -50);
 
 //     //audio.fly.play();
 // }

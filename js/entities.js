@@ -26,6 +26,7 @@ class EntityFactory {
             this.setUpEntity(sprite);
             
             sprite.setOrigin(0.5, 0.5);
+            sprite.setScale(0.05, 0.05);
             
             sprite.setVelocity(0, -250);
             this.nextBulletTime = game.time.now + 200;
@@ -91,7 +92,7 @@ class World {
         this.player.onDeath(gameOver);
 
         // this.bulletFactory = new EntityFactory('bullet_img');
-        // this.enemyFactory = new EntityFactory('enemy_sp');
+        this.enemyFactory = new EntityFactory('class_one');
         
         // this.numEnemies = 0;
     }
@@ -112,12 +113,11 @@ class World {
         // if (this.bg.y >= 0) {
         //     this.bg.y = -phaser.config.height;
         // }
-        // this.player.updateWand(90);
-        // this.enemyFactory.updateAllExists();
+        this.enemyFactory.updateAllExists();
     }
 
     cleanup() {
-        // this.enemyFactory.destroyAllExists();
+        this.enemyFactory.destroyAllExists();
         // this.bulletFactory.destroyAllExists();
     }
 }
