@@ -252,7 +252,6 @@ function startGame() {
 
 function update() {
     input.update();
-    world.player.updateWand(aimFromPlayerToPointer());
     world.update();
 }
 

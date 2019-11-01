@@ -10,10 +10,12 @@ class Player {
     this.facing = 0;
     this.sprites = [playerSprite, wandSprite]
     this.sprites[0].setDepth(10);
-    this.sprites[1].setDepth(20); 
+    this.sprites[1].setDepth(20);
+    this.moving = false; 
   }
     
   left() {
+    this.moving = true;
     this.sprites[0].x -= 5;
     this.sprites[1].x = this.sprites[0].x;
     if (this.facing == 0) {
@@ -25,6 +27,7 @@ class Player {
   }
 
   right() {
+    this.moving = true;
     this.sprites[0].x += 5;
     this.sprites[1].x = this.sprites[0].x;
     if (this.facing == 0) {
@@ -36,6 +39,7 @@ class Player {
   }
 
   up() {
+    this.moving = true;
     this.sprites[0].y -= 5;
     this.sprites[1].y = this.sprites[0].y;
     this.facing = 1;
@@ -44,6 +48,7 @@ class Player {
   }
 
   down() {
+    this.moving = true;
     this.sprites[0].y += 5;
     this.sprites[1].y = this.sprites[0].y;
     this.facing = 0;
@@ -58,6 +63,14 @@ class Player {
     else {
       this.sprites[0].anims.play('idleBack', true);
     }
+  }
+
+  update () {
+    if (this.moving == false) {
+      this.idle();
+    }
+    this.updateWand(aimFromPlayerToPointer()); 
+    this.moving = false;
   }
 
   updateWand(angle) {

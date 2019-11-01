@@ -108,7 +108,7 @@ class World {
     update() {
         //  Scroll the background, reset it when it reaches the bottom
         // this.bg.y += 2;
-
+        this.player.update();
         // if (this.bg.y >= 0) {
         //     this.bg.y = -phaser.config.height;
         // }
