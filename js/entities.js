@@ -89,10 +89,11 @@ class World {
         // this.bg.setOrigin(0, 0);
 
         this.player = new Player();
-        this.player.onDeath(gameOver);
+        // this.player.onDeath(gameOver);
+        this.tempEnemy = new TypeOne();
 
         // this.bulletFactory = new EntityFactory('bullet_img');
-        this.enemyFactory = new EntityFactory('class_one');
+        // this.enemyFactory = new EntityFactory('class_one');
         
         // this.numEnemies = 0;
     }
@@ -110,14 +111,15 @@ class World {
         //  Scroll the background, reset it when it reaches the bottom
         // this.bg.y += 2;
         this.player.update();
+        this.tempEnemy.update();
         // if (this.bg.y >= 0) {
         //     this.bg.y = -phaser.config.height;
         // }
-        this.enemyFactory.updateAllExists();
+        // this.enemyFactory.updateAllExists();
     }
 
     cleanup() {
-        this.enemyFactory.destroyAllExists();
+        // this.enemyFactory.destroyAllExists();
         // this.bulletFactory.destroyAllExists();
     }
 }

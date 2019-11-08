@@ -8,60 +8,63 @@ class Player {
     wandSprite.setScale(0.40, 0.40);
     wandSprite.setOrigin(0.5, 0.5);
     this.facing = 0;
-    this.sprites = [playerSprite, wandSprite]
-    this.sprites[0].setDepth(10);
-    this.sprites[1].setDepth(20);
+    this.playerBody = playerSprite;
+    this.playerWand = wandSprite;
+    this.playerBody.setDepth(10);
+    this.playerWand.setDepth(20);
     this.moving = false; 
+
+    this.scaleRatio = 0.0;
   }
     
   left() {
     this.moving = true;
-    this.sprites[0].x -= 5;
-    this.sprites[1].x = this.sprites[0].x;
+    this.playerBody.x -= 5;
+    this.playerWand.x = this.playerBody.x;
     if (this.facing == 0) {
-      this.sprites[0].anims.play('walkLeft', true);
+      this.playerBody.anims.play('walkLeft', true);
     }
     else {
-      this.sprites[0].anims.play('walkBackLeft', true);
+      this.playerBody.anims.play('walkBackLeft', true);
     }
   }
 
   right() {
     this.moving = true;
-    this.sprites[0].x += 5;
-    this.sprites[1].x = this.sprites[0].x;
+    this.playerBody.x += 5;
+    this.playerWand.x = this.playerBody.x;
     if (this.facing == 0) {
-      this.sprites[0].anims.play('walkRight', true);
+      this.playerBody.anims.play('walkRight', true);
     }
     else {
-      this.sprites[0].anims.play('walkBackRight', true);
+      this.playerBody.anims.play('walkBackRight', true);
     }
   }
 
   up() {
     this.moving = true;
-    this.sprites[0].y -= 5;
-    this.sprites[1].y = this.sprites[0].y;
+    this.playerBody.y -= 5;
+    this.playerWand.y = this.playerBody.y;
     this.facing = 1;
-    this.sprites[1].setDepth(5)
-    this.sprites[0].anims.play('walkBack', true);
+    this.playerWand.setDepth(5)
+    this.playerBody.anims.play('walkBack', true);
   }
 
   down() {
     this.moving = true;
-    this.sprites[0].y += 5;
-    this.sprites[1].y = this.sprites[0].y;
+    this.playerBody.y += 5;
+    this.playerWand.y = this.playerBody.y;
     this.facing = 0;
-    this.sprites[1].setDepth(20)
-    this.sprites[0].anims.play('walkForward', true);
+    this.playerWand.setDepth(20)
+    this.playerBody.anims.play('walkForward', true);
   }
 
   idle() {
     if (this.facing == 0) {
-      this.sprites[0].anims.play('idleForward', true);
+      this.playerBody.anims.play('idleForward', true);
     }
     else {
-      this.sprites[0].anims.play('idleBack', true);
+      this.playerBody.anims.play('idleBack', true);
     }
   }
 
@@ -71,42 +74,75 @@ class Player {
     }
     this.updateWand(aimFromPlayerToPointer()); 
     this.moving = false;
+
+    const playerBody = this.playerBody;
+
+    this.scaleRatio += 0.016;
+
+    if (this.scaleRatio >= 1.5) {
+      this.scaleRatio = 0.0;
+    }
+
+    let start = 0.5;
+    let end = 0.515;
+    let t = this.scaleRatio;
+    let tMax = 1.5;
+
+    playerBody.scaleX = start + (end - start) * this.interpolate(t / tMax);
+    // playerBody.scaleY = start + (end - start) * this.interpolate(t / tMax);
+  }
+
+  interpolate(ratio) {
+    return (ratio == 1.0) ? 1.0 : 1 - Math.pow(2.0, -10 * ratio);
+  
+    // if (ratio < 1/2.75) {
+    //     return 7.5625*ratio*ratio;
+    // } else if (ratio < 2/2.75) {
+    //     var r = ratio - 1.5/2.75;
+    //     return 7.5625*r*r+0.75;
+    // } else if (ratio < 2.5/2.75) {
+    //     var r = ratio-2.25/2.75;
+    //     return 7.5625*r*r+0.9375;
+    // } else {
+    //     var r = ratio - 2.625/2.75;
+    //     return 7.5625*r*r+0.984375;
+    // }
   }
 
   updateWand(angle) {
     switch(true) {
       case ((157 < angle && angle <= 180) || (-180 <= angle && angle <= -158)):
-        this.sprites[1].setTexture('wand_sp', '270deg.png');
+        this.playerWand.setTexture('wand_sp', '270deg.png');
         break;
       case (-158 < angle && angle <= -113):
-        this.sprites[1].setTexture('wand_sp', '315deg.png');
+        this.playerWand.setTexture('wand_sp', '315deg.png');
         break;
       case (-113 < angle && angle < -90):
-        this.sprites[1].setTexture('wand_sp', '350deg.png');
+        this.playerWand.setTexture('wand_sp', '350deg.png');
         break;
       case (-90 <= angle && angle <= -67):
-        this.sprites[1].setTexture('wand_sp', '010deg.png');
+        this.playerWand.setTexture('wand_sp', '010deg.png');
         break;
       case (-67 < angle && angle <= -22):
-        this.sprites[1].setTexture('wand_sp', '045deg.png');
+        this.playerWand.setTexture('wand_sp', '045deg.png');
         break;
       case (-22 < angle && angle <= 23):
-        this.sprites[1].setTexture('wand_sp', '090deg.png');
+        this.playerWand.setTexture('wand_sp', '090deg.png');
         break;
       case (23 < angle && angle <= 67):
-        this.sprites[1].setTexture('wand_sp', '135deg.png');
+        this.playerWand.setTexture('wand_sp', '135deg.png');
         break;
       case (67 < angle && angle <= 90):
-        this.sprites[1].setTexture('wand_sp', '170deg.png');
+        this.playerWand.setTexture('wand_sp', '170deg.png');
         break;
       case (90 < angle && angle <= 112):
-        this.sprites[1].setTexture('wand_sp', '190deg.png');
+        this.playerWand.setTexture('wand_sp', '190deg.png');
         break;
       case (112 < angle && angle <= 157):
-        this.sprites[1].setTexture('wand_sp', '225deg.png');
+        this.playerWand.setTexture('wand_sp', '225deg.png');
         break;
       default:
-        this.sprites[1].setTexture('wand_sp', '090deg.png');
+        this.playerWand.setTexture('wand_sp', '090deg.png');
     }
   }
 

@@ -42,7 +42,7 @@ function preload() {
 
     this.load.image('background_img', 'assets/gameBg.png');
     this.load.image('bullet_img', 'assets/bullet.png');
-    this.load.atlasXML('class_one', 'assets/class_one.png', 'assets/class_one.xml');
+    this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
     this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
     this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
     this.load.audio('intro', 'assets/audio/start.mp3');
@@ -76,6 +76,7 @@ function create() {
     //     audio.shoot.play();
     // });
 
+    //Player Animations
     this.anims.create(
       {
         key: 'walkLeft',
@@ -204,6 +205,85 @@ function create() {
         })
       });
 
+    //Physical Class One animations
+    this.anims.create(
+      {
+        key: 'physTypeOneWalkLeft',
+        repeat: -1,
+        frameRate: 5,
+        frames: this.anims.generateFrameNames('physTypeOne', {
+          prefix: 'side_walk_',
+          suffix: '.png',
+          start: 1,
+          end: 2
+        })
+      });
+
+    this.anims.create(
+      {
+        key: 'physTypeOneWalkRight',
+        repeat: -1,
+        frameRate: 5,
+        frames: this.anims.generateFrameNames('physTypeOne', {
+          prefix: 'right_walk_',
+          suffix: '.png',
+          start: 1,
+          end: 2
+        })
+      });
+
+    this.anims.create(
+      {
+        key: 'physTypeOneWalkBack',
+        repeat: -1,
+        frameRate: 5,
+        frames: this.anims.generateFrameNames('physTypeOne', {
+          prefix: 'back_walk_',
+          suffix: '.png',
+          start: 1,
+          end: 2
+        })
+      });
+
+    this.anims.create(
+      {
+        key: 'physTypeOneWalkForward',
+        repeat: -1,
+        frameRate: 5,
+        frames: this.anims.generateFrameNames('physTypeOne', {
+          prefix: 'front_walk_',
+          suffix: '.png',
+          start: 1,
+          end: 2
+        })
+      });
+
+    this.anims.create(
+      {
+        key: 'physTypeOneIdleForward',
+        repeat: -1,
+        frameRate: 5,
+        frames: this.anims.generateFrameNames('physTypeOne', {
+          prefix: 'front_stand_',
+          suffix: '.png',
+          start: 1,
+          end: 3
+        })
+      });
+
+    this.anims.create(
+      {
+        key: 'physTypeOneIdleBack',
+        repeat: -1,
+        frameRate: 5,
+        frames: this.anims.generateFrameNames('physTypeOne', {
+          prefix: 'back_stand_',
+          suffix: '.png',
+          start: 1,
+          end: 1
+        })
+      });
+
     // this.physics.add.overlap(world.bulletFactory.group, world.enemyFactory.group, onCollisionBulletEnemy);
     
     pauseGameForInput();
@@ -256,7 +336,7 @@ function update() {
 }
 
 function aimFromPlayerToPointer() {
-  playerSprite = world.player.sprites[0];
+  playerSprite = world.player.playerBody;
   radian = Phaser.Math.Angle.BetweenPoints(playerSprite, pointer.position);
   degrees = Phaser.Math.RadToDeg(radian);
   return (degrees);
