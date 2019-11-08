@@ -5,7 +5,7 @@ class Enemy {
     this.currentHP = this.maxHP;
     this.type = type;
     const enemySprite = game.physics.add.sprite(phaser.config.width / 2, phaser.config.height /2, sprite);
-    enemySprite.setScale(0.40, 0.40);
+    enemySprite.setScale(0.10, 0.10);
     enemySprite.setOrigin(0.5, 0.5);
     enemySprite.setCollideWorldBounds(physical);
     this.facing = 0;
