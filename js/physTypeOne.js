@@ -1,6 +1,6 @@
 class TypeOne extends Enemy {
   constructor() {
-    super('physTypeOne', 4, 10, 'physTypeOne', true)
+    super('physTypeOne', 4, 10, 'physTypeOne', true, 0.15)
     this.decisionDelay = 0.0;
     this.rand = parseInt(Math.random()*4);
   }
