@@ -7,6 +7,7 @@ class TypeOne extends Enemy {
 
   update(){
     this.decisionDelay += 0.016;
+    this.foo = bar;
     if (this.decisionDelay > 1) {
       this.rand = parseInt(Math.random()*4);    
       this.decisionDelay = 0.0;
