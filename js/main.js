@@ -8,7 +8,6 @@ let audio;
 
 function main() {
     console.log("main()");
-
     var config = {
         type: Phaser.AUTO,
         parent: 'my-game',
@@ -17,7 +16,7 @@ function main() {
         physics: {
             default: 'arcade',
             arcade: {
-                debug: false
+                debug: true
             }
         },
         scene: {
@@ -39,7 +38,6 @@ function preload() {
 
     game = this;
     game.score = 0;
-
     this.load.image('background_img', 'assets/gameBg.png');
     this.load.image('bullet_img', 'assets/bullet.png');
     this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
@@ -58,30 +56,17 @@ function preload() {
  * The assets have been loaded by this point.
  */
 function create() {
-    console.log("create()");
-
     world = new World(game);
-
     input = new Input();
     ui = new UI();
     audio = new Audio();
-    configureInput();
-    pointer = game.input.activePointer;
-    
-    createAnimation('walkLeft', -1, 5, 'buster_sp', 'frontWalkLeft');
-    createAnimation('walkRight', -1, 5, 'buster_sp', 'frontWalkRight');
-    createAnimation('walkForward', -1, 5, 'buster_sp', 'frontWalk');
-    createAnimation('idleForward', -1, 5, 'buster_sp', 'frontIdle');
-    createAnimation('hitForward', -1, 5, 'buster_sp', 'frontHit');
-    createAnimation('walkBackLeft', -1, 5, 'buster_sp', 'backWalkLeft');
-    createAnimation('walkBackRight', -1, 5, 'buster_sp', 'backWalkRight');
-    createAnimation('walkBack', -1, 5, 'buster_sp', 'backWalk');
-    createAnimation('idleBack', -1, 5, 'buster_sp', 'backIdle');
-    createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
-    generateGhostAnimation('physTypeOne')
 
-    // this.physics.add.overlap(world.bulletFactory.group, world.enemyFactory.group, onCollisionBulletEnemy);
-    this.physics.add.overlap(world.player, world.enemy)
+    animationSetUp();
+    configureInput();
+
+    pointer = game.input.activePointer;
+
+    this.physics.add.overlap(world.player.playerBody, world.tempEnemy.enemySprite, world.tempEnemy.slime);
     
     pauseGameForInput();
     
@@ -96,9 +81,9 @@ function pauseGameForInput() {
 
 function resumeGameFromInput() {
     ui.disableStartText();
-
     game.paused = false;
 }
+
 function createAnimation(key, repeat, frameRate, spriteSheet, animationName) {
   game.anims.create(
     {
@@ -129,6 +114,21 @@ function generateGhostAnimation(sprite)
   createAnimation(`${sprite}LeftHit`, -1, 5, sprite, 'side_hurt_')
   createAnimation(`${sprite}RightHit`, -1, 5, sprite, 'right_hurt_')
 }
+
+function animationSetUp()
+{
+  createAnimation('walkLeft', -1, 5, 'buster_sp', 'frontWalkLeft');
+  createAnimation('walkRight', -1, 5, 'buster_sp', 'frontWalkRight');
+  createAnimation('walkForward', -1, 5, 'buster_sp', 'frontWalk');
+  createAnimation('idleForward', -1, 5, 'buster_sp', 'frontIdle');
+  createAnimation('hitForward', -1, 5, 'buster_sp', 'frontHit');
+  createAnimation('walkBackLeft', -1, 5, 'buster_sp', 'backWalkLeft');
+  createAnimation('walkBackRight', -1, 5, 'buster_sp', 'backWalkRight');
+  createAnimation('walkBack', -1, 5, 'buster_sp', 'backWalk');
+  createAnimation('idleBack', -1, 5, 'buster_sp', 'backIdle');
+  createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
+  generateGhostAnimation('physTypeOne')
+}
 // function spawnEnemies() {
 //     if (world.numEnemies > 0)
 //         return;
@@ -157,8 +157,8 @@ function startGame() {
 }
 
 function update() {
-    input.update();
-    world.update();
+  input.update();
+  world.update();
 }
 
 function configureInput() {
@@ -178,20 +178,18 @@ function aimFromPlayerToPointer() {
   return (degrees);
 }
 
-function onCollisionPlayerEnemy(buster_sp, enemySprite) {
-    // buster_sp.entity.destroy();
-    // enemySprite.entity.destroy();
-    // audio.explode.play();
-}
+// function onCollisionPlayerEnemy(enemy, player) {
+//   enemy.splat();
+// }
 
-function onCollisionBulletEnemy(bulletSprite, enemySprite) {
-    bulletSprite.destroy();
-    enemySprite.destroy();
-    audio.explode.play();
+// function onCollisionBulletEnemy(bulletSprite, enemySprite) {
+//     bulletSprite.destroy();
+//     enemySprite.destroy();
+//     audio.explode.play();
 
-    world.numEnemies--;
-    setScore(game.score + 20);
-}
+//     world.numEnemies--;
+//     setScore(game.score + 20);
+// }
 
 function setScore(value) {
     game.score = value;

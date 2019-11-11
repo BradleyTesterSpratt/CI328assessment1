@@ -4,7 +4,7 @@ class Player {
     playerSprite.setScale(0.40, 0.40);
     playerSprite.setOrigin(0.5, 0.5);
     playerSprite.setCollideWorldBounds(true);
-    const wandSprite = game.physics.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp')
+    const wandSprite = game.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp')
     wandSprite.setScale(0.40, 0.40);
     wandSprite.setOrigin(0.5, 0.5);
     this.facing = 0;
@@ -13,7 +13,6 @@ class Player {
     this.playerBody.setDepth(10);
     this.playerWand.setDepth(20);
     this.moving = false; 
-
     this.scaleRatio = 0.0;
   }
     
@@ -88,26 +87,26 @@ class Player {
     let t = this.scaleRatio;
     let tMax = 1.5;
 
-    playerBody.scaleX = start + (end - start) * this.interpolate(t / tMax);
+    // playerBody.scaleX = start + (end - start) * this.interpolate(t / tMax);
     // playerBody.scaleY = start + (end - start) * this.interpolate(t / tMax);
   }
 
-  interpolate(ratio) {
-    return (ratio == 1.0) ? 1.0 : 1 - Math.pow(2.0, -10 * ratio);
+  // interpolate(ratio) {
+  //   return (ratio == 1.0) ? 1.0 : 1 - Math.pow(2.0, -10 * ratio);
   
-    // if (ratio < 1/2.75) {
-    //     return 7.5625*ratio*ratio;
-    // } else if (ratio < 2/2.75) {
-    //     var r = ratio - 1.5/2.75;
-    //     return 7.5625*r*r+0.75;
-    // } else if (ratio < 2.5/2.75) {
-    //     var r = ratio-2.25/2.75;
-    //     return 7.5625*r*r+0.9375;
-    // } else {
-    //     var r = ratio - 2.625/2.75;
-    //     return 7.5625*r*r+0.984375;
-    // }
-  }
+  //   // if (ratio < 1/2.75) {
+  //   //     return 7.5625*ratio*ratio;
+  //   // } else if (ratio < 2/2.75) {
+  //   //     var r = ratio - 1.5/2.75;
+  //   //     return 7.5625*r*r+0.75;
+  //   // } else if (ratio < 2.5/2.75) {
+  //   //     var r = ratio-2.25/2.75;
+  //   //     return 7.5625*r*r+0.9375;
+  //   // } else {
+  //   //     var r = ratio - 2.625/2.75;
+  //   //     return 7.5625*r*r+0.984375;
+  //   // }
+  // }
 
   updateWand(angle) {
     switch(true) {

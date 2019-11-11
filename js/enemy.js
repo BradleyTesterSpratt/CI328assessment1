@@ -12,7 +12,7 @@ class Enemy {
     //set depth to match player just in case it is necassary
     this.enemySprite = enemySprite
     this.enemySprite.setDepth(10);
-    this.moving = false; 
+    this.moving = false;
   }
 
   slime() {
