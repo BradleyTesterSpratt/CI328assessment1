@@ -65,226 +65,23 @@ function create() {
     input = new Input();
     ui = new UI();
     audio = new Audio();
+    configureInput();
     pointer = game.input.activePointer;
-
-    input.add(Phaser.Input.Keyboard.KeyCodes.A, function() { world.player.left(); });
-    input.add(Phaser.Input.Keyboard.KeyCodes.D, function() { world.player.right(); });
-    input.add(Phaser.Input.Keyboard.KeyCodes.W, function() { world.player.up(); });
-    input.add(Phaser.Input.Keyboard.KeyCodes.S, function() { world.player.down(); });
-    // input.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
-    //     world.spawnBullet(world.player.sprite.x, world.player.sprite.y);
-    //     audio.shoot.play();
-    // });
-
-    //Player Animations
-    this.anims.create(
-      {
-        key: 'walkLeft',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'frontWalkLeft',
-          suffix: '.png',
-          start: 1,
-          end: 5
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'walkRight',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'frontWalkRight',
-          suffix: '.png',
-          start: 1,
-          end: 5
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'walkForward',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'frontWalk',
-          suffix: '.png',
-          start: 1,
-          end: 2
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'idleForward',
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'frontIdle',
-          suffix: '.png',
-          start: 1,
-          end: 1
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'hitForward',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'frontHit',
-          suffix: '.png',
-          start: 1,
-          end: 1
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'walkBackLeft',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'backWalkLeft',
-          suffix: '.png',
-          start: 1,
-          end: 5
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'walkBackRight',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'backWalkRight',
-          suffix: '.png',
-          start: 1,
-          end: 5
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'walkBack',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'backWalk',
-          suffix: '.png',
-          start: 1,
-          end: 4
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'idleBack',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'backIdle',
-          suffix: '.png',
-          start: 1,
-          end: 4
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'hitBack',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('buster_sp', {
-          prefix: 'backHit',
-          suffix: '.png',
-          start: 1,
-          end: 1
-        })
-      });
-
-    //Physical Class One animations
-    this.anims.create(
-      {
-        key: 'physTypeOneWalkLeft',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('physTypeOne', {
-          prefix: 'side_walk_',
-          suffix: '.png',
-          start: 1,
-          end: 2
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'physTypeOneWalkRight',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('physTypeOne', {
-          prefix: 'right_walk_',
-          suffix: '.png',
-          start: 1,
-          end: 2
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'physTypeOneWalkBack',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('physTypeOne', {
-          prefix: 'back_walk_',
-          suffix: '.png',
-          start: 1,
-          end: 2
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'physTypeOneWalkForward',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('physTypeOne', {
-          prefix: 'front_walk_',
-          suffix: '.png',
-          start: 1,
-          end: 2
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'physTypeOneIdleForward',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('physTypeOne', {
-          prefix: 'front_stand_',
-          suffix: '.png',
-          start: 1,
-          end: 3
-        })
-      });
-
-    this.anims.create(
-      {
-        key: 'physTypeOneIdleBack',
-        repeat: -1,
-        frameRate: 5,
-        frames: this.anims.generateFrameNames('physTypeOne', {
-          prefix: 'back_stand_',
-          suffix: '.png',
-          start: 1,
-          end: 1
-        })
-      });
+    
+    createAnimation('walkLeft', -1, 5, 'buster_sp', 'frontWalkLeft');
+    createAnimation('walkRight', -1, 5, 'buster_sp', 'frontWalkRight');
+    createAnimation('walkForward', -1, 5, 'buster_sp', 'frontWalk');
+    createAnimation('idleForward', -1, 5, 'buster_sp', 'frontIdle');
+    createAnimation('hitForward', -1, 5, 'buster_sp', 'frontHit');
+    createAnimation('walkBackLeft', -1, 5, 'buster_sp', 'backWalkLeft');
+    createAnimation('walkBackRight', -1, 5, 'buster_sp', 'backWalkRight');
+    createAnimation('walkBack', -1, 5, 'buster_sp', 'backWalk');
+    createAnimation('idleBack', -1, 5, 'buster_sp', 'backIdle');
+    createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
+    generateGhostAnimation('physTypeOne')
 
     // this.physics.add.overlap(world.bulletFactory.group, world.enemyFactory.group, onCollisionBulletEnemy);
+    this.physics.add.overlap(world.player, world.enemy)
     
     pauseGameForInput();
     
@@ -302,7 +99,36 @@ function resumeGameFromInput() {
 
     game.paused = false;
 }
+function createAnimation(key, repeat, frameRate, spriteSheet, animationName) {
+  game.anims.create(
+    {
+      key: key,
+      repeat: repeat,
+      frameRate: frameRate,
+      frames: game.anims.generateFrameNames(spriteSheet, {
+        prefix: animationName,
+        suffix: '.png',
+        //phaser3 will only load sprites it finds, so using 1-999 means it will catch all
+        start: 1,
+        end: 999
+      })
+    });
+}
 
+function generateGhostAnimation(sprite)
+{
+  createAnimation(`${sprite}WalkLeft`, -1, 5, sprite, 'side_walk_')
+  createAnimation(`${sprite}WalkRight`, -1, 5, sprite, 'right_walk_')
+  createAnimation(`${sprite}WalkBackLeft`, -1, 5, sprite, 'back_side_walk_')
+  createAnimation(`${sprite}WalkBackRight`, -1, 5, sprite, 'back_right_walk_')
+  createAnimation(`${sprite}WalkBack`, -1, 5, sprite, 'back_walk_')
+  createAnimation(`${sprite}WalkForward`, -1, 5, sprite, 'front_walk_')
+  createAnimation(`${sprite}IdleForward`, -1, 5, sprite, 'front_stand_')
+  createAnimation(`${sprite}IdleBack`, -1, 5, sprite, 'back_stand_')
+  createAnimation(`${sprite}Hit`, -1, 5, sprite, 'front_hurt_')
+  createAnimation(`${sprite}LeftHit`, -1, 5, sprite, 'side_hurt_')
+  createAnimation(`${sprite}RightHit`, -1, 5, sprite, 'right_hurt_')
+}
 // function spawnEnemies() {
 //     if (world.numEnemies > 0)
 //         return;
@@ -335,6 +161,16 @@ function update() {
     world.update();
 }
 
+function configureInput() {
+  input.add(Phaser.Input.Keyboard.KeyCodes.A, function() { world.player.left(); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.D, function() { world.player.right(); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.W, function() { world.player.up(); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.S, function() { world.player.down(); });
+  // input.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
+  //     world.spawnBullet(world.player.sprite.x, world.player.sprite.y);
+  //     audio.shoot.play();
+  // });
+}
 function aimFromPlayerToPointer() {
   playerSprite = world.player.playerBody;
   radian = Phaser.Math.Angle.BetweenPoints(playerSprite, pointer.position);
@@ -343,9 +179,9 @@ function aimFromPlayerToPointer() {
 }
 
 function onCollisionPlayerEnemy(buster_sp, enemySprite) {
-    buster_sp.entity.destroy();
-    enemySprite.entity.destroy();
-    audio.explode.play();
+    // buster_sp.entity.destroy();
+    // enemySprite.entity.destroy();
+    // audio.explode.play();
 }
 
 function onCollisionBulletEnemy(bulletSprite, enemySprite) {

@@ -26,23 +26,31 @@ class Enemy {
   left() {
     this.moving = true;
     this.enemySprite.x -= this.speed;
-    // if (this.facing == 0) {
+    if (this.facing == 1) {
+      try {
+        this.enemySprite.anims.play(`${this.type}WalkBackLeft`, true);
+      }
+      catch(err) {
+        this.enemySprite.anims.play(`${this.type}WalkLeft`, true);
+      }
+    } else {
       this.enemySprite.anims.play(`${this.type}WalkLeft`, true);
-    // }
-    // else {
-      // this.enemySprite.anims.play(`${this.type}WalkBackLeft`, true);
-    // }
+    }
   }
 
   right() {
     this.moving = true;
     this.enemySprite.x += this.speed;
-    // if (this.facing == 0) {
+    if (this.facing == 1) {
+      try {
+        this.enemySprite.anims.play(`${this.type}WalkBackRight`, true);
+      }
+      catch(err) {
+        this.enemySprite.anims.play(`${this.type}WalkRight`, true);
+      }
+    } else {
       this.enemySprite.anims.play(`${this.type}WalkRight`, true);
-    // }
-    // else {
-      // this.enemySprite.anims.play(`${this.type}WalkBackRight`, true);
-    // }
+    }
   }
 
   up() {
