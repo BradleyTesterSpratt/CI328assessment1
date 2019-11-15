@@ -4,7 +4,7 @@ class Enemy {
     this.maxHP = hitPoints;
     this.currentHP = this.maxHP;
     this.type = type;
-    const enemySprite = game.physics.add.sprite(phaser.config.width / 2, phaser.config.height /2, sprite);
+    const enemySprite = game.physics.add.sprite(phaser.config.width /3, phaser.config.height /3, sprite);
     enemySprite.setScale(scale, scale);
     enemySprite.setOrigin(0.5, 0.5);
     enemySprite.setCollideWorldBounds(physical);
@@ -13,10 +13,15 @@ class Enemy {
     this.enemySprite = enemySprite
     this.enemySprite.setDepth(10);
     this.moving = false;
+    this.enemySprite.enemy = this;
   }
 
   slime() {
     //action when it hits a player
+  }
+
+  getSpeed() { 
+    return this.speed;
   }
 
   onDeath(callback) {

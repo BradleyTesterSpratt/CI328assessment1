@@ -40,6 +40,7 @@ function preload() {
     game.score = 0;
     this.load.image('background_img', 'assets/gameBg.png');
     this.load.image('bullet_img', 'assets/bullet.png');
+    this.load.image('slime1', 'assets/slime1.png');
     this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
     this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
     this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
@@ -66,7 +67,7 @@ function create() {
 
     pointer = game.input.activePointer;
 
-    this.physics.add.overlap(world.player.playerBody, world.tempEnemy.enemySprite, world.tempEnemy.slime);
+    this.physics.add.overlap(world.player.playerBody, world.tempEnemy.enemySprite, onCollisionPlayerEnemy);
     
     pauseGameForInput();
     
@@ -178,9 +179,10 @@ function aimFromPlayerToPointer() {
   return (degrees);
 }
 
-// function onCollisionPlayerEnemy(enemy, player) {
-//   enemy.splat();
-// }
+function onCollisionPlayerEnemy(playerBody, enemyBody) {
+  slimeInfo = enemyBody.enemy.slime();
+  playerBody.player.slime(slimeInfo);
+}
 
 // function onCollisionBulletEnemy(bulletSprite, enemySprite) {
 //     bulletSprite.destroy();

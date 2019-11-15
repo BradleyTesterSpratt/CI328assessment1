@@ -14,11 +14,42 @@ class Player {
     this.playerWand.setDepth(20);
     this.moving = false; 
     this.scaleRatio = 0.0;
+    this.playerBody.player = this;
+    this.baseSpeed = 5;
+    this.speed = 5;
+    this.currentSlimes = [];
+    this.slime = this.collideGhost.bind(this);
+    this.hasCollided = false;
+    this.decisionDelay = 0.0;
+
   }
-    
+  
+  collideGhost(array) {
+    if (this.hasCollided == false) {
+      if (array[1] == 'speed') {
+        let slimeSprite = game.physics.add.image(this.playerBody.x, this.playerBody.y, 'slime1')
+        slimeSprite.setDepth(11);
+        slimeSprite.setScale(0.4,0.4);
+        slimeSprite.tint = 0x936999;
+        this.speed = this.speed/2;
+        this.currentSlimes.push([slimeSprite, 'speed']);
+        game.time.scene.time.delayedCall(6000, this.cleanSlime, [], this);
+      }
+    }
+    this.hasCollided = true;
+  }
+
+  cleanSlime() {
+    if (this.currentSlimes[0][1] == 'speed') {
+      this.currentSlimes[0][0].destroy();
+      this.currentSlimes.shift();
+      this.speed = this.baseSpeed;
+    }
+  }
+
   left() {
     this.moving = true;
-    this.playerBody.x -= 5;
+    this.playerBody.x -= this.speed;
     this.playerWand.x = this.playerBody.x;
     if (this.facing == 0) {
       this.playerBody.anims.play('walkLeft', true);
@@ -30,7 +61,7 @@ class Player {
 
   right() {
     this.moving = true;
-    this.playerBody.x += 5;
+    this.playerBody.x += this.speed;
     this.playerWand.x = this.playerBody.x;
     if (this.facing == 0) {
       this.playerBody.anims.play('walkRight', true);
@@ -42,7 +73,7 @@ class Player {
 
   up() {
     this.moving = true;
-    this.playerBody.y -= 5;
+    this.playerBody.y -= this.speed;
     this.playerWand.y = this.playerBody.y;
     this.facing = 1;
     this.playerWand.setDepth(5)
@@ -51,7 +82,7 @@ class Player {
 
   down() {
     this.moving = true;
-    this.playerBody.y += 5;
+    this.playerBody.y += this.speed;
     this.playerWand.y = this.playerBody.y;
     this.facing = 0;
     this.playerWand.setDepth(20)
@@ -67,14 +98,29 @@ class Player {
     }
   }
 
+  // updateSlimePosition() {
+  //   slime.x = this.playerBody.x;
+  //   slime.y = this.playerBody.y;
+  // }
+
   update () {
+
+    var i;
+    for (i = 0; i < this.currentSlimes.length; i++) {
+      let slime = this.currentSlimes[i][0];
+      slime.x = this.playerBody.x;
+      slime.y = this.playerBody.y;
+    }   
+    this.decisionDelay += 0.016;
+    if (this.decisionDelay > 1) {
+      if (this.hasCollided == true) { this.hasCollided = false };
+      this.decisionDelay = 0.0;
+    }
     if (this.moving == false) {
       this.idle();
     }
     this.updateWand(aimFromPlayerToPointer()); 
     this.moving = false;
-
-    const playerBody = this.playerBody;
 
     this.scaleRatio += 0.016;
 
@@ -82,10 +128,10 @@ class Player {
       this.scaleRatio = 0.0;
     }
 
-    let start = 0.5;
-    let end = 0.515;
-    let t = this.scaleRatio;
-    let tMax = 1.5;
+    // let start = 0.5;
+    // let end = 0.515;
+    // let t = this.scaleRatio;
+    // let tMax = 1.5;
 
     // playerBody.scaleX = start + (end - start) * this.interpolate(t / tMax);
     // playerBody.scaleY = start + (end - start) * this.interpolate(t / tMax);
