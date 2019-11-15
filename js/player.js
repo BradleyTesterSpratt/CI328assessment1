@@ -4,7 +4,7 @@ class Player {
     playerSprite.setScale(0.40, 0.40);
     playerSprite.setOrigin(0.5, 0.5);
     playerSprite.setCollideWorldBounds(true);
-    const wandSprite = game.physics.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp')
+    const wandSprite = game.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp')
     wandSprite.setScale(0.40, 0.40);
     wandSprite.setOrigin(0.5, 0.5);
     this.facing = 0;
@@ -13,13 +13,43 @@ class Player {
     this.playerBody.setDepth(10);
     this.playerWand.setDepth(20);
     this.moving = false; 
-
     this.scaleRatio = 0.0;
+    this.playerBody.player = this;
+    this.baseSpeed = 5;
+    this.speed = 5;
+    this.currentSlimes = [];
+    this.slime = this.collideGhost.bind(this);
+    this.hasCollided = false;
+    this.decisionDelay = 0.0;
+
   }
-    
+  
+  collideGhost(array) {
+    if (this.hasCollided == false) {
+      if (array[1] == 'speed') {
+        let slimeSprite = game.physics.add.image(this.playerBody.x, this.playerBody.y, 'slime1')
+        slimeSprite.setDepth(11);
+        slimeSprite.setScale(0.4,0.4);
+        slimeSprite.tint = 0x936999;
+        this.speed = this.speed/2;
+        this.currentSlimes.push([slimeSprite, 'speed']);
+        game.time.scene.time.delayedCall(6000, this.cleanSlime, [], this);
+      }
+    }
+    this.hasCollided = true;
+  }
+
+  cleanSlime() {
+    if (this.currentSlimes[0][1] == 'speed') {
+      this.currentSlimes[0][0].destroy();
+      this.currentSlimes.shift();
+      this.speed = this.baseSpeed;
+    }
+  }
+
   left() {
     this.moving = true;
-    this.playerBody.x -= 5;
+    this.playerBody.x -= this.speed;
     this.playerWand.x = this.playerBody.x;
     if (this.facing == 0) {
       this.playerBody.anims.play('walkLeft', true);
@@ -31,7 +61,7 @@ class Player {
 
   right() {
     this.moving = true;
-    this.playerBody.x += 5;
+    this.playerBody.x += this.speed;
     this.playerWand.x = this.playerBody.x;
     if (this.facing == 0) {
       this.playerBody.anims.play('walkRight', true);
@@ -43,7 +73,7 @@ class Player {
 
   up() {
     this.moving = true;
-    this.playerBody.y -= 5;
+    this.playerBody.y -= this.speed;
     this.playerWand.y = this.playerBody.y;
     this.facing = 1;
     this.playerWand.setDepth(5)
@@ -52,7 +82,7 @@ class Player {
 
   down() {
     this.moving = true;
-    this.playerBody.y += 5;
+    this.playerBody.y += this.speed;
     this.playerWand.y = this.playerBody.y;
     this.facing = 0;
     this.playerWand.setDepth(20)
@@ -68,14 +98,29 @@ class Player {
     }
   }
 
+  // updateSlimePosition() {
+  //   slime.x = this.playerBody.x;
+  //   slime.y = this.playerBody.y;
+  // }
+
   update () {
+
+    var i;
+    for (i = 0; i < this.currentSlimes.length; i++) {
+      let slime = this.currentSlimes[i][0];
+      slime.x = this.playerBody.x;
+      slime.y = this.playerBody.y;
+    }   
+    this.decisionDelay += 0.016;
+    if (this.decisionDelay > 1) {
+      if (this.hasCollided == true) { this.hasCollided = false };
+      this.decisionDelay = 0.0;
+    }
     if (this.moving == false) {
       this.idle();
     }
     this.updateWand(aimFromPlayerToPointer()); 
     this.moving = false;
-
-    const playerBody = this.playerBody;
 
     this.scaleRatio += 0.016;
 
@@ -83,31 +128,31 @@ class Player {
       this.scaleRatio = 0.0;
     }
 
-    let start = 0.5;
-    let end = 0.515;
-    let t = this.scaleRatio;
-    let tMax = 1.5;
+    // let start = 0.5;
+    // let end = 0.515;
+    // let t = this.scaleRatio;
+    // let tMax = 1.5;
 
-    playerBody.scaleX = start + (end - start) * this.interpolate(t / tMax);
+    // playerBody.scaleX = start + (end - start) * this.interpolate(t / tMax);
     // playerBody.scaleY = start + (end - start) * this.interpolate(t / tMax);
   }
 
-  interpolate(ratio) {
-    return (ratio == 1.0) ? 1.0 : 1 - Math.pow(2.0, -10 * ratio);
+  // interpolate(ratio) {
+  //   return (ratio == 1.0) ? 1.0 : 1 - Math.pow(2.0, -10 * ratio);
   
-    // if (ratio < 1/2.75) {
-    //     return 7.5625*ratio*ratio;
-    // } else if (ratio < 2/2.75) {
-    //     var r = ratio - 1.5/2.75;
-    //     return 7.5625*r*r+0.75;
-    // } else if (ratio < 2.5/2.75) {
-    //     var r = ratio-2.25/2.75;
-    //     return 7.5625*r*r+0.9375;
-    // } else {
-    //     var r = ratio - 2.625/2.75;
-    //     return 7.5625*r*r+0.984375;
-    // }
-  }
+  //   // if (ratio < 1/2.75) {
+  //   //     return 7.5625*ratio*ratio;
+  //   // } else if (ratio < 2/2.75) {
+  //   //     var r = ratio - 1.5/2.75;
+  //   //     return 7.5625*r*r+0.75;
+  //   // } else if (ratio < 2.5/2.75) {
+  //   //     var r = ratio-2.25/2.75;
+  //   //     return 7.5625*r*r+0.9375;
+  //   // } else {
+  //   //     var r = ratio - 2.625/2.75;
+  //   //     return 7.5625*r*r+0.984375;
+  //   // }
+  // }
 
   updateWand(angle) {
     switch(true) {

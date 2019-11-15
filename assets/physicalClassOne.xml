@@ -3,7 +3,7 @@
   <SubTexture name='right_walk_1.png' x='428' y='0' width='428' height='520'/>
   <SubTexture name='side_walk_2.png' x='856' y='0' width='428' height='520'/>
   <SubTexture name='side_walk_1.png' x='1284' y='0' width='428' height='520'/>
-  <SubTexture name='right_side_hurt.png' x='0' y='520' width='450' height='515'/>
+  <SubTexture name='right_hurt.png' x='0' y='520' width='450' height='515'/>
   <SubTexture name='side_hurt.png' x='450' y='520' width='450' height='515'/>
   <SubTexture name='back_walk_2.png' x='900' y='520' width='636' height='520'/>
   <SubTexture name='back_walk_1.png' x='1536' y='520' width='636' height='520'/>

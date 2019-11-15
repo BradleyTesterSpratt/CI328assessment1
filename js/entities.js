@@ -98,23 +98,23 @@ class World {
         // this.numEnemies = 0;
     }
 
-    spawnEnemy(x, y) {
-        this.enemyFactory.spawnAsEnemy(x, y);
-        this.numEnemies++;
-    }
+    // spawnEnemy(x, y) {
+    //     this.enemyFactory.spawnAsEnemy(x, y);
+    //     this.numEnemies++;
+    // }
 
-    spawnBullet(x, y) {
-        this.bulletFactory.spawnAsBullet(x, y);
-    }
+    // spawnBullet(x, y) {
+    //     this.bulletFactory.spawnAsBullet(x, y);
+    // }
 
     update() {
         //  Scroll the background, reset it when it reaches the bottom
         // this.bg.y += 2;
-        this.player.update();
-        this.tempEnemy.update();
         // if (this.bg.y >= 0) {
         //     this.bg.y = -phaser.config.height;
         // }
+        this.tempEnemy.update();
+        this.player.update();
         // this.enemyFactory.updateAllExists();
     }
 
