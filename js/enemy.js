@@ -14,10 +14,19 @@ class Enemy {
     this.enemySprite.setDepth(10);
     this.moving = false;
     this.enemySprite.enemy = this;
+    this.slime = this.collidePlayer.bind(this);
   }
 
   slime() {
     //action when it hits a player
+  }
+
+  collidePlayer() {
+    if (this.hasCollided == false) {
+      this.speed = this.escapeSpeed;
+      return [this.slimeColour, this.slimeStat]; 
+    }
+    this.hasCollided = true;
   }
 
   getSpeed() { 

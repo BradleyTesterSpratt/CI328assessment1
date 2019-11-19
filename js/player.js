@@ -4,7 +4,7 @@ class Player {
     playerSprite.setScale(0.40, 0.40);
     playerSprite.setOrigin(0.5, 0.5);
     playerSprite.setCollideWorldBounds(true);
-    const wandSprite = game.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp')
+    const wandSprite = game.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp');
     wandSprite.setScale(0.40, 0.40);
     wandSprite.setOrigin(0.5, 0.5);
     this.facing = 0;
@@ -21,18 +21,22 @@ class Player {
     this.slime = this.collideGhost.bind(this);
     this.hasCollided = false;
     this.decisionDelay = 0.0;
-
+    const firstSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'firstSlime');
+    firstSlime.setDepth(11);
+    firstSlime.setScale(0.4, 0.4);
+    this.firstSlime = firstSlime;
+    this.firstSlime.visible = false
   }
-  
+
   collideGhost(array) {
     if (this.hasCollided == false) {
       if (array[1] == 'speed') {
-        let slimeSprite = game.physics.add.image(this.playerBody.x, this.playerBody.y, 'slime1')
-        slimeSprite.setDepth(11);
-        slimeSprite.setScale(0.4,0.4);
-        slimeSprite.tint = 0x936999;
+        this.firstSlime.tint = 0x936999;
+        this.firstSlime.anims.play('slimeDripA', true);
+
+        this.firstSlime.visible = true;
         this.speed = this.speed/2;
-        this.currentSlimes.push([slimeSprite, 'speed']);
+        this.currentSlimes.push([this.firstSlime, 'speed']);
         game.time.scene.time.delayedCall(6000, this.cleanSlime, [], this);
       }
     }
@@ -41,7 +45,7 @@ class Player {
 
   cleanSlime() {
     if (this.currentSlimes[0][1] == 'speed') {
-      this.currentSlimes[0][0].destroy();
+      this.currentSlimes[0][0].visible = false;
       this.currentSlimes.shift();
       this.speed = this.baseSpeed;
     }
