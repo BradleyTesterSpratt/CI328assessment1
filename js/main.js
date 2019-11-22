@@ -61,17 +61,27 @@ function create() {
     input = new Input();
     ui = new UI();
     audio = new Audio();
-
+    player = world.player;
     animationSetUp();
     configureInput();
-
     pointer = game.input.activePointer;
-
-    this.physics.add.overlap(world.player.playerBody, world.tempEnemy.enemySprite, onCollisionPlayerEnemy);
-    
+    this.physics.add.overlap(player.playerBody, world.tempEnemy.enemySprite, onCollisionPlayerEnemy);
     pauseGameForInput();
-    
     game.input.on('pointerdown', startGame);
+
+    path = { t: 0, vec: new Phaser.Math.Vector2() };
+    // this.tweens.add({
+    //   targets: path,
+    //   t: 1,
+    //   ease: 'Sine.easeInOut',
+    //   duration: 2000,
+    //   yoyo: true,
+    //   repeat: -1
+    // });
+
+    stream1 = this.add.graphics();
+    stream2 = this.add.graphics();
+    stream3 = this.add.graphics();
 }
 
 function pauseGameForInput() {
@@ -158,9 +168,42 @@ function startGame() {
     resumeGameFromInput();
 }
 
+function addStreamPoints(curve, noOfPoints) {
+  array = curve;
+  array = array.getDistancePoints(noOfPoints);
+  i = 0;
+  for (i = 0; i < array.length; i++) {
+    random = (Math.floor((Math.random()*5)+1));
+    plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+    random = random * plusOrMinus;
+    array[i].x = array[i].x + random;
+    random = (Math.floor((Math.random()*5)+1));
+    random = random * plusOrMinus;
+    array[i].y = array[i].y + random;
+  }
+  return array;
+}
+
+function drawStream(noOfPoints, thickness, graphics, colour) {
+  curve = new Phaser.Curves.Spline(
+    [
+      player.wandEndX, player.wandEndY,
+      pointer.position.x, pointer.position.y
+    ]
+  );
+  curve.points = addStreamPoints(curve, noOfPoints);
+  graphics.clear();
+  graphics.lineStyle(thickness, colour, 1);
+  curve.draw(graphics, 64);
+  curve.getPoint(path.t, path.vec);
+}
+
 function update() {
   input.update();
   world.update();
+  drawStream(20, 2, stream1, 0xffffff);
+  drawStream(4, 3, stream2, 0xffff00);
+  drawStream(30, 2, stream3, 0xff0000);
 }
 
 function configureInput() {

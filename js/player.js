@@ -26,6 +26,10 @@ class Player {
     firstSlime.setScale(0.4, 0.4);
     this.firstSlime = firstSlime;
     this.firstSlime.visible = false
+    this.wandEndX = 0;
+    this.wandEndY = 0;
+    this.wandOffsetX = 0;
+    this.wandOffsetY = 0;
   }
 
   collideGhost(array) {
@@ -108,7 +112,6 @@ class Player {
   // }
 
   update () {
-
     var i;
     for (i = 0; i < this.currentSlimes.length; i++) {
       let slime = this.currentSlimes[i][0];
@@ -123,7 +126,9 @@ class Player {
     if (this.moving == false) {
       this.idle();
     }
-    this.updateWand(aimFromPlayerToPointer()); 
+    this.updateWand(aimFromPlayerToPointer());
+    this.wandEndX = this.playerBody.x + this.wandOffsetX;
+    this.wandEndY = this.playerBody.y + this.wandOffsetY;
     this.moving = false;
 
     this.scaleRatio += 0.016;
@@ -162,33 +167,53 @@ class Player {
     switch(true) {
       case ((157 < angle && angle <= 180) || (-180 <= angle && angle <= -158)):
         this.playerWand.setTexture('wand_sp', '270deg.png');
+        this.wandOffsetX = -35;
+        this.wandOffsetY = -2;
         break;
       case (-158 < angle && angle <= -113):
         this.playerWand.setTexture('wand_sp', '315deg.png');
+        this.wandOffsetX = -35;
+        this.wandOffsetY = -22;
         break;
       case (-113 < angle && angle < -90):
         this.playerWand.setTexture('wand_sp', '350deg.png');
+        this.wandOffsetX = -15;
+        this.wandOffsetY = -35;
         break;
       case (-90 <= angle && angle <= -67):
         this.playerWand.setTexture('wand_sp', '010deg.png');
+        this.wandOffsetX = 27;
+        this.wandOffsetY = -35;
         break;
       case (-67 < angle && angle <= -22):
         this.playerWand.setTexture('wand_sp', '045deg.png');
+        this.wandOffsetX = 37;
+        this.wandOffsetY = 2;
         break;
       case (-22 < angle && angle <= 23):
         this.playerWand.setTexture('wand_sp', '090deg.png');
+        this.wandOffsetX = 40;
+        this.wandOffsetY = 25;
         break;
       case (23 < angle && angle <= 67):
         this.playerWand.setTexture('wand_sp', '135deg.png');
+        this.wandOffsetX = 32;
+        this.wandOffsetY = 37;
         break;
       case (67 < angle && angle <= 90):
         this.playerWand.setTexture('wand_sp', '170deg.png');
+        this.wandOffsetX = 10;
+        this.wandOffsetY = 40;
         break;
       case (90 < angle && angle <= 112):
         this.playerWand.setTexture('wand_sp', '190deg.png');
+        this.wandOffsetX = -17;
+        this.wandOffsetY = 40;
         break;
       case (112 < angle && angle <= 157):
         this.playerWand.setTexture('wand_sp', '225deg.png');
+        this.wandOffsetX = -27;
+        this.wandOffsetY = 35;
         break;
       default:
         this.playerWand.setTexture('wand_sp', '090deg.png');
