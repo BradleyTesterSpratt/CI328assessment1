@@ -1,5 +1,6 @@
 class Enemy {
-  constructor(sprite, speed, hitPoints, type, physical, scale) {
+  constructor(sprite, speed, escapeSpeed, hitPoints, type, physical, scale) {
+    this.baseSpeed = speed;
     this.speed = speed;
     this.maxHP = hitPoints;
     this.currentHP = this.maxHP;
@@ -14,14 +15,17 @@ class Enemy {
     this.enemySprite.setDepth(10);
     this.moving = false;
     this.enemySprite.enemy = this;
+    this.slime = this.collidePlayer.bind(this);
+    this.escapeSpeed = escapeSpeed;
   }
 
-  slime() {
-    //action when it hits a player
-  }
-
-  getSpeed() { 
-    return this.speed;
+  collidePlayer() {
+    if (this.hasCollided == false) {
+      this.speed = this.escapeSpeed;
+      this.enemySprite.alpha = 0.5;
+      return [this.slimeColour, this.slimeStat]; 
+    }
+    this.hasCollided = true;
   }
 
   onDeath(callback) {
@@ -82,7 +86,10 @@ class Enemy {
   }
 
   update() {
-    //enemy behaviour goes here
-  }
+    this.speed -= 0.05;
+    if (this.speed < this.baseSpeed) {
+      this.enemySprite.alpha = 1.0;
+      this.speed = this.baseSpeed;
+    }  }
 }
 
