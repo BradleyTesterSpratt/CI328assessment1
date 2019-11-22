@@ -128,7 +128,7 @@ function animationSetUp()
   createAnimation('walkBack', -1, 5, 'buster_sp', 'backWalk');
   createAnimation('idleBack', -1, 5, 'buster_sp', 'backIdle');
   createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
-  createAnimation('slimeDripA', -1, 5, 'firstSlime', 'drip');
+  createAnimation('slimeDripA', -1, 2, 'firstSlime', 'drip');
   generateGhostAnimation('physTypeOne')
 }
 // function spawnEnemies() {
