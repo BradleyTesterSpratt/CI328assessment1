@@ -30,6 +30,7 @@ class Player {
     this.wandEndY = 0;
     this.wandOffsetX = 0;
     this.wandOffsetY = 0;
+    this.firing = false;
   }
 
   collideGhost(array) {
@@ -121,6 +122,7 @@ class Player {
     this.decisionDelay += 0.016;
     if (this.decisionDelay > 1) {
       if (this.hasCollided == true) { this.hasCollided = false };
+      if (this.firing == true) { this.firing = false };
       this.decisionDelay = 0.0;
     }
     if (this.moving == false) {
@@ -131,11 +133,11 @@ class Player {
     this.wandEndY = this.playerBody.y + this.wandOffsetY;
     this.moving = false;
 
-    this.scaleRatio += 0.016;
+    // this.scaleRatio += 0.016;
 
-    if (this.scaleRatio >= 1.5) {
-      this.scaleRatio = 0.0;
-    }
+    // if (this.scaleRatio >= 1.5) {
+    //   this.scaleRatio = 0.0;
+    // }
 
     // let start = 0.5;
     // let end = 0.515;

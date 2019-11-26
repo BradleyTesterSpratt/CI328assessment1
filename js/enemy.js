@@ -8,7 +8,7 @@ class Enemy {
     const enemySprite = game.physics.add.sprite(phaser.config.width /3, phaser.config.height /3, sprite);
     enemySprite.setScale(scale, scale);
     enemySprite.setOrigin(0.5, 0.5);
-    enemySprite.setCollideWorldBounds(physical);
+    this.physical = physical;
     this.facing = 0;
     //set depth to match player just in case it is necassary
     this.enemySprite = enemySprite
@@ -16,7 +16,13 @@ class Enemy {
     this.moving = false;
     this.enemySprite.enemy = this;
     this.slime = this.collidePlayer.bind(this);
+    this.leash = this.collideBullet.bind(this);
     this.escapeSpeed = escapeSpeed;
+    this.isLeashed = false;
+  }
+
+  collideBullet() {
+    this.isLeashed = true;
   }
 
   collidePlayer() {
@@ -33,6 +39,7 @@ class Enemy {
   }
 
   left() {
+    if (this.isLeashed) {return this.hurt()};
     this.moving = true;
     this.enemySprite.x -= this.speed;
     if (this.facing == 1) {
@@ -50,6 +57,7 @@ class Enemy {
   right() {
     this.moving = true;
     this.enemySprite.x += this.speed;
+    if (this.isLeashed) {return this.hurt()};
     if (this.facing == 1) {
       try {
         this.enemySprite.anims.play(`${this.type}WalkBackRight`, true);
@@ -66,6 +74,7 @@ class Enemy {
     this.moving = true;
     this.enemySprite.y -= this.speed;
     this.facing = 1;
+    if (this.isLeashed) {return this.hurt()};
     this.enemySprite.anims.play(`${this.type}WalkBack`, true);
   }
 
@@ -73,10 +82,12 @@ class Enemy {
     this.moving = true;
     this.enemySprite.y += this.speed;
     this.facing = 0;
+    if (this.isLeashed) {return this.hurt()};
     this.enemySprite.anims.play(`${this.type}WalkForward`, true);
   }
 
   idle() {
+    if (this.isLeashed) {return this.hurt()};
     if (this.facing == 0) {
       this.enemySprite.anims.play(`${this.type}IdleForward`, true);
     }
@@ -85,11 +96,25 @@ class Enemy {
     }
   }
 
+  hurt() {
+    if (this.facing == 1) {
+      try {
+        this.enemySprite.anims.play(`${this.type}BackHit`, true);
+      }
+      catch(err) {
+        this.enemySprite.anims.play(`${this.type}Hit`, true);
+      }
+    } else {
+      this.enemySprite.anims.play(`${this.type}Hit`, true);
+    }
+  }
+
   update() {
     this.speed -= 0.05;
     if (this.speed < this.baseSpeed) {
       this.enemySprite.alpha = 1.0;
       this.speed = this.baseSpeed;
-    }  }
+    }
+  }
 }
 

@@ -65,23 +65,18 @@ function create() {
     animationSetUp();
     configureInput();
     pointer = game.input.activePointer;
-    this.physics.add.overlap(player.playerBody, world.tempEnemy.enemySprite, onCollisionPlayerEnemy);
+    this.physics.add.overlap(player.playerBody, world.enemies, onCollisionPlayerEnemy);
+    this.physics.add.overlap(world.bulletFactory.group, world.enemies, onCollisionBulletEnemy);
     pauseGameForInput();
     game.input.on('pointerdown', startGame);
-
     path = { t: 0, vec: new Phaser.Math.Vector2() };
-    // this.tweens.add({
-    //   targets: path,
-    //   t: 1,
-    //   ease: 'Sine.easeInOut',
-    //   duration: 2000,
-    //   yoyo: true,
-    //   repeat: -1
-    // });
-
     stream1 = this.add.graphics();
     stream2 = this.add.graphics();
     stream3 = this.add.graphics();
+    streamDestX = pointer.position.x;
+    streamDestY = pointer.position.y;
+    hitEnemy = null;
+    bulletCheck = 0.0
 }
 
 function pauseGameForInput() {
@@ -95,6 +90,8 @@ function resumeGameFromInput() {
     game.paused = false;
 }
 
+//This will not work correctly if each frame doesn't have the .png suffix
+//refactor to add the suffix into the function requirements?
 function createAnimation(key, repeat, frameRate, spriteSheet, animationName) {
   game.anims.create(
     {
@@ -111,6 +108,7 @@ function createAnimation(key, repeat, frameRate, spriteSheet, animationName) {
     });
 }
 
+//This require's all ghost sprites to use the same naming convention in the .xml file
 function generateGhostAnimation(sprite)
 {
   createAnimation(`${sprite}WalkLeft`, -1, 5, sprite, 'side_walk_')
@@ -124,6 +122,7 @@ function generateGhostAnimation(sprite)
   createAnimation(`${sprite}Hit`, -1, 5, sprite, 'front_hurt_')
   createAnimation(`${sprite}LeftHit`, -1, 5, sprite, 'side_hurt_')
   createAnimation(`${sprite}RightHit`, -1, 5, sprite, 'right_hurt_')
+  createAnimation(`${sprite}BackHit`, -1, 5, sprite, 'back_hurt_')
 }
 
 function animationSetUp()
@@ -141,6 +140,7 @@ function animationSetUp()
   createAnimation('slimeDripA', -1, 2, 'firstSlime', 'drip');
   generateGhostAnimation('physTypeOne')
 }
+
 // function spawnEnemies() {
 //     if (world.numEnemies > 0)
 //         return;
@@ -184,11 +184,32 @@ function addStreamPoints(curve, noOfPoints) {
   return array;
 }
 
+function processStreams(shouldFire) {
+  if (hitEnemy == null)  {
+    streamDestX = pointer.position.x;
+    streamDestY = pointer.position.y;
+  } else {
+    streamDestX = hitEnemy.x;
+    streamDestY = hitEnemy.y;
+  }
+  if (shouldFire == true) {
+    drawStream(20, 2, stream1, 0xffffff);
+    drawStream(4, 3, stream2, 0xffff00);
+    drawStream(30, 2, stream3, 0xff0000);
+  } else {
+    stream1.clear();
+    stream2.clear();
+    stream3.clear();
+    world.cleanup(world.bulletFactory);
+    // hitEnemy = null;
+  }
+}
+
 function drawStream(noOfPoints, thickness, graphics, colour) {
   curve = new Phaser.Curves.Spline(
     [
       player.wandEndX, player.wandEndY,
-      pointer.position.x, pointer.position.y
+      streamDestX, streamDestY //pointer.position.x, pointer.position.y
     ]
   );
   curve.points = addStreamPoints(curve, noOfPoints);
@@ -200,21 +221,29 @@ function drawStream(noOfPoints, thickness, graphics, colour) {
 
 function update() {
   input.update();
+  //must process streams before updating the player
+  processStreams(player.firing);
   world.update();
-  drawStream(20, 2, stream1, 0xffffff);
-  drawStream(4, 3, stream2, 0xffff00);
-  drawStream(30, 2, stream3, 0xff0000);
+
+  if (hitEnemy != null) {
+    bulletCheck += 0.02;
+  }
+  if (bulletCheck > 1) {
+    hitEnemy = null;
+    bulletCheck = 0.0;
+  }
 }
 
 function configureInput() {
-  input.add(Phaser.Input.Keyboard.KeyCodes.A, function() { world.player.left(); });
-  input.add(Phaser.Input.Keyboard.KeyCodes.D, function() { world.player.right(); });
-  input.add(Phaser.Input.Keyboard.KeyCodes.W, function() { world.player.up(); });
-  input.add(Phaser.Input.Keyboard.KeyCodes.S, function() { world.player.down(); });
-  // input.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
-  //     world.spawnBullet(world.player.sprite.x, world.player.sprite.y);
-  //     audio.shoot.play();
-  // });
+  input.add(Phaser.Input.Keyboard.KeyCodes.A, function() { player.left(); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.D, function() { player.right(); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.W, function() { player.up(); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.S, function() { player.down(); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
+      player.firing = true;
+      world.spawnBullet(player.playerBody.x, player.playerBody.y, pointer.position.x, pointer.position.y);
+      // audio.shoot.play();
+  });
 
 }
 function aimFromPlayerToPointer() {
@@ -227,6 +256,12 @@ function aimFromPlayerToPointer() {
 function onCollisionPlayerEnemy(playerBody, enemyBody) {
   slimeInfo = enemyBody.enemy.slime();
   playerBody.player.slime(slimeInfo);
+}
+
+function onCollisionBulletEnemy(bullet, enemy) {
+  hitEnemy = enemy;
+  bullet.destroy();
+  enemy.enemy.leash();
 }
 
 // function onCollisionBulletEnemy(bulletSprite, enemySprite) {

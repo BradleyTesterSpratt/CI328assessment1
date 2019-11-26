@@ -13,8 +13,13 @@ class TypeOne extends Enemy {
     this.decisionDelay += 0.016;
     if (this.decisionDelay > 1) {
       this.rand = parseInt(Math.random()*4);
-      this.enemySprite.alpha = 1.0;
-      if (this.hasCollided == true) { this.hasCollided = false };
+      if (this.hasCollided == true) { this.hasCollided = false} ;
+      if (this.isLeashed == true) {
+        this.isLeashed = false;
+        this.speed = this.speed + ((this.rand+3) * ((this.rand+1)/10));
+        //stops the enemy from standing still while being leashed
+        if (this.rand == 4) { this.rand = parseInt(Math.random()*3)}
+      };
       this.decisionDelay = 0.0;
     }
     if (this.rand == 0) {
