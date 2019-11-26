@@ -16,7 +16,7 @@ function main() {
         physics: {
             default: 'arcade',
             arcade: {
-                debug: true
+                debug: false
             }
         },
         scene: {
@@ -44,6 +44,7 @@ function preload() {
     this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
     this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
     this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
+    this.load.atlasXML('wandSparks', 'assets/wandSparks.png', 'assets/wandSparks.xml');
     this.load.audio('intro', 'assets/audio/start.mp3');
     this.load.audio('bg', 'assets/audio/start.mp3');
     //this.load.audio('bg', 'assets/audio/ufo_Theme.mp3');
@@ -139,6 +140,7 @@ function animationSetUp()
   createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
   createAnimation('slimeDripA', -1, 2, 'firstSlime', 'drip');
   generateGhostAnimation('physTypeOne')
+  createAnimation('wandSpark', -1, 20, 'wandSparks', 'spark_')
 }
 
 // function spawnEnemies() {
