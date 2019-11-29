@@ -1,5 +1,5 @@
 class Enemy {
-  constructor(sprite, speed, escapeSpeed, hitPoints, type, physical, scale) {
+  constructor(sprite, speed, escapeSpeed, hitPoints, type, physical, scale, behaviour) {
     this.baseSpeed = speed;
     this.speed = speed;
     this.maxHP = hitPoints;
@@ -19,10 +19,21 @@ class Enemy {
     this.leash = this.collideBullet.bind(this);
     this.escapeSpeed = escapeSpeed;
     this.isLeashed = false;
+    this.baseColliderSize = {x: this.enemySprite.width, y: this.enemySprite.height};
+    this.decisionDelay = 0.0;
+    //this needs chaning when more behaviours added
+    this.behaviour = behaviour || 'dumb';
+    this.behaviourRandomNumber = 4;
   }
 
   collideBullet() {
     this.isLeashed = true;
+    this.updateColliderScale(1.75);
+  }
+
+  updateColliderScale(scale) {
+    this.enemySprite.setSize(this.baseColliderSize.x * scale, this.baseColliderSize.y * scale);
+    scale == 1 ? this.enemySprite.setOrigin(0.5, 0.5) : this.enemySprite.setOrigin(0.5/scale, 0.5/scale);
   }
 
   collidePlayer() {
@@ -114,6 +125,43 @@ class Enemy {
     if (this.speed < this.baseSpeed) {
       this.enemySprite.alpha = 1.0;
       this.speed = this.baseSpeed;
+    }
+    this.decisionDelay += 0.016;
+    if (this.decisionDelay > 1) {
+      this.perFrameUpdate();
+    }
+    if (this.behaviour == 'dumb') {this.dumbBehaviour(this.behaviourRandomNumber)}
+  }
+
+  getRandomNumber(highestValue) {
+    return parseInt(Math.random()*highestValue);
+  }
+
+  perFrameUpdate() {
+    if (this.hasCollided == true) { this.hasCollided = false} ;
+    if (this.isLeashed == true) {
+      this.isLeashed = false;
+      let rand = this.getRandomNumber(4);
+      this.speed = this.speed + ((rand+3) * ((rand+1)/10));
+    } else {
+      this.updateColliderScale(1);
+    }
+    this.decisionDelay = 0.0;
+    this.behaviourRandomNumber = this.getRandomNumber(4);
+    if (this.isLeashed && this.behaviour == 'dumb') {this.behaviourRandomNumber = parseInt(Math.random()*3)};
+  }
+
+  dumbBehaviour(randomNumber) {
+    if (randomNumber == 0) {
+      this.left();
+    } else if (randomNumber == 1) {
+      this.right();
+    } else if (randomNumber == 2) {
+      this.up();
+    } else if (randomNumber == 3) {
+      this.down();
+    } else {
+      this.idle();
     }
   }
 }
