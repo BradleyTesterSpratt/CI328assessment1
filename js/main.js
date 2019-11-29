@@ -16,7 +16,7 @@ function main() {
         physics: {
             default: 'arcade',
             arcade: {
-                debug: false
+                debug: true
             }
         },
         scene: {
@@ -211,7 +211,7 @@ function drawStream(noOfPoints, thickness, graphics, colour) {
   curve = new Phaser.Curves.Spline(
     [
       player.wandEndX, player.wandEndY,
-      streamDestX, streamDestY //pointer.position.x, pointer.position.y
+      streamDestX, streamDestY
     ]
   );
   curve.points = addStreamPoints(curve, noOfPoints);
@@ -223,16 +223,18 @@ function drawStream(noOfPoints, thickness, graphics, colour) {
 
 function update() {
   input.update();
-  //must process streams before updating the player
-  processStreams(player.firing);
-  world.update();
+  if (!game.paused) {
+    //must process streams before updating the player
+    processStreams(player.firing);
+    world.update();
 
-  if (hitEnemy != null) {
-    bulletCheck += 0.02;
-  }
-  if (bulletCheck > 1) {
-    hitEnemy = null;
-    bulletCheck = 0.0;
+    if (hitEnemy != null) {
+      bulletCheck += 0.02;
+    }
+    if (bulletCheck > 1) {
+      hitEnemy = null;
+      bulletCheck = 0.0;
+    }
   }
 }
 

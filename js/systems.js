@@ -35,11 +35,13 @@ class UI {
             fill: '#fff'
         });
         this.startGameText.setOrigin(0.5, 0.5);
+        this.startGameText.setDepth(100);
 
         this.scoreText = game.add.text(10, 10, 'Score: 0', {
             font: '34px Arial',
             fill: '#fff'
         });
+        this.scoreText.setDepth(100);
     }
 
     updateScoreText(newScore) {
