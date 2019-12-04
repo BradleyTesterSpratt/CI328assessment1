@@ -25,11 +25,18 @@ class Player {
     firstSlime.setDepth(11);
     firstSlime.setScale(0.4, 0.4);
     this.firstSlime = firstSlime;
-    this.firstSlime.visible = false
+    this.firstSlime.visible = false;
+    const wandSpark = game.add.sprite(this.wandEndX, this.wandEndY, 'wandSpark')
+    wandSpark.setDepth(20);
+    wandSpark.setScale(0.3, 0.3);
+    wandSpark.alpha = 0.75;
+    this.wandSpark = wandSpark;
+    this.wandSpark.visible = false;
     this.wandEndX = 0;
     this.wandEndY = 0;
     this.wandOffsetX = 0;
     this.wandOffsetY = 0;
+    this.firing = false;
   }
 
   collideGhost(array) {
@@ -110,17 +117,39 @@ class Player {
   //   slime.x = this.playerBody.x;
   //   slime.y = this.playerBody.y;
   // }
+  randomiseSpark(int) {
+    let tint = 0x000000
+    switch(int) {
+      case 0:
+        tint = 0xffffff;
+        break;
+      case 1:
+        tint = 0xffff00;
+        break;
+      default:
+        tint = 0xff0000;
+    }
+    this.wandSpark.tint = tint;
+  }
 
   update () {
+    this.wandSpark.anims.play('wandSpark', true, parseInt(Math.random()*42));
     var i;
     for (i = 0; i < this.currentSlimes.length; i++) {
       let slime = this.currentSlimes[i][0];
       slime.x = this.playerBody.x;
       slime.y = this.playerBody.y;
-    }   
+    }
+    if (this.firing == true) {
+      this.wandSpark.visible = true;
+      this.randomiseSpark(parseInt(Math.random()*3));
+    } else { 
+      this.wandSpark.visible = false;
+    }
     this.decisionDelay += 0.016;
     if (this.decisionDelay > 1) {
       if (this.hasCollided == true) { this.hasCollided = false };
+      if (this.firing == true) { this.firing = false };
       this.decisionDelay = 0.0;
     }
     if (this.moving == false) {
@@ -130,12 +159,14 @@ class Player {
     this.wandEndX = this.playerBody.x + this.wandOffsetX;
     this.wandEndY = this.playerBody.y + this.wandOffsetY;
     this.moving = false;
+    this.wandSpark.x = this.wandEndX;
+    this.wandSpark.y = this.wandEndY;
 
-    this.scaleRatio += 0.016;
+    // this.scaleRatio += 0.016;
 
-    if (this.scaleRatio >= 1.5) {
-      this.scaleRatio = 0.0;
-    }
+    // if (this.scaleRatio >= 1.5) {
+    //   this.scaleRatio = 0.0;
+    // }
 
     // let start = 0.5;
     // let end = 0.515;
@@ -193,7 +224,7 @@ class Player {
       case (-22 < angle && angle <= 23):
         this.playerWand.setTexture('wand_sp', '090deg.png');
         this.wandOffsetX = 40;
-        this.wandOffsetY = 25;
+        this.wandOffsetY = 30;
         break;
       case (23 < angle && angle <= 67):
         this.playerWand.setTexture('wand_sp', '135deg.png');

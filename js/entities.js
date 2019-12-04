@@ -1,125 +1,125 @@
 class Control {
-
-    onUpdate(sprite) {
-
-    }
+  onUpdate(sprite) {}
 }
 
 class EntityFactory {
-    constructor(spriteName) {
-        const group = game.physics.add.group({
-            defaultKey: spriteName
-        });
+  constructor(spriteName) {
+    const group = game.physics.add.group({
+      defaultKey: spriteName
+    });
+    this.group = group;
+  }
 
-        this.group = group;
+  spawnAsBullet(x, y, destX, destY) {
+    if (!this.nextBulletTime) {
+      this.nextBulletTime = 0;
     }
 
-    spawnAsBullet(x, y) {
-        if (!this.nextBulletTime) {
-            this.nextBulletTime = 0;
-        }
-
-        //  To avoid them being allowed to fire too fast we set a time limit
-        if (game.time.now > this.nextBulletTime) {
-
-            const sprite = this.group.create(x-1, y-2)
-            this.setUpEntity(sprite);
-            
-            sprite.setOrigin(0.5, 0.5);
-            sprite.setScale(0.05, 0.05);
-            
-            sprite.setVelocity(0, -250);
-            this.nextBulletTime = game.time.now + 200;
-        }
+    //  To avoid them being allowed to fire too fast we set a time limit
+    if (game.time.now > this.nextBulletTime) {
+      const sprite = this.group.create(x-1, y-2)
+      this.setUpEntity(sprite);
+      
+      sprite.setOrigin(0.5, 0.5);
+      sprite.setScale(0.05, 0.05);
+      game.physics.moveToObject(sprite, new Phaser.Math.Vector2(destX, destY), 750);
+      this.nextBulletTime = game.time.now + 75;
     }
+  }
 
-    spawnAsEnemy(x, y) {
-        const sprite = this.group.create(x, y + 30);
-        
-        this.setUpEntity(sprite);
-        
-        sprite.setVelocity(Phaser.Math.Between(35, 55), Phaser.Math.Between(45, 100));
+  setUpEntity(sprite) {
+    sprite.controls = [];
+    sprite.addControl = (control) => { sprite.controls.push(control); }
+    sprite.updateControls = () => { sprite.controls.forEach(control => control.onUpdate(sprite)); }
+  }
 
-        sprite.setOrigin(1.0, 1.0);
+  updateAllExists() {
+    this.group.children.iterate(function (sprite) {
+      if (sprite) {
+        sprite.updateControls(20);
+      }
+    })
+  }
 
-        sprite.addControl(new EnemyControl());
+  destroyAllExists() {
+    try {
+      this.group.children.iterate(function (sprite) {
+        sprite.destroy();
+      });
     }
-    
-    setUpEntity(sprite) {
-        sprite.controls = [];
-        sprite.addControl = (control) => { sprite.controls.push(control); }
-        sprite.updateControls = () => { sprite.controls.forEach(control => control.onUpdate(sprite)); }
+    catch(err) {
+      console.log(err);
     }
+  }
 
-    updateAllExists() {
-        this.group.children.iterate(function (sprite) {
-            if (sprite)
-                sprite.updateControls(20);
-        })
-    }
-
-    destroyAllExists() {
-        this.group.children.iterate(function (sprite) {
-            sprite.destroy();
-        })
-    }
-}
-
-class EnemyControl extends Control {
-
-    onUpdate(sprite) {
-        if (sprite.x + sprite.width + sprite.width >= phaser.config.width) {
-            sprite.setVelocityX(-Phaser.Math.Between(35, 55));
-        }
-        
-        if (sprite.x <= 0) {
-            sprite.setVelocityX(Phaser.Math.Between(35, 55));
-        }
-        
-        if (sprite.y > phaser.config.height + 40) {
-            sprite.destroy();
-            world.numEnemies--;
-        }
-    }
+  // spawnAsEnemy(x, y) {
+    // const sprite = this.group.create(x, y + 30);
+    // this.setUpEntity(sprite);
+    // sprite.setVelocity(Phaser.Math.Between(35, 55), Phaser.Math.Between(45, 100));
+    // sprite.setOrigin(1.0, 1.0);
+    // sprite.addControl(new EnemyControl());
+  // }
 }
 
 class World {
-    constructor(game) {
-        // this.bg = game.add.image(0, 0, 'background_img');
-        // this.bg.setOrigin(0, 0);
+  constructor(game) {
+    // this.bg = game.add.image(0, 0, 'background_img');
+    // this.bg.setOrigin(0, 0);
+    this.player = new Player();
+    // this.player.onDeath(gameOver);
+    this.physTypeOne = new TypeOne();
+    this.bulletFactory = new EntityFactory('bullet_img');
+    this.enemies = game.physics.add.group();
+    this.addEnemyToGroup(this.physTypeOne);
+  }
 
-        this.player = new Player();
-        // this.player.onDeath(gameOver);
-        this.tempEnemy = new TypeOne();
+  spawnBullet(x, y, destX, destY) {
+    this.bulletFactory.spawnAsBullet(x, y, destX, destY);
+  }
 
-        // this.bulletFactory = new EntityFactory('bullet_img');
-        // this.enemyFactory = new EntityFactory('class_one');
-        
-        // this.numEnemies = 0;
-    }
-
-    // spawnEnemy(x, y) {
-    //     this.enemyFactory.spawnAsEnemy(x, y);
-    //     this.numEnemies++;
+  addEnemyToGroup(enemy){
+    this.enemies.add(enemy.enemySprite);
+    enemy.enemySprite.setCollideWorldBounds(true);
+  }
+  
+  update() {
+    // this.bg.y += 2;
+    // if (this.bg.y >= 0) {
+    //   this.bg.y = -phaser.config.height;
     // }
+    // this.tempEnemy.update();
+    this.player.update();
+    this.enemies.children.iterate(function (sprite) {
+      if (sprite) {
+        sprite.enemy.update();
+      }
+    })
+    // this.enemyFactory.updateAllExists();
+  }
 
-    // spawnBullet(x, y) {
-    //     this.bulletFactory.spawnAsBullet(x, y);
-    // }
+  cleanup(factory) {
+    factory.destroyAllExists();
+  }
 
-    update() {
-        //  Scroll the background, reset it when it reaches the bottom
-        // this.bg.y += 2;
-        // if (this.bg.y >= 0) {
-        //     this.bg.y = -phaser.config.height;
-        // }
-        this.tempEnemy.update();
-        this.player.update();
-        // this.enemyFactory.updateAllExists();
-    }
-
-    cleanup() {
-        // this.enemyFactory.destroyAllExists();
-        // this.bulletFactory.destroyAllExists();
-    }
+  // spawnEnemy(x, y) {
+  //   this.enemyFactory.spawnAsEnemy(x, y);
+  //   this.numEnemies++;
+  // }
 }
+
+// class EnemyControl extends Control {
+  // onUpdate(sprite) {
+  //   if (sprite.x + sprite.width + sprite.width >= phaser.config.width) {
+  //     sprite.setVelocityX(-Phaser.Math.Between(35, 55));
+  //   }
+    
+  //   if (sprite.x <= 0) {
+  //     sprite.setVelocityX(Phaser.Math.Between(35, 55));
+  //   }
+    
+  //   if (sprite.y > phaser.config.height + 40) {
+  //     sprite.destroy();
+  //     world.numEnemies--;
+  //   }
+  // }
+// }
