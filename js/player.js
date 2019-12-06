@@ -1,6 +1,6 @@
 class Player {
   constructor() {
-    const playerSprite = game.physics.add.sprite(phaser.config.width / 2, phaser.config.height /2, 'buster_sp');
+    const playerSprite = game.physics.add.sprite(phaser.config.width / 2 - 100, phaser.config.height /2, 'buster_sp');
     playerSprite.setScale(0.40, 0.40);
     playerSprite.setOrigin(0.5, 0.5);
     playerSprite.setCollideWorldBounds(true);
@@ -12,7 +12,7 @@ class Player {
     this.playerWand = wandSprite;
     this.playerBody.setDepth(10);
     this.playerWand.setDepth(20);
-    this.moving = false; 
+    this.moving = 'idle'; 
     this.scaleRatio = 0.0;
     this.playerBody.player = this;
     this.baseSpeed = 5;
@@ -37,6 +37,8 @@ class Player {
     this.wandOffsetX = 0;
     this.wandOffsetY = 0;
     this.firing = false;
+    this.hasHitWall = false;
+    this.hitWall = this.hitWall.bind(this);
   }
 
   collideGhost(array) {
@@ -63,45 +65,53 @@ class Player {
   }
 
   left() {
-    this.moving = true;
-    this.playerBody.x -= this.speed;
-    this.playerWand.x = this.playerBody.x;
-    if (this.facing == 0) {
-      this.playerBody.anims.play('walkLeft', true);
-    }
-    else {
-      this.playerBody.anims.play('walkBackLeft', true);
+    if (this.moving == 'idle') {
+      this.moving = 'left';
+      this.playerBody.x -= this.speed;
+      this.playerWand.x = this.playerBody.x;
+      if (this.facing == 0) {
+        this.playerBody.anims.play('walkLeft', true);
+      }
+      else {
+        this.playerBody.anims.play('walkBackLeft', true);
+      }
     }
   }
 
   right() {
-    this.moving = true;
-    this.playerBody.x += this.speed;
-    this.playerWand.x = this.playerBody.x;
-    if (this.facing == 0) {
-      this.playerBody.anims.play('walkRight', true);
-    }
-    else {
-      this.playerBody.anims.play('walkBackRight', true);
+    if (this.moving == 'idle') {
+      this.moving = 'right';
+      this.playerBody.x += this.speed;
+      this.playerWand.x = this.playerBody.x;
+      if (this.facing == 0) {
+        this.playerBody.anims.play('walkRight', true);
+      }
+      else {
+        this.playerBody.anims.play('walkBackRight', true);
+      }
     }
   }
 
   up() {
-    this.moving = true;
-    this.playerBody.y -= this.speed;
-    this.playerWand.y = this.playerBody.y;
-    this.facing = 1;
-    this.playerWand.setDepth(5)
-    this.playerBody.anims.play('walkBack', true);
+    if (this.moving == 'idle') {
+      this.moving = 'up';
+      this.playerBody.y -= this.speed;
+      this.playerWand.y = this.playerBody.y;
+      this.facing = 1;
+      this.playerWand.setDepth(5)
+      this.playerBody.anims.play('walkBack', true);
+    }
   }
 
   down() {
-    this.moving = true;
-    this.playerBody.y += this.speed;
-    this.playerWand.y = this.playerBody.y;
-    this.facing = 0;
-    this.playerWand.setDepth(20)
-    this.playerBody.anims.play('walkForward', true);
+    if (this.moving == 'idle') {
+      this.moving = 'down';
+      this.playerBody.y += this.speed;
+      this.playerWand.y = this.playerBody.y;
+      this.facing = 0;
+      this.playerWand.setDepth(20)
+      this.playerBody.anims.play('walkForward', true);
+    }
   }
 
   idle() {
@@ -132,6 +142,34 @@ class Player {
     this.wandSpark.tint = tint;
   }
 
+  hitWall(direction) {
+    this.hasHitWall = true;
+    switch(direction) {
+      case "up":
+        this.playerBody.y += this.speed;
+        this.playerWand.y = this.playerBody.y;
+        this.idle();
+        break;
+      case "down":
+        this.playerBody.y -= this.speed;
+        this.playerWand.y = this.playerBody.y;
+        this.idle();
+        break;
+      case "left":
+        this.playerBody.x += this.speed;
+        this.playerWand.x = this.playerBody.x;
+        this.idle();
+        break;
+      case "right":
+        this.playerBody.x -= this.speed;
+        this.playerWand.x = this.playerBody.x;
+        this.idle();
+        break;
+      default:
+        this.idle();
+    }
+  }
+
   update () {
     this.wandSpark.anims.play('wandSpark', true, parseInt(Math.random()*42));
     var i;
@@ -152,13 +190,16 @@ class Player {
       if (this.firing == true) { this.firing = false };
       this.decisionDelay = 0.0;
     }
-    if (this.moving == false) {
+    if (this.moving == 'idle') {
       this.idle();
     }
     this.updateWand(aimFromPlayerToPointer());
     this.wandEndX = this.playerBody.x + this.wandOffsetX;
     this.wandEndY = this.playerBody.y + this.wandOffsetY;
-    this.moving = false;
+    if (this.hasHitWall == false) {
+      this.moving = 'idle'
+    }
+    this.hasHitWall = false;
     this.wandSpark.x = this.wandEndX;
     this.wandSpark.y = this.wandEndY;
 

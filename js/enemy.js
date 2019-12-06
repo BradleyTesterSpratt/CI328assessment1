@@ -1,14 +1,14 @@
 class Enemy {
-  constructor(sprite, speed, escapeSpeed, hitPoints, type, physical, scale, behaviour) {
+  constructor(sprite, speed, escapeSpeed, hitPoints, type, isPhysical, scale, behaviour) {
     this.baseSpeed = speed;
     this.speed = speed;
     this.maxHP = hitPoints;
     this.currentHP = this.maxHP;
     this.type = type;
-    const enemySprite = game.physics.add.sprite(phaser.config.width /3, phaser.config.height /3, sprite);
+    const enemySprite = game.physics.add.sprite(phaser.config.width /2 + 100, phaser.config.height /3, sprite);
     enemySprite.setScale(scale, scale);
     enemySprite.setOrigin(0.5, 0.5);
-    this.physical = physical;
+    this.isPhysical = isPhysical;
     this.facing = 0;
     //set depth to match player just in case it is necassary
     this.enemySprite = enemySprite
@@ -24,6 +24,8 @@ class Enemy {
     //this needs chaning when more behaviours added
     this.behaviour = behaviour || 'dumb';
     this.behaviourRandomNumber = 4;
+    this.hitWall = false;
+    this.enemySprite.enemy = this;
   }
 
   collideBullet() {
@@ -162,6 +164,34 @@ class Enemy {
       this.down();
     } else {
       this.idle();
+    }
+  }
+
+  hitWall(direction) {
+    this.hasHitWall = true;
+    switch(direction) {
+      case "up":
+        this.playerBody.y += this.speed;
+        this.playerWand.y = this.playerBody.y;
+        this.idle();
+        break;
+      case "down":
+        this.playerBody.y -= this.speed;
+        this.playerWand.y = this.playerBody.y;
+        this.idle();
+        break;
+      case "left":
+        this.playerBody.x += this.speed;
+        this.playerWand.x = this.playerBody.x;
+        this.idle();
+        break;
+      case "right":
+        this.playerBody.x -= this.speed;
+        this.playerWand.x = this.playerBody.x;
+        this.idle();
+        break;
+      default:
+        this.idle();
     }
   }
 }
