@@ -38,6 +38,9 @@ function preload() {
 
     game = this;
     game.score = 0;
+    this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
+    this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
+
     this.load.image('background_img', 'assets/gameBg.png');
     this.load.image('bullet_img', 'assets/bullet.png');
     this.load.atlasXML('firstSlime', 'assets/slimeA.png', 'assets/slimeA.xml');
@@ -68,6 +71,10 @@ function create() {
     pointer = game.input.activePointer;
     this.physics.add.overlap(player.playerBody, world.enemies, onCollisionPlayerEnemy);
     this.physics.add.overlap(world.bulletFactory.group, world.enemies, onCollisionBulletEnemy);
+    this.physics.add.collider(player.playerBody, world.walls, onCollisionPlayerWall);
+    this.physics.add.collider(world.enemies, world.walls, onCollisionEnemyWall);
+    this.physics.add.overlap(world.bulletFactory.group, world.walls, onCollisionBulletWall);
+    
     pauseGameForInput();
     game.input.on('pointerdown', startGame);
     path = { t: 0, vec: new Phaser.Math.Vector2() };
@@ -77,6 +84,7 @@ function create() {
     streamDestX = pointer.position.x;
     streamDestY = pointer.position.y;
     hitEnemy = null;
+    collidedBullet = null;
     bulletCheck = 0.0
 }
 
@@ -186,8 +194,11 @@ function addStreamPoints(curve, noOfPoints) {
   return array;
 }
 
-function processStreams(shouldFire) {
-  if (hitEnemy == null)  {
+function processStreams(shouldFire) {  
+  if (collidedBullet != null) {
+    streamDestX = collidedBullet.x;
+    streamDestY = collidedBullet.y;
+  } else if (hitEnemy == null)  {
     streamDestX = pointer.position.x;
     streamDestY = pointer.position.y;
   } else {
@@ -227,12 +238,13 @@ function update() {
     //must process streams before updating the player
     processStreams(player.firing);
     world.update();
-
-    if (hitEnemy != null) {
+    if (hitEnemy != null || collidedBullet != null) {
       bulletCheck += 0.02;
     }
     if (bulletCheck > 1) {
       hitEnemy = null;
+      collidedBullet = null;
+      world.wallHit = false;
       bulletCheck = 0.0;
     }
   }
@@ -266,6 +278,27 @@ function onCollisionBulletEnemy(bullet, enemy) {
   hitEnemy = enemy;
   bullet.destroy();
   enemy.enemy.leash();
+}
+
+function onCollisionPlayerWall(playerBody, wall) {
+  playerBody.player.hitWall(playerBody.player.moving);
+}
+
+function onCollisionEnemyWall(enemyBody, wall) {
+  if(enemyBody.enemy.isPhysical == true) {
+    console.log("I shouldn't go through this!");
+  }
+}
+
+function onCollisionBulletWall(bullet, wall) {
+  collidedBullet = {
+    x: bullet.x,
+    y: bullet.y
+  }
+  world.wallHitSpark.x = bullet.x;
+  world.wallHitSpark.y = bullet.y;
+  world.wallHit = true;
+  bullet.destroy();
 }
 
 // function onCollisionBulletEnemy(bulletSprite, enemySprite) {
