@@ -21,6 +21,7 @@ class Player {
     this.slime = this.collideGhost.bind(this);
     this.hasCollided = false;
     this.decisionDelay = 0.0;
+    this.moveInputDelay = 0.0;
     const firstSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'firstSlime');
     firstSlime.setDepth(11);
     firstSlime.setScale(0.4, 0.4);
@@ -39,12 +40,14 @@ class Player {
     this.firing = false;
     this.hasHitWall = false;
     this.hitWall = this.hitWall.bind(this);
+    this.hasMovedInput = false;
+    this.setMove = this.setMove.bind(this);
   }
 
   collideGhost(array) {
     if (this.hasCollided == false) {
       if (array[1] == 'speed') {
-        this.firstSlime.tint = 0x936999;
+        this.firstSlime.tint = Constants.colour.pinkSlime;
         this.firstSlime.anims.play('slimeDripA', true);
 
         this.firstSlime.visible = true;
@@ -65,52 +68,63 @@ class Player {
   }
 
   left() {
-    if (this.moving == 'idle') {
-      this.moving = 'left';
-      this.playerBody.x -= this.speed;
-      this.playerWand.x = this.playerBody.x;
-      if (this.facing == 0) {
-        this.playerBody.anims.play('walkLeft', true);
-      }
-      else {
-        this.playerBody.anims.play('walkBackLeft', true);
-      }
+    this.playerBody.x -= this.speed;
+    this.playerWand.x = this.playerBody.x;
+    if (this.facing == 0) {
+      this.playerBody.anims.play('walkLeft', true);
     }
+    else {
+      this.playerBody.anims.play('walkBackLeft', true);
+    }
+    this.hasMovedInput = true;
   }
 
   right() {
-    if (this.moving == 'idle') {
-      this.moving = 'right';
-      this.playerBody.x += this.speed;
-      this.playerWand.x = this.playerBody.x;
-      if (this.facing == 0) {
-        this.playerBody.anims.play('walkRight', true);
-      }
-      else {
-        this.playerBody.anims.play('walkBackRight', true);
-      }
+    this.playerBody.x += this.speed;
+    this.playerWand.x = this.playerBody.x;
+    if (this.facing == 0) {
+      this.playerBody.anims.play('walkRight', true);
     }
+    else {
+      this.playerBody.anims.play('walkBackRight', true);
+    }
+    this.hasMovedInput = true;
   }
 
   up() {
-    if (this.moving == 'idle') {
-      this.moving = 'up';
-      this.playerBody.y -= this.speed;
-      this.playerWand.y = this.playerBody.y;
-      this.facing = 1;
-      this.playerWand.setDepth(5)
-      this.playerBody.anims.play('walkBack', true);
-    }
+    this.playerBody.y -= this.speed;
+    this.playerWand.y = this.playerBody.y;
+    this.facing = 1;
+    this.playerWand.setDepth(5)
+    this.playerBody.anims.play('walkBack', true);
+    this.hasMovedInput = true;
   }
 
   down() {
-    if (this.moving == 'idle') {
-      this.moving = 'down';
-      this.playerBody.y += this.speed;
-      this.playerWand.y = this.playerBody.y;
-      this.facing = 0;
-      this.playerWand.setDepth(20)
-      this.playerBody.anims.play('walkForward', true);
+    this.playerBody.y += this.speed;
+    this.playerWand.y = this.playerBody.y;
+    this.facing = 0;
+    this.playerWand.setDepth(20)
+    this.playerBody.anims.play('walkForward', true);
+    this.hasMovedInput = true;
+  }
+
+  move() {
+    switch(this.moving) {
+      case 'up':
+        this.up();
+        break;
+      case 'down':
+        this.down();
+        break;
+      case 'left':
+        this.left();
+        break;
+      case 'right':
+        this.right();
+        break;
+      default:
+        this.idle();
     }
   }
 
@@ -127,19 +141,24 @@ class Player {
   //   slime.x = this.playerBody.x;
   //   slime.y = this.playerBody.y;
   // }
+
   randomiseSpark(int) {
     let tint = 0x000000
     switch(int) {
       case 0:
-        tint = 0xffffff;
+        tint = Constants.colour.streamWhite;
         break;
       case 1:
-        tint = 0xffff00;
+        tint = Constants.colour.streamRed;
         break;
       default:
-        tint = 0xff0000;
+        tint = Constants.colour.streamYellow;
     }
     this.wandSpark.tint = tint;
+  }
+
+  setMove(direction) {
+    if (this.hasMovedInput == false) { this.moving = direction }
   }
 
   hitWall(direction) {
@@ -148,25 +167,25 @@ class Player {
       case "up":
         this.playerBody.y += this.speed;
         this.playerWand.y = this.playerBody.y;
-        this.idle();
+        this.moving = 'idle';
         break;
       case "down":
         this.playerBody.y -= this.speed;
         this.playerWand.y = this.playerBody.y;
-        this.idle();
+        this.moving = 'idle';
         break;
       case "left":
         this.playerBody.x += this.speed;
         this.playerWand.x = this.playerBody.x;
-        this.idle();
+        this.moving = 'idle';
         break;
       case "right":
         this.playerBody.x -= this.speed;
         this.playerWand.x = this.playerBody.x;
-        this.idle();
+        this.moving = 'idle';
         break;
       default:
-        this.idle();
+        this.moving = 'idle';
     }
   }
 
@@ -185,20 +204,24 @@ class Player {
       this.wandSpark.visible = false;
     }
     this.decisionDelay += 0.016;
+    this.moveInputDelay += 0.016;
     if (this.decisionDelay > 1) {
       if (this.hasCollided == true) { this.hasCollided = false };
       if (this.firing == true) { this.firing = false };
       this.decisionDelay = 0.0;
     }
-    if (this.moving == 'idle') {
-      this.idle();
+    this.move();
+    if (this.moveInputDelay > 0.16) {
+      this.hasMovedInput = false;
+      if (this.hasHitWall == false) {this.moving = 'idle'}
+      this.moveInputDelay = 0.0;
     }
+    // if (this.moving == 'idle') {
+    //   this.idle();
+    // }
     this.updateWand(aimFromPlayerToPointer());
     this.wandEndX = this.playerBody.x + this.wandOffsetX;
     this.wandEndY = this.playerBody.y + this.wandOffsetY;
-    if (this.hasHitWall == false) {
-      this.moving = 'idle'
-    }
     this.hasHitWall = false;
     this.wandSpark.x = this.wandEndX;
     this.wandSpark.y = this.wandEndY;
@@ -237,7 +260,8 @@ class Player {
 
   updateWand(angle) {
     switch(true) {
-      case ((157 < angle && angle <= 180) || (-180 <= angle && angle <= -158)):
+      case (157 < angle && angle <= 180):
+      case (-180 <= angle && angle <= -158):
         this.playerWand.setTexture('wand_sp', '270deg.png');
         this.wandOffsetX = -35;
         this.wandOffsetY = -2;
