@@ -13,7 +13,7 @@ class Enemy {
     //set depth to match player just in case it is necassary
     this.enemySprite = enemySprite
     this.enemySprite.setDepth(10);
-    this.moving = false;
+    this.moving = 'idle';
     this.enemySprite.enemy = this;
     this.slime = this.collidePlayer.bind(this);
     this.leash = this.collideBullet.bind(this);
@@ -24,13 +24,14 @@ class Enemy {
     //this needs chaning when more behaviours added
     this.behaviour = behaviour || 'dumb';
     this.behaviourRandomNumber = 4;
-    this.hitWall = false;
+    this.hasHitWall = false;
     this.enemySprite.enemy = this;
+    this.hitWall = this.hitWall.bind(this);
   }
 
   collideBullet() {
     this.isLeashed = true;
-    this.updateColliderScale(1.75);
+    this.updateColliderScale(1.5);
   }
 
   updateColliderScale(scale) {
@@ -53,7 +54,7 @@ class Enemy {
 
   left() {
     if (this.isLeashed) {return this.hurt()};
-    this.moving = true;
+    this.moving = 'left';
     this.enemySprite.x -= this.speed;
     if (this.facing == 1) {
       try {
@@ -68,7 +69,7 @@ class Enemy {
   }
 
   right() {
-    this.moving = true;
+    this.moving = 'right';
     this.enemySprite.x += this.speed;
     if (this.isLeashed) {return this.hurt()};
     if (this.facing == 1) {
@@ -84,7 +85,7 @@ class Enemy {
   }
 
   up() {
-    this.moving = true;
+    this.moving = 'up';
     this.enemySprite.y -= this.speed;
     this.facing = 1;
     if (this.isLeashed) {return this.hurt()};
@@ -92,7 +93,7 @@ class Enemy {
   }
 
   down() {
-    this.moving = true;
+    this.moving = 'down';
     this.enemySprite.y += this.speed;
     this.facing = 0;
     if (this.isLeashed) {return this.hurt()};
@@ -133,6 +134,7 @@ class Enemy {
       this.perFrameUpdate();
     }
     if (this.behaviour == 'dumb') {this.dumbBehaviour(this.behaviourRandomNumber)}
+    if (this.hasHitWall == false) {this.moving = 'idle'}
   }
 
   getRandomNumber(highestValue) {
@@ -171,23 +173,19 @@ class Enemy {
     this.hasHitWall = true;
     switch(direction) {
       case "up":
-        this.playerBody.y += this.speed;
-        this.playerWand.y = this.playerBody.y;
+        this.enemySprite.y += this.speed;
         this.idle();
         break;
       case "down":
-        this.playerBody.y -= this.speed;
-        this.playerWand.y = this.playerBody.y;
+        this.enemySprite.y -= this.speed;
         this.idle();
         break;
       case "left":
-        this.playerBody.x += this.speed;
-        this.playerWand.x = this.playerBody.x;
+        this.enemySprite.x += this.speed;
         this.idle();
         break;
       case "right":
-        this.playerBody.x -= this.speed;
-        this.playerWand.x = this.playerBody.x;
+        this.enemySprite.x -= this.speed;
         this.idle();
         break;
       default:

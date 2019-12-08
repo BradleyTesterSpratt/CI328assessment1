@@ -250,10 +250,10 @@ function update() {
 }
 
 function configureInput() {
-  input.add(Phaser.Input.Keyboard.KeyCodes.A, function() { player.left(); });
-  input.add(Phaser.Input.Keyboard.KeyCodes.D, function() { player.right(); });
-  input.add(Phaser.Input.Keyboard.KeyCodes.W, function() { player.up(); });
-  input.add(Phaser.Input.Keyboard.KeyCodes.S, function() { player.down(); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.A, function() { player.setMove('left'); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.D, function() { player.setMove('right'); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.W, function() { player.setMove('up'); });
+  input.add(Phaser.Input.Keyboard.KeyCodes.S, function() { player.setMove('down'); });
   input.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
     player.firing = true;
     world.spawnBullet(player.wandEndX, player.wandEndY, pointer.position.x, pointer.position.y);
@@ -285,7 +285,7 @@ function onCollisionPlayerWall(playerBody, wall) {
 
 function onCollisionEnemyWall(enemyBody, wall) {
   if(enemyBody.enemy.isPhysical == true) {
-    console.log("I shouldn't go through this!");
+    enemyBody.enemy.hitWall(enemyBody.enemy.moving);
   }
 }
 

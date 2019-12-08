@@ -100,13 +100,13 @@ class World {
     let tint = 0x000000
     switch(int) {
       case 0:
-        tint = 0xffffff;
+        tint = Constants.colour.streamWhite;
         break;
       case 1:
-        tint = 0xffff00;
+        tint = Constants.colour.streamRed;
         break;
       default:
-        tint = 0xff0000;
+        tint = Constants.colour.streamYellow;
     }
     this.wallHitSpark.tint = tint;
   }
