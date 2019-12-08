@@ -7,26 +7,26 @@ let ui;
 let audio;
 
 function main() {
-    console.log("main()");
-    var config = {
-        type: Phaser.AUTO,
-        parent: 'my-game',
-        width: 800,
-        height: 600,
-        physics: {
-            default: 'arcade',
-            arcade: {
-                debug: false
-            }
-        },
-        scene: {
-            preload: preload,
-            create: create,
-            update: update
-        }
-    };
+  console.log("main()");
+  var config = {
+    type: Phaser.AUTO,
+    parent: 'my-game',
+    width: 800,
+    height: 600,
+    physics: {
+      default: 'arcade',
+      arcade: {
+        debug: false
+      }
+    },
+    scene: {
+      preload: preload,
+      create: create,
+      update: update
+    }
+  };
 
-    phaser = new Phaser.Game(config);
+  phaser = new Phaser.Game(config);
 }
 
 /**
@@ -34,26 +34,26 @@ function main() {
  * Loads assets.
  */
 function preload() {
-    console.log("preload()");
+  console.log("preload()");
 
-    game = this;
-    game.score = 0;
-    this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
-    this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
+  game = this;
+  game.score = 0;
+  this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
+  this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
 
-    this.load.image('background_img', 'assets/gameBg.png');
-    this.load.image('bullet_img', 'assets/bullet.png');
-    this.load.atlasXML('firstSlime', 'assets/slimeA.png', 'assets/slimeA.xml');
-    this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
-    this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
-    this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
-    this.load.atlasXML('wandSparks', 'assets/wandSparks.png', 'assets/wandSparks.xml');
-    this.load.audio('intro', 'assets/audio/start.mp3');
-    this.load.audio('bg', 'assets/audio/start.mp3');
-    //this.load.audio('bg', 'assets/audio/ufo_Theme.mp3');
-    this.load.audio('explode', 'assets/audio/explode.mp3');
-    this.load.audio('fly', 'assets/audio/fly.mp3');
-    this.load.audio('shoot', 'assets/audio/shoot.mp3');
+  this.load.image('background_img', 'assets/gameBg.png');
+  this.load.image('bullet_img', 'assets/bullet.png');
+  this.load.atlasXML('firstSlime', 'assets/slimeA.png', 'assets/slimeA.xml');
+  this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
+  this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
+  this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
+  this.load.atlasXML('wandSparks', 'assets/wandSparks.png', 'assets/wandSparks.xml');
+  this.load.audio('intro', 'assets/audio/start.mp3');
+  this.load.audio('bg', 'assets/audio/start.mp3');
+  //this.load.audio('bg', 'assets/audio/ufo_Theme.mp3');
+  this.load.audio('explode', 'assets/audio/explode.mp3');
+  this.load.audio('fly', 'assets/audio/fly.mp3');
+  this.load.audio('shoot', 'assets/audio/shoot.mp3');
 }
 
 /**
@@ -61,42 +61,41 @@ function preload() {
  * The assets have been loaded by this point.
  */
 function create() {
-    world = new World(game);
-    input = new Input();
-    ui = new UI();
-    audio = new Audio();
-    player = world.player;
-    animationSetUp();
-    configureInput();
-    pointer = game.input.activePointer;
-    this.physics.add.overlap(player.playerBody, world.enemies, onCollisionPlayerEnemy);
-    this.physics.add.overlap(world.bulletFactory.group, world.enemies, onCollisionBulletEnemy);
-    this.physics.add.collider(player.playerBody, world.walls, onCollisionPlayerWall);
-    this.physics.add.collider(world.enemies, world.walls, onCollisionEnemyWall);
-    this.physics.add.overlap(world.bulletFactory.group, world.walls, onCollisionBulletWall);
-    
-    pauseGameForInput();
-    game.input.on('pointerdown', startGame);
-    path = { t: 0, vec: new Phaser.Math.Vector2() };
-    stream1 = this.add.graphics();
-    stream2 = this.add.graphics();
-    stream3 = this.add.graphics();
-    streamDestX = pointer.position.x;
-    streamDestY = pointer.position.y;
-    hitEnemy = null;
-    collidedBullet = null;
-    bulletCheck = 0.0
+  world = new World(game);
+  input = new Input();
+  ui = new UI();
+  audio = new Audio();
+  player = world.player;
+  animationSetUp();
+  configureInput();
+  pointer = game.input.activePointer;
+  this.physics.add.overlap(player.playerBody, world.enemies, onCollisionPlayerEnemy);
+  this.physics.add.overlap(world.bulletFactory.group, world.enemies, onCollisionBulletEnemy);
+  this.physics.add.collider(player.playerBody, world.walls, onCollisionPlayerWall);
+  this.physics.add.collider(world.enemies, world.walls, onCollisionEnemyWall);
+  this.physics.add.overlap(world.bulletFactory.group, world.walls, onCollisionBulletWall);
+  pauseGameForInput();
+  game.input.on('pointerdown', startGame);
+  path = { t: 0, vec: new Phaser.Math.Vector2() };
+  stream1 = this.add.graphics();
+  stream2 = this.add.graphics();
+  stream3 = this.add.graphics();
+  streamDestX = pointer.position.x;
+  streamDestY = pointer.position.y;
+  hitEnemy = null;
+  collidedBullet = null;
+  bulletCheck = 0.0
 }
 
 function pauseGameForInput() {
-    game.paused = true;
+  game.paused = true;
 
-    ui.showStartText();
+  ui.showStartText();
 }
 
 function resumeGameFromInput() {
-    ui.disableStartText();
-    game.paused = false;
+  ui.disableStartText();
+  game.paused = false;
 }
 
 //This will not work correctly if each frame doesn't have the .png suffix
@@ -166,16 +165,16 @@ function animationSetUp()
 // }
 
 function startGame() {
-    if (!game.paused)
-        return;
-    
-    console.log("startGame()");
+  if (!game.paused)
+    return;
+  
+  console.log("startGame()");
 
-    // game.time.addEvent({ delay: 4000, repeat: -1, callback: spawnEnemies });
-    
-    setScore(0);
+  // game.time.addEvent({ delay: 4000, repeat: -1, callback: spawnEnemies });
+  
+  setScore(0);
 
-    resumeGameFromInput();
+  resumeGameFromInput();
 }
 
 function addStreamPoints(curve, noOfPoints) {
@@ -206,9 +205,9 @@ function processStreams(shouldFire) {
     streamDestY = hitEnemy.y;
   }
   if (shouldFire == true) {
-    drawStream(20, 2, stream1, 0xffffff);
-    drawStream(4, 3, stream2, 0xffff00);
-    drawStream(30, 2, stream3, 0xff0000);
+    drawStream(20, 2, stream1, Constants.colour.streamBlue);
+    drawStream(4, 4, stream2, Constants.colour.streamYellow);
+    drawStream(30, 2, stream3, Constants.colour.streamRed);
   } else {
     stream1.clear();
     stream2.clear();
@@ -256,9 +255,9 @@ function configureInput() {
   input.add(Phaser.Input.Keyboard.KeyCodes.W, function() { player.up(); });
   input.add(Phaser.Input.Keyboard.KeyCodes.S, function() { player.down(); });
   input.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
-      player.firing = true;
-      world.spawnBullet(player.playerBody.x, player.playerBody.y, pointer.position.x, pointer.position.y);
-      // audio.shoot.play();
+    player.firing = true;
+    world.spawnBullet(player.wandEndX, player.wandEndY, pointer.position.x, pointer.position.y);
+    // audio.shoot.play();
   });
 
 }
@@ -301,24 +300,15 @@ function onCollisionBulletWall(bullet, wall) {
   bullet.destroy();
 }
 
-// function onCollisionBulletEnemy(bulletSprite, enemySprite) {
-//     bulletSprite.destroy();
-//     enemySprite.destroy();
-//     audio.explode.play();
-
-//     world.numEnemies--;
-//     setScore(game.score + 20);
-// }
-
 function setScore(value) {
-    game.score = value;
-    ui.updateScoreText(value);
+  game.score = value;
+  ui.updateScoreText(value);
 }
 
 function gameOver() {
-    console.log("gameOver()");
+  console.log("gameOver()");
 
-    world.cleanup();
+  world.cleanup();
 
-    pauseGameForInput();
+  pauseGameForInput();
 }
