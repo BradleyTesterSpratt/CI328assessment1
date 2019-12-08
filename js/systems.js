@@ -1,58 +1,70 @@
 class Audio {
-    constructor() {
-        this.intro = game.sound.add('intro');
-        //this.intro.play();
-        this.bg = game.sound.add('bg', true);
-        //this.bg.play();
-        this.explode = game.sound.add('explode');
-        this.fly = game.sound.add('fly');
-        this.shoot = game.sound.add('shoot');
-    }
+  constructor() {
+    this.intro = game.sound.add('intro');
+    //this.intro.play();
+    this.bg = game.sound.add('bg', true);
+    //this.bg.play();
+    this.explode = game.sound.add('explode');
+    this.fly = game.sound.add('fly');
+    this.shoot = game.sound.add('shoot');
+  }
 }
 
 class Input {
-    constructor() {
-        this.keyMap = new Map();
-    }
+  constructor() {
+    this.keyMap = new Map();
+  }
 
-    add(key, action) {
-        this.keyMap.set(game.input.keyboard.addKey(key), action);
-    }
+  add(key, action) {
+    this.keyMap.set(game.input.keyboard.addKey(key), action);
+  }
 
-    update() {
-        for (const [key, action] of this.keyMap.entries()) {
-            if (key.isDown) {
-                action();
-            }
-        }
+  update() {
+    for (const [key, action] of this.keyMap.entries()) {
+      if (key.isDown) {
+        action();
+      }
     }
+  }
 }
 
 class UI {
-    constructor() {
-        this.startGameText = game.add.text(phaser.config.width / 2, phaser.config.height / 2, 'Click to Start', {
-            font: '30px Arial',
-            fill: '#fff'
-        });
-        this.startGameText.setOrigin(0.5, 0.5);
-        this.startGameText.setDepth(100);
+  constructor() {
+    this.startGameText = game.add.text(phaser.config.width / 2, phaser.config.height / 2, 'Click to Start', {
+      font: '30px Arial',
+      fill: '#fff'
+    });
+    this.startGameText.setOrigin(0.5, 0.5);
+    this.startGameText.setDepth(100);
 
-        this.scoreText = game.add.text(10, 10, 'Score: 0', {
-            font: '34px Arial',
-            fill: '#fff'
-        });
-        this.scoreText.setDepth(100);
-    }
+    this.scoreText = game.add.text(10, 10, 'Score: 0', {
+      font: '34px Arial',
+      fill: '#fff'
+    });
+    this.scoreText.setDepth(100);
+  }
 
-    updateScoreText(newScore) {
-        this.scoreText.setText('Score: ' + newScore);
-    }
+  updateScoreText(newScore) {
+    this.scoreText.setText('Score: ' + newScore);
+  }
 
-    showStartText() {
-        this.startGameText.visible = true;
-    }
+  showStartText() {
+    this.startGameText.visible = true;
+  }
 
-    disableStartText() {
-        this.startGameText.visible = false;
-    }
+  disableStartText() {
+    this.startGameText.visible = false;
+  }
+}
+
+class Constants {
+  static colour = {
+    streamWhite: 0xffffff,
+    streamBlue: 0x00ffff,
+    streamRed: 0xff0000,
+    streamYellow: 0xffff00,
+    pinkSlime: 0x936999,
+    greenSlime: 0x00FF00,
+    blackSlime: 0x444444
+  }
 }
