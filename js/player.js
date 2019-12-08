@@ -44,7 +44,7 @@ class Player {
   collideGhost(array) {
     if (this.hasCollided == false) {
       if (array[1] == 'speed') {
-        this.firstSlime.tint = 0x936999;
+        this.firstSlime.tint = Constants.colour.pinkSlime;
         this.firstSlime.anims.play('slimeDripA', true);
 
         this.firstSlime.visible = true;
@@ -131,13 +131,13 @@ class Player {
     let tint = 0x000000
     switch(int) {
       case 0:
-        tint = 0xffffff;
+        tint = Constants.colour.streamWhite;
         break;
       case 1:
-        tint = 0xffff00;
+        tint = Constants.colour.streamRed;
         break;
       default:
-        tint = 0xff0000;
+        tint = Constants.colour.streamYellow;
     }
     this.wandSpark.tint = tint;
   }
@@ -146,22 +146,22 @@ class Player {
     this.hasHitWall = true;
     switch(direction) {
       case "up":
-        this.playerBody.y += this.speed;
+        this.playerBody.y += this.speed*4;
         this.playerWand.y = this.playerBody.y;
         this.idle();
         break;
       case "down":
-        this.playerBody.y -= this.speed;
+        this.playerBody.y -= this.speed*4;
         this.playerWand.y = this.playerBody.y;
         this.idle();
         break;
       case "left":
-        this.playerBody.x += this.speed;
+        this.playerBody.x += this.speed*4;
         this.playerWand.x = this.playerBody.x;
         this.idle();
         break;
       case "right":
-        this.playerBody.x -= this.speed;
+        this.playerBody.x -= this.speed*4;
         this.playerWand.x = this.playerBody.x;
         this.idle();
         break;
