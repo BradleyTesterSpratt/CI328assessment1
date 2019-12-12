@@ -1,0 +1,10 @@
+<TextureAtlas imagePath='gates.png'>
+  <SubTexture name='slime_1.png' x='0' y='0' width='64' height='64'/>
+  <SubTexture name='slime_2.png' x='64' y='0' width='64' height='64'/>
+  <SubTexture name='slime_3.png' x='128' y='0' width='64' height='64'/>
+  <SubTexture name='glow_1.png' x='0' y='64' width='64' height='64'/>
+  <SubTexture name='glow_2.png' x='64' y='64' width='64' height='64'/>
+  <SubTexture name='glow_3.png' x='128' y='64' width='64' height='64'/>
+  <SubTexture name='glow_4.png' x='0' y='128' width='64' height='64'/>
+  <SubTexture name='closed_1.png' x='64' y='128' width='64' height='64'/>
+</TextureAtlas>
