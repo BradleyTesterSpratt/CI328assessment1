@@ -17,7 +17,7 @@ class World {
     this.tileset = this.map.addTilesetImage('sciFiTiles', 'testTiles');
     this.background = this.map.createStaticLayer('background', this.tileset, 0, 0);
     this.foreground = this.map.createStaticLayer('foreground', this.tileset, 0, 0);
-    this.foreground.setDepth(40);
+    this.foreground.setDepth(100);
     this.walls = game.physics.add.group({
       allowGravity: false,
       immovable: true
