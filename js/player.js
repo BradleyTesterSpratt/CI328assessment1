@@ -43,6 +43,7 @@ class Player {
     this.hitWall = this.hitWall.bind(this);
     this.hasMovedInput = false;
     this.setMove = this.setMove.bind(this);
+    this.streamStrength = 1;
   }
 
   collideGhost(array) {
@@ -163,9 +164,9 @@ class Player {
     if (this.hasMovedInput == false) { this.moving = direction }
   }
 
-  hitWall(direction) {
+  hitWall() {
     this.hasHitWall = true;
-    switch(direction) {
+    switch(this.moving) {
       case "up":
         this.playerBody.y += this.speed;
         this.playerWand.y = this.playerBody.y;

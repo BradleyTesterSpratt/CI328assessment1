@@ -38,6 +38,7 @@ class World {
     this.wallHit = false;
     this.spawnTimer = 100;
   }
+
   randomiseSpark(int) {
     let tint = 0x000000;
     switch (int) {
@@ -52,9 +53,11 @@ class World {
     }
     this.wallHitSpark.tint = tint;
   }
+
   spawnBullet(x, y, destX, destY) {
     this.bulletFactory.spawnAsBullet(x, y, destX, destY);
   }
+
   addEnemyToGroup(enemy) {
     this.enemies.add(enemy.enemySprite);
     enemy.enemySprite.setCollideWorldBounds(true);
@@ -65,7 +68,14 @@ class World {
       return console.log('game over');  
     }
     let enemy = this.spiritWorld.pop();
-    let spawnLocation = this.findRandomGate();
+    let spawnGate = this.findRandomGate();
+    while (spawnGate.self.open == false) {
+      spawnGate = this.findRandomGate();
+    }
+    let spawnLocation = {
+      x: spawnGate.x,
+      y: spawnGate.y
+    }
     switch(enemy) {
       case('physTypeOne'):
       this.addEnemyToGroup(new TypeOne(spawnLocation));
@@ -78,22 +88,32 @@ class World {
 
   findRandomGate() {
     let randomEntry = parseInt(Math.random() * this.ghostGates.children.entries.length);
-    let randomGate = this.ghostGates.children.entries[randomEntry];
-    if (randomGate.self.open == true) {
-      return {x: randomGate.x, y:randomGate.y};
-    }
+    return this.ghostGates.children.entries[randomEntry];
+  }
+
+  checkForOpenGates() {
+    let result = false;
+    this.ghostGates.children.entries.forEach(gate => {
+      if (gate.self.open == true) { 
+        result = true;
+      }
+    });
+    return result;
   }
 
   update() {
     this.ghostGates.children.iterate(function (gate) {
       if (gate) {
         gate.self.setAnimation();
+        gate.self.update();
       }
     });
     this.spawnTimer += 0.16;
     if (this.spawnTimer > 100) {
-      this.spawnEnemy();
-      this.spawnTimer = 0;
+      if (this.checkForOpenGates() == true) {
+        this.spawnEnemy();
+        this.spawnTimer = 0;
+      }
     }
     this.wallHitSpark.anims.play('wandSpark', true, parseInt(Math.random() * 42));
     this.player.update();

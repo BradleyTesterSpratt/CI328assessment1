@@ -16,7 +16,7 @@ function main() {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false
+        debug: true
       }
     },
     scene: {
@@ -77,6 +77,8 @@ function create() {
   this.physics.add.collider(player.playerBody, world.walls, onCollisionPlayerWall);
   this.physics.add.collider(world.enemies, world.walls, onCollisionEnemyWall);
   this.physics.add.overlap(world.bulletFactory.group, world.walls, onCollisionBulletWall);
+  this.physics.add.collider(player.playerBody, world.ghostGates, onCollisionPlayerGate);
+  this.physics.add.overlap(world.bulletFactory.group, world.ghostGates, onCollisionBulletGate);
   pauseGameForInput();
   game.input.on('pointerdown', startGame);
   path = { t: 0, vec: new Phaser.Math.Vector2() };
@@ -290,14 +292,12 @@ function onCollisionPlayerEnemy(playerBody, enemyBody) {
   playerBody.player.slime(slimeInfo);
 }
 
-function onCollisionBulletEnemy(bullet, enemy) {
-  hitEnemy = enemy;
-  bullet.destroy();
-  enemy.enemy.leash();
+function onCollisionPlayerWall(playerBody, wall) {
+  playerBody.player.hitWall();
 }
 
-function onCollisionPlayerWall(playerBody, wall) {
-  playerBody.player.hitWall(playerBody.player.moving);
+function onCollisionPlayerGate(playerBody, gate) {
+  if (gate.self.open == true) { playerBody.player.hitWall() }
 }
 
 function onCollisionEnemyWall(enemyBody, wall) {
@@ -315,6 +315,20 @@ function onCollisionBulletWall(bullet, wall) {
   world.wallHitSpark.y = bullet.y;
   world.wallHit = true;
   bullet.destroy();
+}
+
+function onCollisionBulletGate(bullet, gate) {
+  if (gate.self.open == true) {
+    hitEnemy = gate;
+    bullet.destroy();
+    gate.self.damageGate(1);
+  }
+}
+
+function onCollisionBulletEnemy(bullet, enemy) {
+  hitEnemy = enemy;
+  bullet.destroy();
+  enemy.enemy.leash();
 }
 
 function setScore(value) {
