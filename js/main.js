@@ -16,7 +16,7 @@ function main() {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false
+        debug: true
       }
     },
     scene: {
@@ -43,11 +43,14 @@ function preload() {
 
   this.load.image('background_img', 'assets/gameBg.png');
   this.load.image('bullet_img', 'assets/bullet.png');
+
+  this.load.atlasXML('ghostGate', 'assets/sprites/gates.png', 'assets/sprites/gates.xml');
   this.load.atlasXML('firstSlime', 'assets/slimeA.png', 'assets/slimeA.xml');
   this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
   this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
   this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
   this.load.atlasXML('wandSparks', 'assets/wandSparks.png', 'assets/wandSparks.xml');
+
   this.load.audio('intro', 'assets/audio/start.mp3');
   this.load.audio('bg', 'assets/audio/start.mp3');
   //this.load.audio('bg', 'assets/audio/ufo_Theme.mp3');
@@ -74,12 +77,14 @@ function create() {
   this.physics.add.collider(player.playerBody, world.walls, onCollisionPlayerWall);
   this.physics.add.collider(world.enemies, world.walls, onCollisionEnemyWall);
   this.physics.add.overlap(world.bulletFactory.group, world.walls, onCollisionBulletWall);
+  this.physics.add.collider(player.playerBody, world.ghostGates, onCollisionPlayerGate);
+  this.physics.add.overlap(world.bulletFactory.group, world.ghostGates, onCollisionBulletGate);
   pauseGameForInput();
   game.input.on('pointerdown', startGame);
   path = { t: 0, vec: new Phaser.Math.Vector2() };
-  stream1 = this.add.graphics();
-  stream2 = this.add.graphics();
-  stream3 = this.add.graphics();
+  stream1 = this.add.graphics().setDepth(50);
+  stream2 = this.add.graphics().setDepth(50);
+  stream3 = this.add.graphics().setDepth(50);
   streamDestX = pointer.position.x;
   streamDestY = pointer.position.y;
   hitEnemy = null;
@@ -100,12 +105,13 @@ function resumeGameFromInput() {
 
 //This will not work correctly if each frame doesn't have the .png suffix
 //refactor to add the suffix into the function requirements?
-function createAnimation(key, repeat, frameRate, spriteSheet, animationName) {
+function createAnimation(key, repeat, frameRate, spriteSheet, animationName, yoyo) {
   game.anims.create(
     {
       key: key,
       repeat: repeat,
       frameRate: frameRate,
+      yoyo: (yoyo || false),
       frames: game.anims.generateFrameNames(spriteSheet, {
         prefix: animationName,
         suffix: '.png',
@@ -119,21 +125,28 @@ function createAnimation(key, repeat, frameRate, spriteSheet, animationName) {
 //This require's all ghost sprites to use the same naming convention in the .xml file
 function generateGhostAnimation(sprite)
 {
-  createAnimation(`${sprite}WalkLeft`, -1, 5, sprite, 'side_walk_')
-  createAnimation(`${sprite}WalkRight`, -1, 5, sprite, 'right_walk_')
-  createAnimation(`${sprite}WalkBackLeft`, -1, 5, sprite, 'back_side_walk_')
-  createAnimation(`${sprite}WalkBackRight`, -1, 5, sprite, 'back_right_walk_')
-  createAnimation(`${sprite}WalkBack`, -1, 5, sprite, 'back_walk_')
-  createAnimation(`${sprite}WalkForward`, -1, 5, sprite, 'front_walk_')
-  createAnimation(`${sprite}IdleForward`, -1, 5, sprite, 'front_stand_')
-  createAnimation(`${sprite}IdleBack`, -1, 5, sprite, 'back_stand_')
-  createAnimation(`${sprite}Hit`, -1, 5, sprite, 'front_hurt_')
-  createAnimation(`${sprite}LeftHit`, -1, 5, sprite, 'side_hurt_')
-  createAnimation(`${sprite}RightHit`, -1, 5, sprite, 'right_hurt_')
-  createAnimation(`${sprite}BackHit`, -1, 5, sprite, 'back_hurt_')
+  createAnimation(`${sprite}WalkLeft`, -1, 5, sprite, 'side_walk_');
+  createAnimation(`${sprite}WalkRight`, -1, 5, sprite, 'right_walk_');
+  createAnimation(`${sprite}WalkBackLeft`, -1, 5, sprite, 'back_side_walk_');
+  createAnimation(`${sprite}WalkBackRight`, -1, 5, sprite, 'back_right_walk_');
+  createAnimation(`${sprite}WalkBack`, -1, 5, sprite, 'back_walk_');
+  createAnimation(`${sprite}WalkForward`, -1, 5, sprite, 'front_walk_');
+  createAnimation(`${sprite}IdleForward`, -1, 5, sprite, 'front_stand_');
+  createAnimation(`${sprite}IdleBack`, -1, 5, sprite, 'back_stand_');
+  createAnimation(`${sprite}Hit`, -1, 5, sprite, 'front_hurt_');
+  createAnimation(`${sprite}LeftHit`, -1, 5, sprite, 'side_hurt_');
+  createAnimation(`${sprite}RightHit`, -1, 5, sprite, 'right_hurt_');
+  createAnimation(`${sprite}BackHit`, -1, 5, sprite, 'back_hurt_');
 }
 
 function animationSetUp()
+{
+  playerAnimations();
+  gateAnimations();
+  generateGhostAnimation('physTypeOne');
+}
+
+function playerAnimations()
 {
   createAnimation('walkLeft', -1, 5, 'buster_sp', 'frontWalkLeft');
   createAnimation('walkRight', -1, 5, 'buster_sp', 'frontWalkRight');
@@ -146,8 +159,14 @@ function animationSetUp()
   createAnimation('idleBack', -1, 5, 'buster_sp', 'backIdle');
   createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
   createAnimation('slimeDripA', -1, 2, 'firstSlime', 'drip');
-  generateGhostAnimation('physTypeOne')
-  createAnimation('wandSpark', -1, 20, 'wandSparks', 'spark_')
+  createAnimation('wandSpark', -1, 20, 'wandSparks', 'spark_');
+}
+
+function gateAnimations()
+{
+  createAnimation('slimeGate', -1, 1.5, 'ghostGate', 'slime_', true);
+  createAnimation('glowGate', -1, 5, 'ghostGate', 'glow_', true);
+  createAnimation('closedGate', -1, 5, 'ghostGate', 'closed_');
 }
 
 // function spawnEnemies() {
@@ -206,8 +225,8 @@ function processStreams(shouldFire) {
   }
   if (shouldFire == true) {
     drawStream(20, 2, stream1, Constants.colour.streamBlue);
-    drawStream(4, 4, stream2, Constants.colour.streamYellow);
-    drawStream(30, 2, stream3, Constants.colour.streamRed);
+    drawStream(4, 2, stream2, Constants.colour.streamYellow);
+    drawStream(4, 4, stream3, Constants.colour.streamRed);
   } else {
     stream1.clear();
     stream2.clear();
@@ -273,14 +292,12 @@ function onCollisionPlayerEnemy(playerBody, enemyBody) {
   playerBody.player.slime(slimeInfo);
 }
 
-function onCollisionBulletEnemy(bullet, enemy) {
-  hitEnemy = enemy;
-  bullet.destroy();
-  enemy.enemy.leash();
+function onCollisionPlayerWall(playerBody, wall) {
+  playerBody.player.hitWall();
 }
 
-function onCollisionPlayerWall(playerBody, wall) {
-  playerBody.player.hitWall(playerBody.player.moving);
+function onCollisionPlayerGate(playerBody, gate) {
+  if (gate.self.open == true) { playerBody.player.hitWall() }
 }
 
 function onCollisionEnemyWall(enemyBody, wall) {
@@ -298,6 +315,20 @@ function onCollisionBulletWall(bullet, wall) {
   world.wallHitSpark.y = bullet.y;
   world.wallHit = true;
   bullet.destroy();
+}
+
+function onCollisionBulletGate(bullet, gate) {
+  if (gate.self.open == true) {
+    hitEnemy = gate;
+    bullet.destroy();
+    gate.self.damageGate(1);
+  }
+}
+
+function onCollisionBulletEnemy(bullet, enemy) {
+  hitEnemy = enemy;
+  bullet.destroy();
+  enemy.enemy.leash();
 }
 
 function setScore(value) {

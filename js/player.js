@@ -25,6 +25,7 @@ class Player {
     const firstSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'firstSlime');
     firstSlime.setDepth(11);
     firstSlime.setScale(0.4, 0.4);
+    firstSlime.forwardScale = {x:0.4, y: 0.4};
     this.firstSlime = firstSlime;
     this.firstSlime.visible = false;
     const wandSpark = game.add.sprite(this.wandEndX, this.wandEndY, 'wandSpark')
@@ -42,6 +43,7 @@ class Player {
     this.hitWall = this.hitWall.bind(this);
     this.hasMovedInput = false;
     this.setMove = this.setMove.bind(this);
+    this.streamStrength = 1;
   }
 
   collideGhost(array) {
@@ -137,10 +139,11 @@ class Player {
     }
   }
 
-  // updateSlimePosition() {
-  //   slime.x = this.playerBody.x;
-  //   slime.y = this.playerBody.y;
-  // }
+  updateSlime(slime) {
+    slime.x = this.playerBody.x;
+    slime.y = this.playerBody.y;
+    this.facing == 0 ? slime.setScale(slime.forwardScale.x, slime.forwardScale.y): slime.setScale(slime.forwardScale.x*-1, slime.forwardScale.y);
+  }
 
   randomiseSpark(int) {
     let tint = 0x000000
@@ -161,9 +164,9 @@ class Player {
     if (this.hasMovedInput == false) { this.moving = direction }
   }
 
-  hitWall(direction) {
+  hitWall() {
     this.hasHitWall = true;
-    switch(direction) {
+    switch(this.moving) {
       case "up":
         this.playerBody.y += this.speed;
         this.playerWand.y = this.playerBody.y;
@@ -194,8 +197,7 @@ class Player {
     var i;
     for (i = 0; i < this.currentSlimes.length; i++) {
       let slime = this.currentSlimes[i][0];
-      slime.x = this.playerBody.x;
-      slime.y = this.playerBody.y;
+      this.updateSlime(slime);
     }
     if (this.firing == true) {
       this.wandSpark.visible = true;
