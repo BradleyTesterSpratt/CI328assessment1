@@ -1,0 +1,6 @@
+<TextureAtlas imagePath='trap.png'>
+  <SubTexture name='trap_out_3.png' x='0' y='0' width='916' height='829'/>
+  <SubTexture name='trap_out_2.png' x='916' y='0' width='916' height='829'/>
+  <SubTexture name='trap_out_1.png' x='0' y='829' width='916' height='829'/>
+  <SubTexture name='trap_closed_1.png' x='916' y='829' width='916' height='829'/>
+</TextureAtlas>

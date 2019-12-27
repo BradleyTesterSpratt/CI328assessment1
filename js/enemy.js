@@ -27,11 +27,22 @@ class Enemy {
     this.hasHitWall = false;
     this.enemySprite.enemy = this;
     this.hitWall = this.hitWall.bind(this);
+    this.active = true;
   }
 
-  collideBullet() {
-    this.isLeashed = true;
+  collideBullet(streamStrength) {
     this.updateColliderScale(1.5);
+    if (this.isLeashed == false) {
+      this.currentHP = this.currentHP - streamStrength;
+      this.isLeashed = true;
+    }
+    return {'hp': this.currentHP, 'x': this.enemySprite.x , 'y': this.enemySprite.y};
+  }
+
+  trap() {
+    this.enemySprite.y -= 15;
+    this.hurt();
+    this.active = false;
   }
 
   updateColliderScale(scale) {
@@ -101,6 +112,7 @@ class Enemy {
   }
 
   idle() {
+    this.moving = 'idle';
     if (this.isLeashed) {return this.hurt()};
     if (this.facing == 0) {
       this.enemySprite.anims.play(`${this.type}IdleForward`, true);
@@ -133,26 +145,41 @@ class Enemy {
     if (this.decisionDelay > 1) {
       this.perFrameUpdate();
     }
-    if (this.behaviour == 'dumb') {this.dumbBehaviour(this.behaviourRandomNumber)}
-    if (this.hasHitWall == false) {this.moving = 'idle'}
-  }
+    if (this.active == true) {
+      if (this.behaviour == 'dumb') {this.dumbBehaviour(this.behaviourRandomNumber)}
+      if (this.hasHitWall == false) {this.moving = 'idle'}
+    }
+}
 
   getRandomNumber(highestValue) {
     return parseInt(Math.random()*highestValue);
   }
 
   perFrameUpdate() {
-    if (this.hasCollided == true) { this.hasCollided = false} ;
-    if (this.isLeashed == true) {
-      this.isLeashed = false;
-      let rand = this.getRandomNumber(4);
-      this.speed = this.speed + ((rand+3) * ((rand+1)/10));
+    if (this.active == true) {
+      if (this.hasCollided == true) { this.hasCollided = false} ;
+      if (this.isLeashed == false) {
+        if (this.currentHP < this.maxHP) {
+          this.currentHP += 1;
+        }
+      }
+      if (this.isLeashed == true) {
+        this.isLeashed = false;
+        let rand = this.getRandomNumber(4);
+        this.speed = this.speed + ((rand+3) * ((rand+1)/10));
+      } else {
+        this.updateColliderScale(1);
+      }
+      this.decisionDelay = 0.0;
+      this.behaviourRandomNumber = this.getRandomNumber(4);
+      if (this.isLeashed && this.behaviour == 'dumb') {this.behaviourRandomNumber = parseInt(Math.random()*3)};
     } else {
-      this.updateColliderScale(1);
+      this.enemySprite.scaleX = (this.enemySprite.scaleX * 0.95);
+      this.enemySprite.scaleY = (this.enemySprite.scaleY * 0.95);
+      if (this.enemySprite.scaleX <= 0.01) {
+        this.enemySprite.destroy();
+      }
     }
-    this.decisionDelay = 0.0;
-    this.behaviourRandomNumber = this.getRandomNumber(4);
-    if (this.isLeashed && this.behaviour == 'dumb') {this.behaviourRandomNumber = parseInt(Math.random()*3)};
   }
 
   dumbBehaviour(randomNumber) {
