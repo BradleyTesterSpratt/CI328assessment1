@@ -1,49 +1,65 @@
 class Player {
   constructor() {
+    this.facing = 0;
+    this.moving = 'idle'; 
+    this.scaleRatio = 0.0;
+    this.baseSpeed = 5;
+    this.speed = 5;
+    this.currentSlimes = [];
+    this.hasCollided = false;
+    this.decisionDelay = 0.0;
+    this.moveInputDelay = 0.0;
+    this.wandEnd = {x: 0, y: 0};
+    this.wandOffset = {x: 0, y: 0};
+    this.beltOffset = {x: 10, y: 25};
+    this.firing = false;
+    this.hasHitWall = false;
+    this.hasMovedInput = false;
+    this.streamStrength = 1;
+    this.trapHeld = true;
+    this.trapLocation = {x: 0, y: 0};
+    const sprites = this.generateSprites();
+    this.playerBody = sprites['player'];
+    this.playerWand = sprites['wand'];
+    this.firstSlime = sprites['firstSlime'];
+    this.wandSpark = sprites['sparks'];
+    this.trap = sprites['trap'];
+    //allow the playerBody to access the whole class and it's functions
+    this.playerBody.player = this;
+    //bind so functions called from outside the class use 'this' correctly
+    this.slime = this.collideGhost.bind(this);
+    this.hitWall = this.hitWall.bind(this);
+    this.setMove = this.setMove.bind(this);
+    this.deployTrap = this.deployTrap.bind(this);
+    this.grabTrap = this.grabTrap.bind(this);    
+  }
+
+  generateSprites() {
     const playerSprite = game.physics.add.sprite(phaser.config.width / 2 - 100, phaser.config.height /2, 'buster_sp');
     playerSprite.setScale(0.40, 0.40);
     playerSprite.setOrigin(0.5, 0.5);
     playerSprite.setCollideWorldBounds(true);
+    playerSprite.setDepth(10);
     const wandSprite = game.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp');
     wandSprite.setScale(0.40, 0.40);
     wandSprite.setOrigin(0.5, 0.5);
-    this.facing = 0;
-    this.playerBody = playerSprite;
-    this.playerWand = wandSprite;
-    this.playerBody.setDepth(10);
-    this.playerWand.setDepth(20);
-    this.moving = 'idle'; 
-    this.scaleRatio = 0.0;
-    this.playerBody.player = this;
-    this.baseSpeed = 5;
-    this.speed = 5;
-    this.currentSlimes = [];
-    this.slime = this.collideGhost.bind(this);
-    this.hasCollided = false;
-    this.decisionDelay = 0.0;
-    this.moveInputDelay = 0.0;
+    wandSprite.setDepth(20);
     const firstSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'firstSlime');
     firstSlime.setDepth(11);
     firstSlime.setScale(0.4, 0.4);
     firstSlime.forwardScale = {x:0.4, y: 0.4};
-    this.firstSlime = firstSlime;
-    this.firstSlime.visible = false;
-    const wandSpark = game.add.sprite(this.wandEndX, this.wandEndY, 'wandSpark')
+    firstSlime.visible = false;
+    const wandSpark = game.add.sprite(this.wandEnd.x, this.wandEnd.y, 'wandSpark')
     wandSpark.setDepth(20);
     wandSpark.setScale(0.3, 0.3);
     wandSpark.alpha = 0.75;
-    this.wandSpark = wandSpark;
-    this.wandSpark.visible = false;
-    this.wandEndX = 0;
-    this.wandEndY = 0;
-    this.wandOffsetX = 0;
-    this.wandOffsetY = 0;
-    this.firing = false;
-    this.hasHitWall = false;
-    this.hitWall = this.hitWall.bind(this);
-    this.hasMovedInput = false;
-    this.setMove = this.setMove.bind(this);
-    this.streamStrength = 1;
+    wandSpark.visible = false;
+    const trap = game.physics.add.sprite(playerSprite.x, playerSprite.y, 'trap');
+    trap.setDepth(11);
+    trap.setScale(0.03, 0.03);
+    trap.rotation = 90;
+    trap.body.enable = false;
+    return {'player': playerSprite, 'wand': wandSprite, 'firstSlime': firstSlime, 'sparks': wandSpark, 'trap': trap};
   }
 
   collideGhost(array) {
@@ -98,6 +114,7 @@ class Player {
     this.playerWand.y = this.playerBody.y;
     this.facing = 1;
     this.playerWand.setDepth(5)
+    this.trap.setDepth(5)
     this.playerBody.anims.play('walkBack', true);
     this.hasMovedInput = true;
   }
@@ -107,6 +124,7 @@ class Player {
     this.playerWand.y = this.playerBody.y;
     this.facing = 0;
     this.playerWand.setDepth(20)
+    this.trap.setDepth(11)
     this.playerBody.anims.play('walkForward', true);
     this.hasMovedInput = true;
   }
@@ -218,16 +236,17 @@ class Player {
       if (this.hasHitWall == false) {this.moving = 'idle'}
       this.moveInputDelay = 0.0;
     }
-    // if (this.moving == 'idle') {
-    //   this.idle();
-    // }
     this.updateWand(aimFromPlayerToPointer());
-    this.wandEndX = this.playerBody.x + this.wandOffsetX;
-    this.wandEndY = this.playerBody.y + this.wandOffsetY;
+    this.wandEnd.x = this.playerBody.x + this.wandOffset.x;
+    this.wandEnd.y = this.playerBody.y + this.wandOffset.y;
     this.hasHitWall = false;
-    this.wandSpark.x = this.wandEndX;
-    this.wandSpark.y = this.wandEndY;
-
+    this.wandSpark.x = this.wandEnd.x;
+    this.wandSpark.y = this.wandEnd.y;
+    if (this.trapHeld) {
+      this.trap.x = this.playerBody.x + this.beltOffset.x;
+      this.trap.y = this.playerBody.y + this.beltOffset.y;
+      this.trap.anims.play('trapClosed', true);
+    }
     // this.scaleRatio += 0.016;
 
     // if (this.scaleRatio >= 1.5) {
@@ -260,58 +279,77 @@ class Player {
   //   // }
   // }
 
+  deployTrap(x, y) {
+    this.trapHeld = false;
+    this.trap.x = x;
+    this.trap.y = y;
+    this.trap.anims.play('trapOut', true)
+    this.trap.setScale(0.06, 0.06);
+    this.trap.rotation = 0;
+    this.trap.body.enable = true;
+  }
+  
+  grabTrap()
+  {
+    this.trapHeld = true;
+    this.trap.anims.play('trapClosed', true)
+    this.trap.setScale(0.03, 0.03);
+    this.trap.rotation = 90;
+    this.trap.body.enable = false;
+  }
+
   updateWand(angle) {
     switch(true) {
       case (157 < angle && angle <= 180):
       case (-180 <= angle && angle <= -158):
         this.playerWand.setTexture('wand_sp', '270deg.png');
-        this.wandOffsetX = -35;
-        this.wandOffsetY = -2;
+        this.wandOffset.x = -35;
+        this.wandOffset.y = -2;
         break;
       case (-158 < angle && angle <= -113):
         this.playerWand.setTexture('wand_sp', '315deg.png');
-        this.wandOffsetX = -35;
-        this.wandOffsetY = -22;
+        this.wandOffset.x = -35;
+        this.wandOffset.y = -22;
         break;
       case (-113 < angle && angle < -90):
         this.playerWand.setTexture('wand_sp', '350deg.png');
-        this.wandOffsetX = -15;
-        this.wandOffsetY = -35;
+        this.wandOffset.x = -15;
+        this.wandOffset.y = -35;
         break;
       case (-90 <= angle && angle <= -67):
         this.playerWand.setTexture('wand_sp', '010deg.png');
-        this.wandOffsetX = 27;
-        this.wandOffsetY = -35;
+        this.wandOffset.x = 27;
+        this.wandOffset.y = -35;
         break;
       case (-67 < angle && angle <= -22):
         this.playerWand.setTexture('wand_sp', '045deg.png');
-        this.wandOffsetX = 37;
-        this.wandOffsetY = 2;
+        this.wandOffset.x = 37;
+        this.wandOffset.y = 2;
         break;
       case (-22 < angle && angle <= 23):
         this.playerWand.setTexture('wand_sp', '090deg.png');
-        this.wandOffsetX = 40;
-        this.wandOffsetY = 30;
+        this.wandOffset.x = 40;
+        this.wandOffset.y = 30;
         break;
       case (23 < angle && angle <= 67):
         this.playerWand.setTexture('wand_sp', '135deg.png');
-        this.wandOffsetX = 32;
-        this.wandOffsetY = 37;
+        this.wandOffset.x = 32;
+        this.wandOffset.y = 37;
         break;
       case (67 < angle && angle <= 90):
         this.playerWand.setTexture('wand_sp', '170deg.png');
-        this.wandOffsetX = 10;
-        this.wandOffsetY = 40;
+        this.wandOffset.x = 10;
+        this.wandOffset.y = 40;
         break;
       case (90 < angle && angle <= 112):
         this.playerWand.setTexture('wand_sp', '190deg.png');
-        this.wandOffsetX = -17;
-        this.wandOffsetY = 40;
+        this.wandOffset.x = -17;
+        this.wandOffset.y = 40;
         break;
       case (112 < angle && angle <= 157):
         this.playerWand.setTexture('wand_sp', '225deg.png');
-        this.wandOffsetX = -27;
-        this.wandOffsetY = 35;
+        this.wandOffset.x = -27;
+        this.wandOffset.y = 35;
         break;
       default:
         this.playerWand.setTexture('wand_sp', '090deg.png');

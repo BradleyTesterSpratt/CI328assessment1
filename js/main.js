@@ -16,7 +16,7 @@ function main() {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false
+        debug: true
       }
     },
     scene: {
@@ -50,6 +50,7 @@ function preload() {
   this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
   this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
   this.load.atlasXML('wandSparks', 'assets/wandSparks.png', 'assets/wandSparks.xml');
+  this.load.atlasXML('trap', 'assets/sprites/trap.png', 'assets/sprites/trap.xml');
 
   this.load.audio('intro', 'assets/audio/start.mp3');
   this.load.audio('bg', 'assets/audio/start.mp3');
@@ -79,14 +80,15 @@ function create() {
   this.physics.add.overlap(world.bulletFactory.group, world.walls, onCollisionBulletWall);
   this.physics.add.collider(player.playerBody, world.ghostGates, onCollisionPlayerGate);
   this.physics.add.overlap(world.bulletFactory.group, world.ghostGates, onCollisionBulletGate);
+  this.physics.add.overlap(player.playerBody, player.trap, onCollisionPlayerTrap);
   pauseGameForInput();
   game.input.on('pointerdown', startGame);
   path = { t: 0, vec: new Phaser.Math.Vector2() };
   stream1 = this.add.graphics().setDepth(50);
   stream2 = this.add.graphics().setDepth(50);
   stream3 = this.add.graphics().setDepth(50);
-  streamDestX = pointer.position.x;
-  streamDestY = pointer.position.y;
+  streamDest = {x: pointer.position.x, y: pointer.position.y};
+  trapWire = this.add.graphics().setDepth(12);
   hitEnemy = null;
   collidedBullet = null;
   bulletCheck = 0.0
@@ -160,6 +162,8 @@ function playerAnimations()
   createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
   createAnimation('slimeDripA', -1, 2, 'firstSlime', 'drip');
   createAnimation('wandSpark', -1, 20, 'wandSparks', 'spark_');
+  createAnimation('trapOut', -1, 5, 'trap', 'trap_out_');
+  createAnimation('trapClosed', -1, 5, 'trap', 'trap_closed_');
 }
 
 function gateAnimations()
@@ -214,14 +218,14 @@ function addStreamPoints(curve, noOfPoints) {
 
 function processStreams(shouldFire) {  
   if (collidedBullet != null) {
-    streamDestX = collidedBullet.x;
-    streamDestY = collidedBullet.y;
+    streamDest.x = collidedBullet.x;
+    streamDest.y = collidedBullet.y;
   } else if (hitEnemy == null)  {
-    streamDestX = pointer.position.x;
-    streamDestY = pointer.position.y;
+    streamDest.x = pointer.position.x;
+    streamDest.y = pointer.position.y;
   } else {
-    streamDestX = hitEnemy.x;
-    streamDestY = hitEnemy.y;
+    streamDest.x = hitEnemy.x;
+    streamDest.y = hitEnemy.y;
   }
   if (shouldFire == true) {
     drawStream(20, 2, stream1, Constants.colour.streamBlue);
@@ -239,14 +243,28 @@ function processStreams(shouldFire) {
 function drawStream(noOfPoints, thickness, graphics, colour) {
   curve = new Phaser.Curves.Spline(
     [
-      player.wandEndX, player.wandEndY,
-      streamDestX, streamDestY
+      player.wandEnd.x, player.wandEnd.y,
+      streamDest.x, streamDest.y
     ]
   );
   curve.points = addStreamPoints(curve, noOfPoints);
   graphics.clear();
   graphics.lineStyle(thickness, colour, 1);
   curve.draw(graphics, 64);
+  curve.getPoint(path.t, path.vec);
+}
+
+function deployTrap(destX, destY) {
+  curve = new Phaser.Curves.Spline(
+    [
+      player.playerBody.x, player.playerBody.y,
+      destX, destY
+    ]
+  );
+  curve.points = addStreamPoints(curve, 5);
+  trapWire.clear();
+  trapWire.lineStyle(2, Constants.colour.blackSlime, 1);
+  curve.draw(trapWire, 64);
   curve.getPoint(path.t, path.vec);
 }
 
@@ -275,7 +293,7 @@ function configureInput() {
   input.add(Phaser.Input.Keyboard.KeyCodes.S, function() { player.setMove('down'); });
   input.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
     player.firing = true;
-    world.spawnBullet(player.wandEndX, player.wandEndY, pointer.position.x, pointer.position.y);
+    world.spawnBullet(player.wandEnd.x, player.wandEnd.y, pointer.position.x, pointer.position.y);
     // audio.shoot.play();
   });
 
@@ -298,6 +316,11 @@ function onCollisionPlayerWall(playerBody, wall) {
 
 function onCollisionPlayerGate(playerBody, gate) {
   if (gate.self.open == true) { playerBody.player.hitWall() }
+}
+
+function onCollisionPlayerTrap(playerBody, trap) {
+  playerBody.player.grabTrap();
+  trapWire.clear();
 }
 
 function onCollisionEnemyWall(enemyBody, wall) {
@@ -328,7 +351,15 @@ function onCollisionBulletGate(bullet, gate) {
 function onCollisionBulletEnemy(bullet, enemy) {
   hitEnemy = enemy;
   bullet.destroy();
-  enemy.enemy.leash();
+  ghostStats = enemy.enemy.leash(1);
+  if (ghostStats.hp <= 0 && world.player.trapHeld == true) {
+    world.cleanup(world.bulletFactory);
+    world.player.deployTrap(ghostStats.x, ghostStats.y);
+    enemy.enemy.trap();
+    deployTrap(ghostStats.x, ghostStats.y);
+    //unshift adds to the beginning of an array, so that the most recent ghost caught is the last to spawn
+    world.spiritWorld.unshift(enemy.enemy.type);
+  }
 }
 
 function setScore(value) {
