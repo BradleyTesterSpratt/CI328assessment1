@@ -54,7 +54,7 @@ class Enemy {
     if (this.hasCollided == false) {
       this.speed = this.escapeSpeed;
       this.enemySprite.alpha = 0.5;
-      return [this.slimeColour, this.slimeStat]; 
+      return {'colour': this.slimeColour, 'debuff': this.slimeStat}; 
     }
     this.hasCollided = true;
   }

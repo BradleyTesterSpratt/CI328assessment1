@@ -1,0 +1,6 @@
+<TextureAtlas imagePath='slimeC.png'>
+  <SubTexture name='drip4.png' x='0' y='0' width='136' height='233'/>
+  <SubTexture name='drip3.png' x='136' y='0' width='136' height='233'/>
+  <SubTexture name='drip2.png' x='0' y='233' width='136' height='233'/>
+  <SubTexture name='drip1.png' x='136' y='233' width='136' height='233'/>
+</TextureAtlas>

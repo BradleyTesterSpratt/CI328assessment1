@@ -5,10 +5,11 @@ class Player {
     this.scaleRatio = 0.0;
     this.baseSpeed = 5;
     this.speed = 5;
-    this.currentSlimes = [];
+    this.slimes = [];
     this.hasCollided = false;
-    this.decisionDelay = 0.0;
+    this.fireDelay = 0.0;
     this.moveInputDelay = 0.0;
+    this.slimeDelay = 0.0;
     this.wandEnd = {x: 0, y: 0};
     this.wandOffset = {x: 0, y: 0};
     this.beltOffset = {x: 10, y: 25};
@@ -22,6 +23,12 @@ class Player {
     this.playerBody = sprites['player'];
     this.playerWand = sprites['wand'];
     this.firstSlime = sprites['firstSlime'];
+    this.firstSlime.debuff = 'none';
+    this.secondSlime = sprites['secondSlime'];
+    this.secondSlime.debuff = 'none';
+    this.thirdSlime = sprites['thirdSlime'];
+    this.thirdSlime.debuff = 'none';
+    this.slimes.push(this.firstSlime, this.secondSlime, this.thirdSlime);
     this.wandSpark = sprites['sparks'];
     this.trap = sprites['trap'];
     //allow the playerBody to access the whole class and it's functions
@@ -50,6 +57,16 @@ class Player {
     firstSlime.setScale(0.4, 0.4);
     firstSlime.forwardScale = {x:0.4, y: 0.4};
     firstSlime.visible = false;
+    const secondSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'secondSlime');
+    secondSlime.setDepth(11);
+    secondSlime.setScale(0.4, 0.4);
+    secondSlime.forwardScale = {x:0.4, y: 0.4};
+    secondSlime.visible = false;
+    const thirdSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'secondSlime');
+    thirdSlime.setDepth(11);
+    thirdSlime.setScale(0.4, 0.4);
+    thirdSlime.forwardScale = {x:0.4, y: 0.4};
+    thirdSlime.visible = false;
     const wandSpark = game.add.sprite(this.wandEnd.x, this.wandEnd.y, 'wandSpark')
     wandSpark.setDepth(20);
     wandSpark.setScale(0.3, 0.3);
@@ -60,30 +77,36 @@ class Player {
     trap.setScale(0.03, 0.03);
     trap.rotation = 90;
     trap.body.enable = false;
-    return {'player': playerSprite, 'wand': wandSprite, 'firstSlime': firstSlime, 'sparks': wandSpark, 'trap': trap};
+    return {
+      'player': playerSprite,
+      'wand': wandSprite,
+      'firstSlime': firstSlime,
+      'secondSlime': secondSlime,
+      'thirdSlime': thirdSlime,
+      'sparks': wandSpark,
+      'trap': trap
+    };
   }
 
-  collideGhost(array) {
-    if (this.hasCollided == false) {
-      if (array[1] == 'speed') {
-        this.firstSlime.tint = Constants.colour.pinkSlime;
-        this.firstSlime.anims.play('slimeDripA', true);
-
-        this.firstSlime.visible = true;
-        this.speed = this.speed/2;
-        this.currentSlimes.push([this.firstSlime, 'speed']);
-        game.time.scene.time.delayedCall(6000, this.cleanSlime, [], this);
-      }
-    }
+  collideGhost(slimeInfo) {
     this.hasCollided = true;
+    let availableSlime = null;
+    this.slimes.forEach(slime => {
+      if(slime.visible == false) {
+        availableSlime = slime;
+      }
+    })
+    if (availableSlime != null) {
+      availableSlime.debuff = slimeInfo['debuff'];
+      availableSlime.tint = slimeInfo['colour'];
+      availableSlime.visible = true;
+      game.time.scene.time.delayedCall(6000, this.cleanSlime, [availableSlime], this);
+    }
   }
 
-  cleanSlime() {
-    if (this.currentSlimes[0][1] == 'speed') {
-      this.currentSlimes[0][0].visible = false;
-      this.currentSlimes.shift();
-      this.speed = this.baseSpeed;
-    }
+  cleanSlime(slime) {
+    slime.visible = false;
+    slime.debuff = 'none';
   }
 
   left() {
@@ -158,10 +181,22 @@ class Player {
     }
   }
 
-  updateSlime(slime) {
-    slime.x = this.playerBody.x;
-    slime.y = this.playerBody.y;
-    this.facing == 0 ? slime.setScale(slime.forwardScale.x, slime.forwardScale.y): slime.setScale(slime.forwardScale.x*-1, slime.forwardScale.y);
+  updateSlimes() {
+    this.slimes.forEach(slime => {
+      slime.x = this.playerBody.x;
+      slime.y = this.playerBody.y;
+      this.facing == 0 ? slime.setScale(slime.forwardScale.x, slime.forwardScale.y): slime.setScale(slime.forwardScale.x*-1, slime.forwardScale.y);
+    })
+  }
+
+  processDebuffs() {
+    let currentSpeed = this.baseSpeed;
+    this.slimes.forEach(slime => {
+      if (slime.debuff == 'speed') {
+        currentSpeed = currentSpeed * 0.5;
+      }
+    })
+    this.speed = currentSpeed;
   }
 
   randomiseSpark(int) {
@@ -212,35 +247,39 @@ class Player {
   }
 
   update () {
+    this.processDebuffs();
+    this.firstSlime.anims.play('slimeDripA', true);
+    this.secondSlime.anims.play('slimeDripB', true);
+    this.thirdSlime.anims.play('slimeDripC', true);
     this.wandSpark.anims.play('wandSpark', true, parseInt(Math.random()*42));
-    var i;
-    for (i = 0; i < this.currentSlimes.length; i++) {
-      let slime = this.currentSlimes[i][0];
-      this.updateSlime(slime);
-    }
+    this.updateSlimes();
     if (this.firing == true) {
+      this.fireDelay += 0.016;
       this.wandSpark.visible = true;
       this.randomiseSpark(parseInt(Math.random()*3));
     } else { 
       this.wandSpark.visible = false;
     }
-    this.decisionDelay += 0.016;
-    this.moveInputDelay += 0.016;
-    if (this.decisionDelay > 1) {
-      if (this.hasCollided == true) { this.hasCollided = false };
-      if (this.firing == true) { this.firing = false };
-      this.decisionDelay = 0.0;
+    if (this.hasCollided == true) {this.slimeDelay += 0.016};
+    if (this.fireDelay > 1) {
+      this.firing = false;
+      this.fireDelay = 0.0;
+    }
+    if (this.slimeDelay > 2) {
+      this.slimeDelay = 0.0;
+      this.hasCollided = false;
     }
     this.move();
+    this.moveInputDelay += 0.016;
     if (this.moveInputDelay > 0.16) {
       this.hasMovedInput = false;
       if (this.hasHitWall == false) {this.moving = 'idle'}
       this.moveInputDelay = 0.0;
+      this.hasHitWall = false;
     }
     this.updateWand(aimFromPlayerToPointer());
     this.wandEnd.x = this.playerBody.x + this.wandOffset.x;
     this.wandEnd.y = this.playerBody.y + this.wandOffset.y;
-    this.hasHitWall = false;
     this.wandSpark.x = this.wandEnd.x;
     this.wandSpark.y = this.wandEnd.y;
     if (this.trapHeld) {
@@ -248,37 +287,7 @@ class Player {
       this.trap.y = this.playerBody.y + this.beltOffset.y;
       this.trap.anims.play('trapClosed', true);
     }
-    // this.scaleRatio += 0.016;
-
-    // if (this.scaleRatio >= 1.5) {
-    //   this.scaleRatio = 0.0;
-    // }
-
-    // let start = 0.5;
-    // let end = 0.515;
-    // let t = this.scaleRatio;
-    // let tMax = 1.5;
-
-    // playerBody.scaleX = start + (end - start) * this.interpolate(t / tMax);
-    // playerBody.scaleY = start + (end - start) * this.interpolate(t / tMax);
   }
-
-  // interpolate(ratio) {
-  //   return (ratio == 1.0) ? 1.0 : 1 - Math.pow(2.0, -10 * ratio);
-  
-  //   // if (ratio < 1/2.75) {
-  //   //     return 7.5625*ratio*ratio;
-  //   // } else if (ratio < 2/2.75) {
-  //   //     var r = ratio - 1.5/2.75;
-  //   //     return 7.5625*r*r+0.75;
-  //   // } else if (ratio < 2.5/2.75) {
-  //   //     var r = ratio-2.25/2.75;
-  //   //     return 7.5625*r*r+0.9375;
-  //   // } else {
-  //   //     var r = ratio - 2.625/2.75;
-  //   //     return 7.5625*r*r+0.984375;
-  //   // }
-  // }
 
   deployTrap(x, y) {
     this.trapHeld = false;
@@ -355,9 +364,5 @@ class Player {
       default:
         this.playerWand.setTexture('wand_sp', '090deg.png');
     }
-  }
-
-  onDeath(callback) {
-    //this.sprite.events.onKilled.add(callback);
   }
 }

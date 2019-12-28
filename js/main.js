@@ -46,6 +46,8 @@ function preload() {
 
   this.load.atlasXML('ghostGate', 'assets/sprites/gates.png', 'assets/sprites/gates.xml');
   this.load.atlasXML('firstSlime', 'assets/slimeA.png', 'assets/slimeA.xml');
+  this.load.atlasXML('secondSlime', 'assets/sprites/slimeB.png', 'assets/sprites/slimeB.xml');
+  this.load.atlasXML('thirdSlime', 'assets/sprites/slimeC.png', 'assets/sprites/slimeC.xml');
   this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
   this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
   this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
@@ -60,10 +62,6 @@ function preload() {
   this.load.audio('shoot', 'assets/audio/shoot.mp3');
 }
 
-/**
- * Initialize the game.
- * The assets have been loaded by this point.
- */
 function create() {
   world = new World(game);
   input = new Input();
@@ -161,6 +159,8 @@ function playerAnimations()
   createAnimation('idleBack', -1, 5, 'buster_sp', 'backIdle');
   createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
   createAnimation('slimeDripA', -1, 2, 'firstSlime', 'drip');
+  createAnimation('slimeDripB', -1, 2, 'secondSlime', 'drip');
+  createAnimation('slimeDripC', -1, 2, 'thirdSlime', 'drip');
   createAnimation('wandSpark', -1, 20, 'wandSparks', 'spark_');
   createAnimation('trapOut', -1, 5, 'trap', 'trap_out_');
   createAnimation('trapClosed', -1, 5, 'trap', 'trap_closed_');
@@ -172,20 +172,6 @@ function gateAnimations()
   createAnimation('glowGate', -1, 5, 'ghostGate', 'glow_', true);
   createAnimation('closedGate', -1, 5, 'ghostGate', 'closed_');
 }
-
-// function spawnEnemies() {
-//     if (world.numEnemies > 0)
-//         return;
-    
-//     const x = Phaser.Math.Between(50, 150);
-
-    // attempt to display a wave of 3 new enemies
-    // world.spawnEnemy(x, -50);
-    // world.spawnEnemy(170, -50);
-    // world.spawnEnemy(340 - x, -50);
-
-//     //audio.fly.play();
-// }
 
 function startGame() {
   if (!game.paused)
@@ -238,7 +224,6 @@ function processStreams(shouldFire) {
     stream2.clear();
     stream3.clear();
     world.cleanup(world.bulletFactory);
-    // hitEnemy = null;
   }
 }
 
@@ -308,8 +293,10 @@ function aimFromPlayerToPointer() {
 }
 
 function onCollisionPlayerEnemy(playerBody, enemyBody) {
-  slimeInfo = enemyBody.enemy.slime();
-  playerBody.player.slime(slimeInfo);
+  if (player.hasCollided == false) {
+    slimeInfo = enemyBody.enemy.slime();
+    player.slime(slimeInfo);
+  }
 }
 
 function onCollisionPlayerWall(playerBody, wall) {
