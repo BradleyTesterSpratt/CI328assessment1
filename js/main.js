@@ -16,7 +16,7 @@ function main() {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false
+        debug: true
       }
     },
     scene: {
@@ -192,6 +192,8 @@ function startGame() {
     return;
   
   console.log("startGame()");
+  //trap will not deploy if the player is in it's collider, this resets it
+  player.deployTrap(player.playerBody.x, player.playerBody.y)
 
   // game.time.addEvent({ delay: 4000, repeat: -1, callback: spawnEnemies });
   
@@ -204,7 +206,7 @@ function addStreamPoints(curve, noOfPoints) {
   array = curve;
   array = array.getDistancePoints(noOfPoints);
   i = 0;
-  for (i = 0; i < array.length; i++) {
+  for (i = 1; i < array.length-1; i++) {
     random = (Math.floor((Math.random()*5)+1));
     plusOrMinus = Math.random() < 0.5 ? -1 : 1;
     random = random * plusOrMinus;
@@ -258,13 +260,13 @@ function deployTrap(destX, destY) {
   curve = new Phaser.Curves.Spline(
     [
       player.playerBody.x, player.playerBody.y,
-      destX, destY
+      destX-40, destY+40,
+      destX-10, destY+20
     ]
   );
-  curve.points = addStreamPoints(curve, 5);
-  trapWire.clear();
+  curve.points = addStreamPoints(curve, 9);
   trapWire.lineStyle(2, Constants.colour.blackSlime, 1);
-  curve.draw(trapWire, 64);
+  curve.draw(trapWire, 10);
   curve.getPoint(path.t, path.vec);
 }
 
@@ -354,9 +356,9 @@ function onCollisionBulletEnemy(bullet, enemy) {
   ghostStats = enemy.enemy.leash(1);
   if (ghostStats.hp <= 0 && world.player.trapHeld == true) {
     world.cleanup(world.bulletFactory);
-    world.player.deployTrap(ghostStats.x, ghostStats.y);
     enemy.enemy.trap();
     deployTrap(ghostStats.x, ghostStats.y);
+    world.player.deployTrap(ghostStats.x, ghostStats.y);
     //unshift adds to the beginning of an array, so that the most recent ghost caught is the last to spawn
     world.spiritWorld.unshift(enemy.enemy.type);
   }

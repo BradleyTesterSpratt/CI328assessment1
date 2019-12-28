@@ -31,7 +31,8 @@ class Player {
     this.hitWall = this.hitWall.bind(this);
     this.setMove = this.setMove.bind(this);
     this.deployTrap = this.deployTrap.bind(this);
-    this.grabTrap = this.grabTrap.bind(this);    
+    this.grabTrap = this.grabTrap.bind(this);
+    //the trap will not deploy     
   }
 
   generateSprites() {
