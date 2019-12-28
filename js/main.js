@@ -41,11 +41,10 @@ function preload() {
   this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
   this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
 
-  this.load.image('background_img', 'assets/gameBg.png');
   this.load.image('bullet_img', 'assets/bullet.png');
 
   this.load.atlasXML('ghostGate', 'assets/sprites/gates.png', 'assets/sprites/gates.xml');
-  this.load.atlasXML('firstSlime', 'assets/slimeA.png', 'assets/slimeA.xml');
+  this.load.atlasXML('firstSlime', 'assets/sprites/slimeA.png', 'assets/sprites/slimeA.xml');
   this.load.atlasXML('secondSlime', 'assets/sprites/slimeB.png', 'assets/sprites/slimeB.xml');
   this.load.atlasXML('thirdSlime', 'assets/sprites/slimeC.png', 'assets/sprites/slimeC.xml');
   this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
@@ -56,7 +55,6 @@ function preload() {
 
   this.load.audio('intro', 'assets/audio/start.mp3');
   this.load.audio('bg', 'assets/audio/start.mp3');
-  //this.load.audio('bg', 'assets/audio/ufo_Theme.mp3');
   this.load.audio('explode', 'assets/audio/explode.mp3');
   this.load.audio('fly', 'assets/audio/fly.mp3');
   this.load.audio('shoot', 'assets/audio/shoot.mp3');
