@@ -6,10 +6,9 @@ class Player {
     this.baseSpeed = 5;
     this.speed = 5;
     this.slimes = [];
-    this.hasCollided = false;
+    // this.hasCollided = false;
     this.fireDelay = 0.0;
     this.moveInputDelay = 0.0;
-    this.slimeDelay = 0.0;
     this.wandEnd = {x: 0, y: 0};
     this.wandOffset = {x: 0, y: 0};
     this.beltOffset = {x: 10, y: 25};
@@ -89,7 +88,7 @@ class Player {
   }
 
   collideGhost(slimeInfo) {
-    this.hasCollided = true;
+    // this.hasCollided = true;
     let availableSlime = null;
     this.slimes.forEach(slime => {
       if(slime.visible == false) {
@@ -260,15 +259,16 @@ class Player {
     } else { 
       this.wandSpark.visible = false;
     }
-    if (this.hasCollided == true) {this.slimeDelay += 0.016};
     if (this.fireDelay > 1) {
       this.firing = false;
       this.fireDelay = 0.0;
     }
-    if (this.slimeDelay > 2) {
-      this.slimeDelay = 0.0;
-      this.hasCollided = false;
-    }
+    // if (this.hasCollided == true) {this.slimeDelay += 0.016};
+    // if (this.slimeDelay > 2) {
+    //   this.slimeDelay = 0.0;
+    //   this.hasCollided = false;
+    // }
+    
     this.move();
     this.moveInputDelay += 0.016;
     if (this.moveInputDelay > 0.16) {

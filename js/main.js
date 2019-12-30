@@ -291,7 +291,7 @@ function aimFromPlayerToPointer() {
 }
 
 function onCollisionPlayerEnemy(playerBody, enemyBody) {
-  if (player.hasCollided == false) {
+  if (enemyBody.enemy.hasCollided == false) {
     slimeInfo = enemyBody.enemy.slime();
     player.slime(slimeInfo);
   }
