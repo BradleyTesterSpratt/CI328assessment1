@@ -9,8 +9,10 @@ class World {
     const glowGate = new EnemyGate('glow', {x: phaser.config.width /2 - 100, y: phaser.config.height /3 * 2}, true);
     this.slimeGate = slimeGate;
     this.slimeGate.gate.tint = Constants.colour.greenSlime;
+    this.slimeGate.gate.rotation = parseInt(Math.random() * 360);
     this.glowGate = glowGate;
     this.glowGate.gate.tint = Constants.colour.streamRed;
+    this.glowGate.gate.rotation = parseInt(Math.random() * 360);
     this.ghostGates.add(this.slimeGate.gate);
     this.ghostGates.add(this.glowGate.gate);
     this.map = game.make.tilemap({ key: 'testMap' });

@@ -16,7 +16,7 @@ function main() {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false
+        debug: true
       }
     },
     scene: {
@@ -41,11 +41,12 @@ function preload() {
   this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
   this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
 
-  this.load.image('background_img', 'assets/gameBg.png');
   this.load.image('bullet_img', 'assets/bullet.png');
 
   this.load.atlasXML('ghostGate', 'assets/sprites/gates.png', 'assets/sprites/gates.xml');
-  this.load.atlasXML('firstSlime', 'assets/slimeA.png', 'assets/slimeA.xml');
+  this.load.atlasXML('firstSlime', 'assets/sprites/slimeA.png', 'assets/sprites/slimeA.xml');
+  this.load.atlasXML('secondSlime', 'assets/sprites/slimeB.png', 'assets/sprites/slimeB.xml');
+  this.load.atlasXML('thirdSlime', 'assets/sprites/slimeC.png', 'assets/sprites/slimeC.xml');
   this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
   this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
   this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
@@ -54,16 +55,11 @@ function preload() {
 
   this.load.audio('intro', 'assets/audio/start.mp3');
   this.load.audio('bg', 'assets/audio/start.mp3');
-  //this.load.audio('bg', 'assets/audio/ufo_Theme.mp3');
   this.load.audio('explode', 'assets/audio/explode.mp3');
   this.load.audio('fly', 'assets/audio/fly.mp3');
   this.load.audio('shoot', 'assets/audio/shoot.mp3');
 }
 
-/**
- * Initialize the game.
- * The assets have been loaded by this point.
- */
 function create() {
   world = new World(game);
   input = new Input();
@@ -161,6 +157,8 @@ function playerAnimations()
   createAnimation('idleBack', -1, 5, 'buster_sp', 'backIdle');
   createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
   createAnimation('slimeDripA', -1, 2, 'firstSlime', 'drip');
+  createAnimation('slimeDripB', -1, 2, 'secondSlime', 'drip');
+  createAnimation('slimeDripC', -1, 2, 'thirdSlime', 'drip');
   createAnimation('wandSpark', -1, 20, 'wandSparks', 'spark_');
   createAnimation('trapOut', -1, 5, 'trap', 'trap_out_');
   createAnimation('trapClosed', -1, 5, 'trap', 'trap_closed_');
@@ -173,25 +171,13 @@ function gateAnimations()
   createAnimation('closedGate', -1, 5, 'ghostGate', 'closed_');
 }
 
-// function spawnEnemies() {
-//     if (world.numEnemies > 0)
-//         return;
-    
-//     const x = Phaser.Math.Between(50, 150);
-
-    // attempt to display a wave of 3 new enemies
-    // world.spawnEnemy(x, -50);
-    // world.spawnEnemy(170, -50);
-    // world.spawnEnemy(340 - x, -50);
-
-//     //audio.fly.play();
-// }
-
 function startGame() {
   if (!game.paused)
     return;
   
   console.log("startGame()");
+  //trap will not deploy if the player is in it's collider, this resets it
+  player.deployTrap(player.playerBody.x, player.playerBody.y)
 
   // game.time.addEvent({ delay: 4000, repeat: -1, callback: spawnEnemies });
   
@@ -204,7 +190,7 @@ function addStreamPoints(curve, noOfPoints) {
   array = curve;
   array = array.getDistancePoints(noOfPoints);
   i = 0;
-  for (i = 0; i < array.length; i++) {
+  for (i = 1; i < array.length-1; i++) {
     random = (Math.floor((Math.random()*5)+1));
     plusOrMinus = Math.random() < 0.5 ? -1 : 1;
     random = random * plusOrMinus;
@@ -236,7 +222,6 @@ function processStreams(shouldFire) {
     stream2.clear();
     stream3.clear();
     world.cleanup(world.bulletFactory);
-    // hitEnemy = null;
   }
 }
 
@@ -258,13 +243,13 @@ function deployTrap(destX, destY) {
   curve = new Phaser.Curves.Spline(
     [
       player.playerBody.x, player.playerBody.y,
-      destX, destY
+      destX-40, destY+40,
+      destX-10, destY+20
     ]
   );
-  curve.points = addStreamPoints(curve, 5);
-  trapWire.clear();
+  curve.points = addStreamPoints(curve, 9);
   trapWire.lineStyle(2, Constants.colour.blackSlime, 1);
-  curve.draw(trapWire, 64);
+  curve.draw(trapWire, 10);
   curve.getPoint(path.t, path.vec);
 }
 
@@ -306,8 +291,10 @@ function aimFromPlayerToPointer() {
 }
 
 function onCollisionPlayerEnemy(playerBody, enemyBody) {
-  slimeInfo = enemyBody.enemy.slime();
-  playerBody.player.slime(slimeInfo);
+  if (enemyBody.enemy.hasCollided == false) {
+    slimeInfo = enemyBody.enemy.slime();
+    player.slime(slimeInfo);
+  }
 }
 
 function onCollisionPlayerWall(playerBody, wall) {
@@ -354,9 +341,9 @@ function onCollisionBulletEnemy(bullet, enemy) {
   ghostStats = enemy.enemy.leash(1);
   if (ghostStats.hp <= 0 && world.player.trapHeld == true) {
     world.cleanup(world.bulletFactory);
-    world.player.deployTrap(ghostStats.x, ghostStats.y);
     enemy.enemy.trap();
     deployTrap(ghostStats.x, ghostStats.y);
+    world.player.deployTrap(ghostStats.x, ghostStats.y);
     //unshift adds to the beginning of an array, so that the most recent ghost caught is the last to spawn
     world.spiritWorld.unshift(enemy.enemy.type);
   }

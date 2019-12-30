@@ -28,6 +28,8 @@ class Enemy {
     this.enemySprite.enemy = this;
     this.hitWall = this.hitWall.bind(this);
     this.active = true;
+    this.slimeDelay = 0.0;
+    this.hasCollided = false;
   }
 
   collideBullet(streamStrength) {
@@ -54,9 +56,9 @@ class Enemy {
     if (this.hasCollided == false) {
       this.speed = this.escapeSpeed;
       this.enemySprite.alpha = 0.5;
-      return [this.slimeColour, this.slimeStat]; 
+      this.hasCollided = true;
+      return {'colour': this.slimeColour, 'debuff': this.slimeStat}; 
     }
-    this.hasCollided = true;
   }
 
   onDeath(callback) {
@@ -149,6 +151,11 @@ class Enemy {
       if (this.behaviour == 'dumb') {this.dumbBehaviour(this.behaviourRandomNumber)}
       if (this.hasHitWall == false) {this.moving = 'idle'}
     }
+    if (this.hasCollided == true) {this.slimeDelay += 0.016};
+    if (this.slimeDelay > 2) {
+      this.slimeDelay = 0.0;
+      this.hasCollided = false;
+    }
 }
 
   getRandomNumber(highestValue) {
@@ -157,7 +164,7 @@ class Enemy {
 
   perFrameUpdate() {
     if (this.active == true) {
-      if (this.hasCollided == true) { this.hasCollided = false} ;
+      // if (this.hasCollided == true) { this.hasCollided = false} ;
       if (this.isLeashed == false) {
         if (this.currentHP < this.maxHP) {
           this.currentHP += 1;
