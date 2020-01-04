@@ -39,7 +39,8 @@ class MainScene extends Phaser.Scene {
     this.ui = new UI(this);
     this.audio = new Audio(this);
     this.player = this.world.player;
-    this.gameInput.leftClick(function() { this.startGame(); });
+    const game = this;
+    this.gameInput.leftClick(function() { game.startGame(); });
     this.animationSetUp();
     // this.input.on('pointerdown', 
     //   start = true;
@@ -54,7 +55,6 @@ class MainScene extends Phaser.Scene {
     this.physics.add.overlap(this.world.bulletFactory.group, this.world.ghostGates, this.onCollisionBulletGate);
     this.physics.add.overlap(this.player.playerBody, this.player.trap, this.onCollisionPlayerTrap);
     this.pauseGameForInput();
-    
     this.path = { t: 0, vec: new Phaser.Math.Vector2() };
     this.stream1 = this.add.graphics().setDepth(50);
     this.stream2 = this.add.graphics().setDepth(50);
@@ -153,23 +153,23 @@ class MainScene extends Phaser.Scene {
     
     console.log("startGame()");
     //trap will not deploy if the player is in it's collider, this resets it
-    this.player.deployTrap(player.playerBody.x, player.playerBody.y)
+    this.player.deployTrap(this.player.playerBody.x, this.player.playerBody.y)
 
     // game.time.addEvent({ delay: 4000, repeat: -1, callback: spawnEnemies });
     
     this.setScore(0);
-    this.configureInput();
+    this.configureInput(this);
 
     this.resumeGameFromInput();
   }
 
   addStreamPoints(curve, noOfPoints) {
-    array = curve;
+    let array = curve;
     array = array.getDistancePoints(noOfPoints);
-    i = 0;
-    for (i = 1; i < array.length-1; i++) {
-      random = (Math.floor((Math.random()*5)+1));
-      plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+    // let i = 0;
+    for (let i = 1; i < array.length-1; i++) {
+      let random = (Math.floor((Math.random()*5)+1));
+      let plusOrMinus = Math.random() < 0.5 ? -1 : 1;
       random = random * plusOrMinus;
       array[i].x = array[i].x + random;
       random = (Math.floor((Math.random()*5)+1));
@@ -180,15 +180,15 @@ class MainScene extends Phaser.Scene {
   }
 
   processStreams(shouldFire) {  
-    if (collidedBullet != null) {
-      streamDest.x = collidedBullet.x;
-      streamDest.y = collidedBullet.y;
-    } else if (hitEnemy == null)  {
-      streamDest.x = pointer.position.x;
-      streamDest.y = pointer.position.y;
+    if (this.collidedBullet != null) {
+      this.streamDest.x = this.collidedBullet.x;
+      this.streamDest.y = this.collidedBullet.y;
+    } else if (this.hitEnemy == null)  {
+      this.streamDest.x = this.pointer.position.x;
+      this.streamDest.y = this.pointer.position.y;
     } else {
-      streamDest.x = hitEnemy.x;
-      streamDest.y = hitEnemy.y;
+      this.streamDest.x = this.hitEnemy.x;
+      this.streamDest.y = this.hitEnemy.y;
     }
     if (shouldFire == true) {
       this.drawStream(20, 2, this.stream1, Constants.colour.streamBlue);
@@ -203,21 +203,21 @@ class MainScene extends Phaser.Scene {
   }
 
   drawStream(noOfPoints, thickness, graphics, colour) {
-    curve = new Phaser.Curves.Spline(
+    let curve = new Phaser.Curves.Spline(
       [
-        player.wandEnd.x, player.wandEnd.y,
-        streamDest.x, streamDest.y
+        this.player.wandEnd.x, this.player.wandEnd.y,
+        this.streamDest.x, this.streamDest.y
       ]
     );
-    curve.points = addStreamPoints(curve, noOfPoints);
+    curve.points = this.addStreamPoints(curve, noOfPoints);
     graphics.clear();
     graphics.lineStyle(thickness, colour, 1);
     curve.draw(graphics, 64);
-    curve.getPoint(path.t, path.vec);
+    curve.getPoint(this.path.t, this.path.vec);
   }
 
   deployTrap(destX, destY) {
-    curve = new Phaser.Curves.Spline(
+    let curve = new Phaser.Curves.Spline(
       [
         this.player.playerBody.x, this.player.playerBody.y,
         destX-40, destY+40,
@@ -231,8 +231,7 @@ class MainScene extends Phaser.Scene {
   }
 
   update() {
-    this.start  == true ? this.startGame() : this.start = false;
-    this.input.update();
+    this.gameInput.update();
     if (!this.paused) {
       //must process streams before updating the player
       this.processStreams(this.player.firing);
@@ -249,28 +248,27 @@ class MainScene extends Phaser.Scene {
     }
   }
 
-  configureInput() {
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.A, function() { this.player.setMove('left'); });
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.D, function() { this.player.setMove('right'); });
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.W, function() { this.player.setMove('up'); });
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.S, function() { this.player.setMove('down'); });
+  configureInput(game) {
+    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.A, function() { game.player.setMove('left'); });
+    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.D, function() { game.player.setMove('right'); });
+    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.W, function() { game.player.setMove('up'); });
+    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.S, function() { game.player.setMove('down'); });
     this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
-      this.player.firing = true;
-      this.world.spawnBullet(this.player.wandEnd.x, this.player.wandEnd.y, this.pointer.position.x, this.pointer.position.y);
+      game.player.firing = true;
+      game.world.spawnBullet(game.player.wandEnd.x, game.player.wandEnd.y, game.pointer.position.x, game.pointer.position.y);
       // audio.shoot.play();
     });
 
   }
   aimFromPlayerToPointer() {
-    playerSprite = this.world.player.playerBody;
-    radian = Phaser.Math.Angle.BetweenPoints(playerSprite, pointer.position);
-    degrees = Phaser.Math.RadToDeg(radian);
+    let radian = Phaser.Math.Angle.BetweenPoints(this.player.playerBody, this.pointer.position);
+    let degrees = Phaser.Math.RadToDeg(radian);
     return (degrees);
   }
 
   onCollisionPlayerEnemy(playerBody, enemyBody) {
     if (enemyBody.enemy.hasCollided == false) {
-      slimeInfo = enemyBody.enemy.slime();
+      let slimeInfo = enemyBody.enemy.slime();
       playerBody.player.slime(slimeInfo);
     }
   }
@@ -285,7 +283,7 @@ class MainScene extends Phaser.Scene {
 
   onCollisionPlayerTrap(playerBody, trap) {
     playerBody.player.grabTrap();
-    trapWire.clear();
+    playerBody.scene.trapWire.clear();
   }
 
   onCollisionEnemyWall(enemyBody, wall) {
@@ -295,41 +293,42 @@ class MainScene extends Phaser.Scene {
   }
 
   onCollisionBulletWall(bullet, wall) {
-    this.collidedBullet = {
+    bullet.scene.collidedBullet = {
       x: bullet.x,
       y: bullet.y
     }
-    this.world.wallHitSpark.x = bullet.x;
-    this.world.wallHitSpark.y = bullet.y;
-    this.world.wallHit = true;
+    bullet.scene.world.wallHitSpark.x = bullet.x;
+    bullet.scene.world.wallHitSpark.y = bullet.y;
+    bullet.scene.world.wallHit = true;
     bullet.destroy();
   }
 
   onCollisionBulletGate(bullet, gate) {
     if (gate.self.open == true) {
-      this.hitEnemy = gate;
+      bullet.scene.hitEnemy = gate;
       bullet.destroy();
       gate.self.damageGate(1);
     }
   }
 
   onCollisionBulletEnemy(bullet, enemy) {
-    this.hitEnemy = enemy;
+    let scene = bullet.scene;
+    bullet.scene.hitEnemy = enemy;
     bullet.destroy();
-    ghostStats = enemy.enemy.leash(1);
-    if (ghostStats.hp <= 0 && this.world.player.trapHeld == true) {
-      this.world.cleanup(world.bulletFactory);
+    let ghostStats = enemy.enemy.leash(1);
+    if (ghostStats.hp <= 0 && scene.world.player.trapHeld == true) {
+      scene.world.cleanup(scene.world.bulletFactory);
       enemy.enemy.trap();
-      this.deployTrap(ghostStats.x, ghostStats.y);
-      this.world.player.deployTrap(ghostStats.x, ghostStats.y);
+      scene.deployTrap(ghostStats.x, ghostStats.y);
+      scene.player.deployTrap(ghostStats.x, ghostStats.y);
       //unshift adds to the beginning of an array, so that the most recent ghost caught is the last to spawn
-      this.world.spiritWorld.unshift(enemy.enemy.type);
+      scene.world.spiritWorld.unshift(enemy.enemy.type);
     }
   }
 
   setScore(value) {
-    game.score = value;
-    ui.updateScoreText(value);
+    this.score = value;
+    this.ui.updateScoreText(value);
   }
 
   gameOver() {

@@ -100,7 +100,7 @@ class Player {
       availableSlime.debuff = slimeInfo['debuff'];
       availableSlime.tint = slimeInfo['colour'];
       availableSlime.visible = true;
-      game.time.scene.time.delayedCall(6000, this.cleanSlime, [availableSlime], this);
+      this.game.time.scene.time.delayedCall(6000, this.cleanSlime, [availableSlime], this);
     }
   }
 
@@ -278,7 +278,7 @@ class Player {
       this.moveInputDelay = 0.0;
       this.hasHitWall = false;
     }
-    this.updateWand(aimFromPlayerToPointer());
+    this.updateWand(this.game.aimFromPlayerToPointer());
     this.wandEnd.x = this.playerBody.x + this.wandOffset.x;
     this.wandEnd.y = this.playerBody.y + this.wandOffset.y;
     this.wandSpark.x = this.wandEnd.x;

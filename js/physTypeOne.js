@@ -1,6 +1,6 @@
 class TypeOne extends Enemy {
-  constructor(location) {
-    super(location, 'physTypeOne', 4.0, 10.0, 10, 'physTypeOne', true, 0.125);
+  constructor(game, location) {
+    super(game, location, 'physTypeOne', 4.0, 10.0, 10, 'physTypeOne', true, 0.125);
     this.decisionDelay = 0.0;
     this.randomColour();
     if (this.slimeColour != Constants.colour.pinkSlime){

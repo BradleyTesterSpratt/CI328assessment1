@@ -1,11 +1,12 @@
 class Enemy {
-  constructor(location, sprite, speed, escapeSpeed, hitPoints, type, isPhysical, scale, behaviour) {
+  constructor(game, location, sprite, speed, escapeSpeed, hitPoints, type, isPhysical, scale, behaviour) {
+    this.game = game;
     this.baseSpeed = speed;
     this.speed = speed;
     this.maxHP = hitPoints;
     this.currentHP = this.maxHP;
     this.type = type;
-    const enemySprite = game.physics.add.sprite(location.x, location.y, sprite);
+    const enemySprite = this.game.physics.add.sprite(location.x, location.y, sprite);
     enemySprite.setScale(scale, scale);
     enemySprite.setOrigin(0.5, 0.5);
     this.isPhysical = isPhysical;

@@ -1,5 +1,6 @@
 class World {
   constructor(game) {
+    this.game = game;
     this.player = new Player(game);
     this.bulletFactory = new EntityFactory(game, 'bullet_img');
     this.spiritWorld = ['physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne'];
@@ -80,7 +81,7 @@ class World {
     }
     switch(enemy) {
       case('physTypeOne'):
-      this.addEnemyToGroup(new TypeOne(spawnLocation));
+      this.addEnemyToGroup(new TypeOne(this.game, spawnLocation));
         break;
       default: 
         console.log('no Type');
