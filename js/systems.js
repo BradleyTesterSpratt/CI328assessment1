@@ -1,5 +1,5 @@
 class Audio {
-  constructor() {
+  constructor(game) {
     this.intro = game.sound.add('intro');
     //this.intro.play();
     this.bg = game.sound.add('bg', true);
@@ -11,14 +11,20 @@ class Audio {
 }
 
 class Input {
-  constructor() {
+  constructor(game) {
+    this.game = game;
+
     this.keyMap = new Map();
   }
 
   add(key, action) {
-    this.keyMap.set(game.input.keyboard.addKey(key), action);
+    this.keyMap.set(this.game.input.keyboard.addKey(key), action);
   }
 
+  leftClick(action) {
+    this.keyMap.set(this.game.input.activePointer, action);
+  }
+  
   update() {
     for (const [key, action] of this.keyMap.entries()) {
       if (key.isDown) {
@@ -29,7 +35,7 @@ class Input {
 }
 
 class UI {
-  constructor() {
+  constructor(game) {
     this.startGameText = game.add.text(phaser.config.width / 2, phaser.config.height / 2, 'Click to Start', {
       font: '30px Arial',
       fill: '#fff'

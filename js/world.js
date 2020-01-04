@@ -1,12 +1,12 @@
 class World {
   constructor(game) {
-    this.player = new Player();
-    this.bulletFactory = new EntityFactory('bullet_img');
+    this.player = new Player(game);
+    this.bulletFactory = new EntityFactory(game, 'bullet_img');
     this.spiritWorld = ['physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne'];
     this.enemies = game.physics.add.group();
     this.ghostGates = game.physics.add.group();
-    const slimeGate = new EnemyGate('slime', {x: phaser.config.width /2 + 100, y: phaser.config.height /3}, true);
-    const glowGate = new EnemyGate('glow', {x: phaser.config.width /2 - 100, y: phaser.config.height /3 * 2}, true);
+    const slimeGate = new EnemyGate(game, 'slime', {x: phaser.config.width /2 + 100, y: phaser.config.height /3}, true);
+    const glowGate = new EnemyGate(game, 'glow', {x: phaser.config.width /2 - 100, y: phaser.config.height /3 * 2}, true);
     this.slimeGate = slimeGate;
     this.slimeGate.gate.tint = Constants.colour.greenSlime;
     this.slimeGate.gate.rotation = parseInt(Math.random() * 360);

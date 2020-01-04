@@ -3,7 +3,8 @@ class Control {
 }
 
 class EntityFactory {
-  constructor(spriteName) {
+  constructor(game, spriteName) {
+    this.game = game;
     const group = game.physics.add.group({
       defaultKey: spriteName
     });
@@ -22,7 +23,7 @@ class EntityFactory {
       
       sprite.setOrigin(0.5, 0.5);
       sprite.setScale(0.05, 0.05);
-      game.physics.moveToObject(sprite, new Phaser.Math.Vector2(destX, destY), 750);
+      this.game.physics.moveToObject(sprite, new Phaser.Math.Vector2(destX, destY), 750);
       this.nextBulletTime = game.time.now + 75;
     }
   }
