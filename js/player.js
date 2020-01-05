@@ -1,5 +1,6 @@
 class Player {
-  constructor() {
+  constructor(game) {
+    this.game = game;
     this.facing = 0;
     this.moving = 'idle'; 
     this.scaleRatio = 0.0;
@@ -42,36 +43,36 @@ class Player {
   }
 
   generateSprites() {
-    const playerSprite = game.physics.add.sprite(phaser.config.width / 2 - 100, phaser.config.height /2, 'buster_sp');
+    const playerSprite = this.game.physics.add.sprite(phaser.config.width / 2 - 100, phaser.config.height /2, 'buster_sp');
     playerSprite.setScale(0.40, 0.40);
     playerSprite.setOrigin(0.5, 0.5);
     playerSprite.setCollideWorldBounds(true);
     playerSprite.setDepth(10);
-    const wandSprite = game.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp');
+    const wandSprite = this.game.add.sprite(playerSprite.x, playerSprite.y, 'wand_sp');
     wandSprite.setScale(0.40, 0.40);
     wandSprite.setOrigin(0.5, 0.5);
     wandSprite.setDepth(20);
-    const firstSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'firstSlime');
+    const firstSlime = this.game.add.sprite(playerSprite.x, playerSprite.y, 'firstSlime');
     firstSlime.setDepth(11);
     firstSlime.setScale(0.4, 0.4);
     firstSlime.forwardScale = {x:0.4, y: 0.4};
     firstSlime.visible = false;
-    const secondSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'secondSlime');
+    const secondSlime = this.game.add.sprite(playerSprite.x, playerSprite.y, 'secondSlime');
     secondSlime.setDepth(11);
     secondSlime.setScale(0.4, 0.4);
     secondSlime.forwardScale = {x:0.4, y: 0.4};
     secondSlime.visible = false;
-    const thirdSlime = game.add.sprite(playerSprite.x, playerSprite.y, 'secondSlime');
+    const thirdSlime = this.game.add.sprite(playerSprite.x, playerSprite.y, 'secondSlime');
     thirdSlime.setDepth(11);
     thirdSlime.setScale(0.4, 0.4);
     thirdSlime.forwardScale = {x:0.4, y: 0.4};
     thirdSlime.visible = false;
-    const wandSpark = game.add.sprite(this.wandEnd.x, this.wandEnd.y, 'wandSpark')
+    const wandSpark = this.game.add.sprite(this.wandEnd.x, this.wandEnd.y, 'wandSpark')
     wandSpark.setDepth(20);
     wandSpark.setScale(0.3, 0.3);
     wandSpark.alpha = 0.75;
     wandSpark.visible = false;
-    const trap = game.physics.add.sprite(playerSprite.x, playerSprite.y, 'trap');
+    const trap = this.game.physics.add.sprite(playerSprite.x, playerSprite.y, 'trap');
     trap.setDepth(11);
     trap.setScale(0.03, 0.03);
     trap.rotation = 90;
@@ -99,7 +100,7 @@ class Player {
       availableSlime.debuff = slimeInfo['debuff'];
       availableSlime.tint = slimeInfo['colour'];
       availableSlime.visible = true;
-      game.time.scene.time.delayedCall(6000, this.cleanSlime, [availableSlime], this);
+      this.game.time.scene.time.delayedCall(6000, this.cleanSlime, [availableSlime], this);
     }
   }
 
@@ -277,7 +278,7 @@ class Player {
       this.moveInputDelay = 0.0;
       this.hasHitWall = false;
     }
-    this.updateWand(aimFromPlayerToPointer());
+    this.updateWand(this.game.aimFromPlayerToPointer());
     this.wandEnd.x = this.playerBody.x + this.wandOffset.x;
     this.wandEnd.y = this.playerBody.y + this.wandOffset.y;
     this.wandSpark.x = this.wandEnd.x;

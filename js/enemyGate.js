@@ -1,5 +1,5 @@
 class EnemyGate {
-  constructor(type, location, open) {
+  constructor(game, type, location, open) {
     const gate = game.physics.add.sprite(location.x, location.y, 'ghostGate');
     gate.setOrigin(0.5, 0.5);
     gate.setDepth(5);

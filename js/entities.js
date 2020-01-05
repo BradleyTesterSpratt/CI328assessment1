@@ -3,7 +3,8 @@ class Control {
 }
 
 class EntityFactory {
-  constructor(spriteName) {
+  constructor(game, spriteName) {
+    this.game = game;
     const group = game.physics.add.group({
       defaultKey: spriteName
     });
@@ -16,14 +17,14 @@ class EntityFactory {
     }
 
     //  To avoid them being allowed to fire too fast we set a time limit
-    if (game.time.now > this.nextBulletTime) {
+    if (this.game.time.now > this.nextBulletTime) {
       const sprite = this.group.create(x-1, y-2)
       this.setUpEntity(sprite);
       
       sprite.setOrigin(0.5, 0.5);
       sprite.setScale(0.05, 0.05);
-      game.physics.moveToObject(sprite, new Phaser.Math.Vector2(destX, destY), 750);
-      this.nextBulletTime = game.time.now + 75;
+      this.game.physics.moveToObject(sprite, new Phaser.Math.Vector2(destX, destY), 750);
+      this.nextBulletTime = this.game.time.now + 75;
     }
   }
 
