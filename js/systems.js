@@ -83,4 +83,15 @@ class Constants {
     {mapKey: 'simpleRoom1', mapTileSetRef: 'room2', tileKey: 'industrialTiles2'},
     {mapKey: 'simpleRoom2', mapTileSetRef: 'room1', tileKey: 'industrialTiles1'}
   ]
+  static modularBuildingMaps = [
+    {mapKey: 'industrialEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: true, s: false, w: false}},
+    {mapKey: 'industrialN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: false, s: false, w: false}},
+    {mapKey: 'industrialS', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: false, e: false, s: true, w: false}},
+    {mapKey: 'industrialSE', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: false, e: true, s: true, w: false}},
+    {mapKey: 'industrialWEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: true, s: false, w: true}},
+    {mapKey: 'industrialWN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: false, s: false, w: true}},
+    {mapKey: 'industrialWS', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: false, e: true, s: true, w: false}},
+    {mapKey: 'industrialWSE', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: true, s: false, w: false}},
+    {mapKey: 'industrialWSEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: true, s: true, w: true}}
+  ]
 }

@@ -18,7 +18,9 @@ class MainScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('outsideMap2', 'assets/tilemaps/outside2.json');
     this.load.tilemapTiledJSON('simpleRoom1', 'assets/tilemaps/simpleRoom.json');
     this.load.tilemapTiledJSON('simpleRoom2', 'assets/tilemaps/simpleRoom2.json');
-
+    Constants.modularBuildingMaps.forEach(map => {
+      this.load.tilemapTiledJSON(map.mapKey, `assets/tilemaps/${map.mapKey}.json`);
+    });
     this.load.image('bullet_img', 'assets/bullet.png');
 
     this.load.atlasXML('ghostGate', 'assets/sprites/gates.png', 'assets/sprites/gates.xml');

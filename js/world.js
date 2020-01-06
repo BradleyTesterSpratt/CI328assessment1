@@ -51,7 +51,6 @@ class World {
       this.mapSize.x = 0;
       let availableSpace = row;
       while (availableSpace > 0) {
-        console.log('space' + availableSpace);
         let randNum = parseInt(Math.random() * Constants.baseMaps.length);
         while (!(Constants.baseMaps[randNum].size <= availableSpace)) {
           randNum = parseInt(Math.random() * Constants.baseMaps.length)
@@ -70,8 +69,6 @@ class World {
         this.playerSpawned ? '' : this.spawnPlayer(game, mapSet.map);
         this.placeMap(mapSet, this.mapSize);
         this.mapSize.x = this.mapSize.x + (mapSet.map.tileWidth * mapSet.map.width);
-        console.log(this.mapSize);
-
         availableSpace = parseInt(availableSpace - set.size);
       }
       this.mapSize.y = this.mapSize.y + 1568;
