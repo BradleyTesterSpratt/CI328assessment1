@@ -60,11 +60,13 @@ class World {
         // this.mapSets.push(this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey));
         let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
         if(mapSet.map.properties[0] != null && mapSet.map.properties[0].name == 'baseMap') {
-          mapSet.map.getObjectLayer('simpleBuilding')['objects'].forEach(spot => {
-            buildingCount ++;
-          });
+          let simpleBuildings = mapSet.map.getObjectLayer('simpleBuilding');
+          if(simpleBuildings != null) {
+            simpleBuildings['objects'].forEach(spot => {
+              buildingCount ++;
+            });
+          }
         }
-        console.log('map placed');
         this.playerSpawned ? '' : this.spawnPlayer(game, mapSet.map);
         this.placeMap(mapSet, this.mapSize);
         this.mapSize.x = this.mapSize.x + (mapSet.map.tileWidth * mapSet.map.width);
@@ -88,11 +90,14 @@ class World {
     let map = mapSet.map;
     let tiles = mapSet.tiles;
     if(map.properties[0] != null && map.properties[0].name == 'baseMap') {
-      map.getObjectLayer('simpleBuilding')['objects'].forEach(spot => {
-        spot.x += this.mapSize.x;
-        spot.y += this.mapSize.y;
-        this.simpleBuildingSpots.push(spot);
-      });
+      let simpleBuildings = map.getObjectLayer('simpleBuilding');
+      if(simpleBuildings != null) {
+        simpleBuildings['objects'].forEach(spot => {
+          spot.x += this.mapSize.x;
+          spot.y += this.mapSize.y;
+          this.simpleBuildingSpots.push(spot);
+        });
+      }
     } else if (map.properties[0] != null && map.properties[0].name == 'simpleBuilding') {
       let spot = this.simpleBuildingSpots[0];
       let mapHeight = map.tileHeight * map.height;
