@@ -1,37 +1,32 @@
 class World {
   constructor(game) {
     this.game = game;
-    this.player = new Player(game);
     this.bulletFactory = new EntityFactory(game, 'bullet_img');
     this.spiritWorld = ['physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne'];
     this.enemies = game.physics.add.group();
     this.ghostGates = game.physics.add.group();
-    const slimeGate = new EnemyGate(game, 'slime', {x: phaser.config.width /2 + 100, y: phaser.config.height /3}, true);
-    const glowGate = new EnemyGate(game, 'glow', {x: phaser.config.width /2 - 100, y: phaser.config.height /3 * 2}, true);
-    this.slimeGate = slimeGate;
-    this.slimeGate.gate.tint = Constants.colour.greenSlime;
-    this.slimeGate.gate.rotation = parseInt(Math.random() * 360);
-    this.glowGate = glowGate;
-    this.glowGate.gate.tint = Constants.colour.streamRed;
-    this.glowGate.gate.rotation = parseInt(Math.random() * 360);
-    this.ghostGates.add(this.slimeGate.gate);
-    this.ghostGates.add(this.glowGate.gate);
-    this.map = game.make.tilemap({ key: 'testMap' });
-    this.tileset = this.map.addTilesetImage('sciFiTiles', 'testTiles');
-    this.background = this.map.createStaticLayer('background', this.tileset, 0, 0);
-    this.foreground = this.map.createStaticLayer('foreground', this.tileset, 0, 0);
-    this.foreground.setDepth(100);
-    this.walls = game.physics.add.group({
-      allowGravity: false,
-      immovable: true
-    });
-    this.wallObjects = this.map.getObjectLayer('wallObjects')['objects'];
-    this.wallObjects.forEach(wallObject => {
-      let wall = this.walls.create(wallObject.x + 16, wallObject.y + 16, '').setOrigin(0, 0);
-      wall.visible = false;
-      wall.body.height = wallObject.height;
-      wall.body.width = wallObject.width;
-    });
+    this.groundMap = game.make.tilemap({ key: 'outsideMap' });
+    this.tileset = this.groundMap.addTilesetImage('outside', 'outsideTiles');
+    this.background = this.groundMap.createStaticLayer('background', this.tileset, 0, 0);
+    // this.foreground = this.groundMap.createStaticLayer('foreground', this.tileset, 0, 0);
+    // this.foreground.setDepth(100);
+    // this.walls = game.physics.add.group({
+    //   allowGravity: false,
+    //   immovable: true
+    // });
+    this.spawners = this.groundMap.getObjectLayer('spawners')['objects'];
+    let playerSpawner = parseInt(Math.random() * this.spawners.length);
+    this.player = new Player(game, this.spawners[playerSpawner].x, this.spawners[playerSpawner].y);
+    this.spawners.splice(playerSpawner, 1);
+    
+    // this.wallObjects = this.groundMap.getObjectLayer('wallObjects')['objects'];
+    // this.wallObjects.forEach(wallObject => {
+    //   let wall = this.walls.create(wallObject.x + 16, wallObject.y + 16, '').setOrigin(0, 0);
+    //   wall.visible = false;
+    //   wall.body.height = wallObject.height;
+    //   wall.body.width = wallObject.width;
+    // });
+    this.setUpGates(4);
     const wallhitSpark = game.add.sprite(0, 0, 'wandSpark');
     wallhitSpark.setDepth(20);
     wallhitSpark.setScale(0.5, 0.5);
@@ -40,6 +35,11 @@ class World {
     this.wallHitSpark.visible = false;
     this.wallHit = false;
     this.spawnTimer = 100;
+    this.mapSize = {
+      x: this.groundMap.tileWidth * this.groundMap.width,
+      y: this.groundMap.tileHeight * this.groundMap.height
+    };
+    this.game.physics.world.setBounds(0, 0, this.mapSize.x, this.mapSize.y, true, true, true, true);
   }
 
   randomiseSpark(int) {
@@ -86,6 +86,37 @@ class World {
       default: 
         console.log('no Type');
         break;
+    }
+  }
+
+  setUpGates(numOfGates) {
+    for(let i = 0; (i < numOfGates); i++) {
+      let randomNumber = parseInt(Math.random() * this.spawners.length);
+      let newGate = new EnemyGate(this.game, this.chooseGateType(), {x: this.spawners[randomNumber].x, y: this.spawners[randomNumber].y}, true)
+      newGate.gate.tint = this.chooseGateColour();
+      newGate.gate.rotation = parseInt(Math.random() * 360);
+      this.ghostGates.add(newGate.gate);
+      this.spawners.splice(randomNumber, 1);
+    }
+  }
+
+  chooseGateColour() {
+    switch(parseInt(Math.random() * 2)) {
+      case 0:
+        return Constants.colour.greenSlime;
+      case 1:
+        return Constants.colour.pinkSlime;
+      default:
+        return Constants.colour.blackSlime;
+    }
+  }
+
+  chooseGateType() {
+    switch(parseInt(Math.random() * 1)) {
+      case 0:
+        return 'slime';
+      default:
+        return 'glow';
     }
   }
 

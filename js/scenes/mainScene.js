@@ -3,15 +3,18 @@ class MainScene extends Phaser.Scene {
     super('mainScene');
   }
   /**
- * The first thing to be called.
- * Loads assets.
- */
+   * The first thing to be called.
+   * Loads assets.
+   */
   preload() {
     console.log("preload()");
-
     // this.score = 0;
-    this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
-    this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
+    // this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
+    this.load.image('industrialTiles1', 'assets/tiles/room1.png');
+    this.load.image('industrialTiles2', 'assets/tiles/room2.png');
+    this.load.image('outsideTiles', 'assets/tiles/outside.png');
+    // this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
+    this.load.tilemapTiledJSON('outsideMap', 'assets/tilemaps/outside.json');
 
     this.load.image('bullet_img', 'assets/bullet.png');
 
@@ -59,11 +62,18 @@ class MainScene extends Phaser.Scene {
     this.stream1 = this.add.graphics().setDepth(50);
     this.stream2 = this.add.graphics().setDepth(50);
     this.stream3 = this.add.graphics().setDepth(50);
-    this.streamDest = {x: this.pointer.position.x, y: this.pointer.position.y};
+    this.streamDest = {
+      x: this.pointer.worldX,
+      y: this.pointer.worldY
+    };
     this.trapWire = this.add.graphics().setDepth(12);
     this.hitEnemy = null;
     this.collidedBullet = null;
-    this.bulletCheck = 0.0
+    this.bulletCheck = 0.0;
+    this.cameras.main.startFollow(this.player.playerBody);
+    // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
+    // this.cameras.main.setDeadzone(700,500);
+
   }
 
   pauseGameForInput() {
@@ -184,8 +194,8 @@ class MainScene extends Phaser.Scene {
       this.streamDest.x = this.collidedBullet.x;
       this.streamDest.y = this.collidedBullet.y;
     } else if (this.hitEnemy == null)  {
-      this.streamDest.x = this.pointer.position.x;
-      this.streamDest.y = this.pointer.position.y;
+      this.streamDest.x = this.pointer.worldX;
+      this.streamDest.y = this.pointer.worldY;
     } else {
       this.streamDest.x = this.hitEnemy.x;
       this.streamDest.y = this.hitEnemy.y;
@@ -255,13 +265,13 @@ class MainScene extends Phaser.Scene {
     this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.S, function() { game.player.setMove('down'); });
     this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
       game.player.firing = true;
-      game.world.spawnBullet(game.player.wandEnd.x, game.player.wandEnd.y, game.pointer.position.x, game.pointer.position.y);
+      game.world.spawnBullet(game.player.wandEnd.x, game.player.wandEnd.y, game.pointer.worldX, game.pointer.worldY);
       // audio.shoot.play();
     });
 
   }
   aimFromPlayerToPointer() {
-    let radian = Phaser.Math.Angle.BetweenPoints(this.player.playerBody, this.pointer.position);
+    let radian = Phaser.Math.Angle.BetweenPoints(this.player.playerBody, {x: this.pointer.worldX, y: this.pointer.worldY});
     let degrees = Phaser.Math.RadToDeg(radian);
     return (degrees);
   }
