@@ -1,5 +1,5 @@
 class Player {
-  constructor(game) {
+  constructor(game, spawnLocationX, spawnLocationY) {
     this.game = game;
     this.facing = 0;
     this.moving = 'idle'; 
@@ -19,7 +19,7 @@ class Player {
     this.streamStrength = 1;
     this.trapHeld = true;
     this.trapLocation = {x: 0, y: 0};
-    const sprites = this.generateSprites();
+    const sprites = this.generateSprites(spawnLocationX, spawnLocationY);
     this.playerBody = sprites['player'];
     this.playerWand = sprites['wand'];
     this.firstSlime = sprites['firstSlime'];
@@ -42,8 +42,8 @@ class Player {
     //the trap will not deploy     
   }
 
-  generateSprites() {
-    const playerSprite = this.game.physics.add.sprite(phaser.config.width / 2 - 100, phaser.config.height /2, 'buster_sp');
+  generateSprites(spawnLocationX, spawnLocationY) {
+    const playerSprite = this.game.physics.add.sprite(spawnLocationX, spawnLocationY, 'buster_sp');
     playerSprite.setScale(0.40, 0.40);
     playerSprite.setOrigin(0.5, 0.5);
     playerSprite.setCollideWorldBounds(true);

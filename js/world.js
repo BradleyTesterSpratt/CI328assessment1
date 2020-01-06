@@ -1,37 +1,34 @@
 class World {
   constructor(game) {
     this.game = game;
-    this.player = new Player(game);
     this.bulletFactory = new EntityFactory(game, 'bullet_img');
     this.spiritWorld = ['physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne'];
     this.enemies = game.physics.add.group();
     this.ghostGates = game.physics.add.group();
-    const slimeGate = new EnemyGate(game, 'slime', {x: phaser.config.width /2 + 100, y: phaser.config.height /3}, true);
-    const glowGate = new EnemyGate(game, 'glow', {x: phaser.config.width /2 - 100, y: phaser.config.height /3 * 2}, true);
-    this.slimeGate = slimeGate;
-    this.slimeGate.gate.tint = Constants.colour.greenSlime;
-    this.slimeGate.gate.rotation = parseInt(Math.random() * 360);
-    this.glowGate = glowGate;
-    this.glowGate.gate.tint = Constants.colour.streamRed;
-    this.glowGate.gate.rotation = parseInt(Math.random() * 360);
-    this.ghostGates.add(this.slimeGate.gate);
-    this.ghostGates.add(this.glowGate.gate);
-    this.map = game.make.tilemap({ key: 'testMap' });
-    this.tileset = this.map.addTilesetImage('sciFiTiles', 'testTiles');
-    this.background = this.map.createStaticLayer('background', this.tileset, 0, 0);
-    this.foreground = this.map.createStaticLayer('foreground', this.tileset, 0, 0);
-    this.foreground.setDepth(100);
+    this.groundMap = game.make.tilemap({ key: 'outsideMap' });
+    this.groundTiles = this.groundMap.addTilesetImage('outside', 'outsideTiles');
+    //spawn Player before building the map to prevent a ghost gate appearing in the same space
+    this.spawnPlayer(game, this.groundMap); 
+    this.buildingMap = game.make.tilemap({ key: 'simpleRoom'});
+    // let randTileNum = (parseInt(Math.random() * 2) + 1).toString()
+    // this.buildingTiles = this.buildingMap.addTilesetImage(`room${randTileNum}`, `industrialTiles${randTileNum}`);
+    this.buildingTiles = this.buildingMap.addTilesetImage('room2', 'industrialTiles2');
+    this.mapSets = [
+      {
+        'map': this.groundMap,
+        'tiles': this.groundTiles
+      },
+      {
+        'map': this.buildingMap,
+        'tiles': this.buildingTiles
+      }
+    ];
     this.walls = game.physics.add.group({
       allowGravity: false,
       immovable: true
     });
-    this.wallObjects = this.map.getObjectLayer('wallObjects')['objects'];
-    this.wallObjects.forEach(wallObject => {
-      let wall = this.walls.create(wallObject.x + 16, wallObject.y + 16, '').setOrigin(0, 0);
-      wall.visible = false;
-      wall.body.height = wallObject.height;
-      wall.body.width = wallObject.width;
-    });
+    this.buildMap();
+    this.setDifficulty('normal')
     const wallhitSpark = game.add.sprite(0, 0, 'wandSpark');
     wallhitSpark.setDepth(20);
     wallhitSpark.setScale(0.5, 0.5);
@@ -39,7 +36,79 @@ class World {
     this.wallHitSpark = wallhitSpark;
     this.wallHitSpark.visible = false;
     this.wallHit = false;
-    this.spawnTimer = 100;
+  }
+  
+  spawnPlayer(game, map) {
+    let playerSpawner = parseInt(Math.random() * map.getObjectLayer('spawners')['objects'].length);
+    this.player = new Player(
+      game,
+      map.getObjectLayer('spawners')['objects'][playerSpawner].x,
+      map.getObjectLayer('spawners')['objects'][playerSpawner].y
+    );
+    map.getObjectLayer('spawners')['objects'].splice(playerSpawner, 1);
+  }
+
+  buildMap() {
+    this.simpleBuildingSpots = [];
+    this.spawners = [];
+    this.mapSets.forEach(set => {
+      let map = set.map;
+      let tiles = set.tiles;
+      let spawnLocation = {x: 0, y: 0};
+      if(map.properties[0] != null && map.properties[0].name == 'baseMap') {
+        map.getObjectLayer('simpleBuilding')['objects'].forEach(spot => {
+          this.simpleBuildingSpots.push(spot);
+        });
+      } else if (map.properties[0] != null && map.properties[0].name == 'simpleBuilding') {
+        let spot = this.simpleBuildingSpots[0];
+        let mapHeight = map.tileHeight * map.height;
+        spawnLocation.x = spot.x;
+        //spawn at the bottom of the area so that the first door is on the road.
+        spawnLocation.y = spot.y + spot.height - mapHeight + 3;
+      }
+      map.createStaticLayer('background', tiles, spawnLocation.x, spawnLocation.y);
+      let foreground = map.createStaticLayer('foreground', tiles, spawnLocation.x, spawnLocation.y);
+      if(foreground != null) { foreground.setDepth(100) };
+      if(map.getObjectLayer('wallObjects') != null) {
+        let wallObjects = map.getObjectLayer('wallObjects')['objects'];
+        wallObjects.forEach(wallObject => {
+          let wall = this.walls.create(wallObject.x + 16 + spawnLocation.x, wallObject.y + 16 + spawnLocation.y, '').setOrigin(0, 0);
+          wall.visible = false;
+          wall.body.height = wallObject.height;
+          wall.body.width = wallObject.width;
+        });
+      }
+      map.getObjectLayer('spawners')['objects'].forEach(spawner => {
+        spawner.x += spawnLocation.x;
+        spawner.y += spawnLocation.y;
+      });
+      this.spawners = this.spawners.concat(map.getObjectLayer('spawners')['objects']);
+    })
+    this.mapSize = {
+      x: this.groundMap.tileWidth * this.groundMap.width,
+      y: this.groundMap.tileHeight * this.groundMap.height
+    };
+    this.game.physics.world.setBounds(0, 0, this.mapSize.x, this.mapSize.y, true, true, true, true);
+  }
+
+
+  setDifficulty(difficulty) {
+    switch(difficulty) {
+      case (difficulty == 'easy'):
+        this.setUpGates(2);
+        this.spawnDelay = 300;
+        this.spawnTimer = 300;
+        break;
+      case (difficulty == 'hard'):
+        this.setUpGates(6);
+        this.spawnDelay = 150;
+        this.spawnTimer = 150;
+        break;
+      default:
+        this.setUpGates(4);
+        this.spawnDelay = 200;
+        this.spawnTimer = 200;
+    }
   }
 
   randomiseSpark(int) {
@@ -89,6 +158,37 @@ class World {
     }
   }
 
+  setUpGates(numOfGates) {
+    for(let i = 0; (i < numOfGates); i++) {
+      let randomNumber = parseInt(Math.random() * this.spawners.length);
+      let newGate = new EnemyGate(this.game, this.chooseGateType(), {x: this.spawners[randomNumber].x, y: this.spawners[randomNumber].y}, true)
+      newGate.gate.tint = this.chooseGateColour();
+      newGate.gate.rotation = parseInt(Math.random() * 360);
+      this.ghostGates.add(newGate.gate);
+      this.spawners.splice(randomNumber, 1);
+    }
+  }
+
+  chooseGateColour() {
+    switch(parseInt(Math.random() * 2)) {
+      case 0:
+        return Constants.colour.greenSlime;
+      case 1:
+        return Constants.colour.pinkSlime;
+      default:
+        return Constants.colour.blackSlime;
+    }
+  }
+
+  chooseGateType() {
+    switch(parseInt(Math.random() * 1)) {
+      case 0:
+        return 'slime';
+      default:
+        return 'glow';
+    }
+  }
+
   findRandomGate() {
     let randomEntry = parseInt(Math.random() * this.ghostGates.children.entries.length);
     return this.ghostGates.children.entries[randomEntry];
@@ -112,7 +212,7 @@ class World {
       }
     });
     this.spawnTimer += 0.16;
-    if (this.spawnTimer > 100) {
+    if (this.spawnTimer > this.spawnDelay) {
       if (this.checkForOpenGates() == true) {
         this.spawnEnemy();
         this.spawnTimer = 0;
