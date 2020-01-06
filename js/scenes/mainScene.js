@@ -14,8 +14,9 @@ class MainScene extends Phaser.Scene {
     this.load.image('industrialTiles2', 'assets/tiles/room2.png');
     this.load.image('outsideTiles', 'assets/tiles/outside.png');
     // this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
-    this.load.tilemapTiledJSON('outsideMap', 'assets/tilemaps/outside.json');
-    this.load.tilemapTiledJSON('simpleRoom', 'assets/tilemaps/simpleRoom.json');
+    this.load.tilemapTiledJSON('outsideMap1', 'assets/tilemaps/outside.json');
+    this.load.tilemapTiledJSON('simpleRoom1', 'assets/tilemaps/simpleRoom.json');
+    this.load.tilemapTiledJSON('simpleRoom2', 'assets/tilemaps/simpleRoom2.json');
 
     this.load.image('bullet_img', 'assets/bullet.png');
 

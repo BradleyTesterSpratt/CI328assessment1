@@ -75,4 +75,11 @@ class Constants {
     greenSlime: 0x00FF00,
     blackSlime: 0x444444
   }
+  static baseMaps = [
+    {mapKey: 'outsideMap1', mapTileSetRef: 'outside', tileKey: 'outsideTiles', size: 1}
+  ]
+  static simpleBuildingMaps = [
+    {mapKey: 'simpleRoom1', mapTileSetRef: 'room2', tileKey: 'industrialTiles2'},
+    {mapKey: 'simpleRoom2', mapTileSetRef: 'room1', tileKey: 'industrialTiles1'}
+  ]
 }
