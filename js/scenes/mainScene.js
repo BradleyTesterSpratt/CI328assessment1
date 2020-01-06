@@ -15,6 +15,7 @@ class MainScene extends Phaser.Scene {
     this.load.image('outsideTiles', 'assets/tiles/outside.png');
     // this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
     this.load.tilemapTiledJSON('outsideMap', 'assets/tilemaps/outside.json');
+    this.load.tilemapTiledJSON('simpleRoom', 'assets/tilemaps/simpleRoom.json');
 
     this.load.image('bullet_img', 'assets/bullet.png');
 
@@ -71,14 +72,14 @@ class MainScene extends Phaser.Scene {
     this.collidedBullet = null;
     this.bulletCheck = 0.0;
     this.cameras.main.startFollow(this.player.playerBody);
+    // this one doesn't work
     // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
+    // this one doesn't keep the player centered
     // this.cameras.main.setDeadzone(700,500);
-
   }
 
   pauseGameForInput() {
     this.paused = true;
-
     this.ui.showStartText();
   }
 
@@ -164,12 +165,8 @@ class MainScene extends Phaser.Scene {
     console.log("startGame()");
     //trap will not deploy if the player is in it's collider, this resets it
     this.player.deployTrap(this.player.playerBody.x, this.player.playerBody.y)
-
-    // game.time.addEvent({ delay: 4000, repeat: -1, callback: spawnEnemies });
-    
     this.setScore(0);
     this.configureInput(this);
-
     this.resumeGameFromInput();
   }
 
@@ -213,12 +210,10 @@ class MainScene extends Phaser.Scene {
   }
 
   drawStream(noOfPoints, thickness, graphics, colour) {
-    let curve = new Phaser.Curves.Spline(
-      [
-        this.player.wandEnd.x, this.player.wandEnd.y,
-        this.streamDest.x, this.streamDest.y
-      ]
-    );
+    let curve = new Phaser.Curves.Spline([
+      this.player.wandEnd.x, this.player.wandEnd.y,
+      this.streamDest.x, this.streamDest.y
+    ]);
     curve.points = this.addStreamPoints(curve, noOfPoints);
     graphics.clear();
     graphics.lineStyle(thickness, colour, 1);
@@ -227,13 +222,11 @@ class MainScene extends Phaser.Scene {
   }
 
   deployTrap(destX, destY) {
-    let curve = new Phaser.Curves.Spline(
-      [
-        this.player.playerBody.x, this.player.playerBody.y,
-        destX-40, destY+40,
-        destX-10, destY+20
-      ]
-    );
+    let curve = new Phaser.Curves.Spline([
+      this.player.playerBody.x, this.player.playerBody.y,
+      destX-40, destY+40,
+      destX-10, destY+20
+    ]);
     curve.points = this.addStreamPoints(curve, 9);
     this.trapWire.lineStyle(2, Constants.colour.blackSlime, 1);
     curve.draw(this.trapWire, 10);
@@ -343,9 +336,7 @@ class MainScene extends Phaser.Scene {
 
   gameOver() {
     console.log("gameOver()");
-
     this.world.cleanup();
-
     this.pauseGameForInput();
   }
 }

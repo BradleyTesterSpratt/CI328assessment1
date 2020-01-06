@@ -16,6 +16,28 @@
         }, 
         {
          "draworder":"topdown",
+         "id":5,
+         "name":"simpleBuilding",
+         "objects":[
+                {
+                 "height":1024,
+                 "id":8,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":1024,
+                 "x":480,
+                 "y":64
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":2,
          "name":"spawners",
          "objects":[
@@ -102,9 +124,15 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":5,
- "nextobjectid":8,
+ "nextlayerid":6,
+ "nextobjectid":9,
  "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"baseMap",
+         "type":"bool",
+         "value":true
+        }],
  "renderorder":"right-down",
  "tiledversion":"1.2.4",
  "tileheight":32,

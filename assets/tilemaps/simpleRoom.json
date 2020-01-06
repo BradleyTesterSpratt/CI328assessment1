@@ -182,8 +182,14 @@
          "y":0
         }],
  "nextlayerid":15,
- "nextobjectid":21,
+ "nextobjectid":22,
  "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"simpleBuilding",
+         "type":"bool",
+         "value":true
+        }],
  "renderorder":"right-down",
  "tiledversion":"1.2.4",
  "tileheight":32,
@@ -195,7 +201,20 @@
          "imageheight":224,
          "imagewidth":320,
          "margin":0,
-         "name":"room",
+         "name":"room2",
+         "spacing":0,
+         "tilecount":70,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":10,
+         "firstgid":71,
+         "image":"..\/tiles\/room1.png",
+         "imageheight":224,
+         "imagewidth":320,
+         "margin":0,
+         "name":"room1",
          "spacing":0,
          "tilecount":70,
          "tileheight":32,
