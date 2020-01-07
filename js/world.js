@@ -173,7 +173,7 @@ class World {
   }
 
   setDifficulty(difficulty) {
-    switch(difficulty) {
+    switch(true) {
       case (difficulty == 'easy'):
         this.numOfGates = 2;
         this.spawnDelay = 300;
