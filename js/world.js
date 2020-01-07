@@ -1,8 +1,8 @@
 class World {
-  constructor(game) {
+  constructor(game, difficulty, levelSize) {
     this.game = game;
-    this.setDifficulty('normal');
-    this.setLevelSize('medium');
+    this.setDifficulty(difficulty);
+    this.setLevelSize(levelSize);
     this.bulletFactory = new EntityFactory(game, 'bullet_img');
     this.spiritWorld = ['physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne'];
     this.enemies = game.physics.add.group();
@@ -109,10 +109,8 @@ class World {
     }
     for (const entry in this.modularBuildings) {
       let building = this.modularBuildings[entry];
-      console.log(building);
       for (const entry in building) {
         let row = building[entry];
-        console.log(row);
         for (const entry in row) {
           let spot = row[entry];
           let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
@@ -195,7 +193,7 @@ class World {
   }
 
   setLevelSize(size) {
-    switch(size) {
+    switch(true) {
       case (size == 'tiny'):
         this.levelMap = [1];  
         break;

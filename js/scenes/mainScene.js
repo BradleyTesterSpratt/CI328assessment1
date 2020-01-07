@@ -42,7 +42,7 @@ class MainScene extends Phaser.Scene {
 
   create() {
     this.start = false;
-    this.world = new World(this);
+    this.world = new World(this, 'normal', 'large');
     this.gameInput = new Input(this);
     this.ui = new UI(this);
     this.audio = new Audio(this);
