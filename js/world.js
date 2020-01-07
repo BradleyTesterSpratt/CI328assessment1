@@ -41,10 +41,14 @@ class World {
     this.playerSpawned = true;
   }
 
+  buildModularBuilding() {}
+
   buildMap(game) {
     this.spawners = [];
     this.mapSize = {x: 0, y: 0};
     this.simpleBuildingSpots = [];
+    this.modularBuildings = {};
+
     //add base maps
     let buildingCount = 0;
     this.levelMap.forEach(row => {
@@ -62,7 +66,30 @@ class World {
           let simpleBuildings = mapSet.map.getObjectLayer('simpleBuilding');
           if(simpleBuildings != null) {
             simpleBuildings['objects'].forEach(spot => {
-              buildingCount ++;
+              buildingCount += 1;
+            });
+          }
+          let modularBuilding = mapSet.map.getObjectLayer('modularBuilding');
+          if(modularBuilding != null) {
+            //initialise these if they do not exist
+            this.modularBuildingCount >= 0 ? this.modularBuildingCount += 1 : this.modularBuildingCount = 0;
+            let buildingName = `building${this.modularBuildingCount}`;
+            if (!(buildingName in this.modularBuildings)) {this.modularBuildings[buildingName] = {}};
+            let building = this.modularBuildings[buildingName];
+            modularBuilding['objects'].forEach(spot => {
+              let column, row;
+              spot.x += this.mapSize.x;
+              spot.y += this.mapSize.y - 61;
+              spot.properties.forEach(prop => {
+                if (prop.name == 'column') {
+                  column = prop.value
+                } else if (prop.name == 'row') {
+                  row = prop.value
+                };
+              });
+              let rowKey = `row_${row}`;
+              if (!(rowKey in building)) {building[rowKey] = {}};
+              building[rowKey][`column_${column}`] = spot;
             });
           }
         }
@@ -80,6 +107,28 @@ class World {
       let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
       this.placeMap(mapSet);
     }
+    for (const entry in this.modularBuildings) {
+      let building = this.modularBuildings[entry];
+      console.log(building);
+      for (const entry in building) {
+        let row = building[entry];
+        console.log(row);
+        for (const entry in row) {
+          let spot = row[entry];
+          let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
+          let set = Constants.modularBuildingMaps[randNum];
+          let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
+          let spawnLocation = {x: spot.x, y: spot.y};
+          this.placeMap(mapSet, spawnLocation);
+        }
+
+      }
+    }
+      // let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
+      // let set = Constants.modularBuildingMaps[randNum];
+      // let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
+      // this.placeMap(mapSet);
+    // })
     this.game.physics.world.setBounds(0, 0, this.mapSize.x, this.mapSize.y, true, true, true, true);
   }
 
@@ -116,11 +165,13 @@ class World {
         wall.body.width = wallObject.width;
       });
     }
-    map.getObjectLayer('spawners')['objects'].forEach(spawner => {
-      spawner.x += spawnLocation.x;
-      spawner.y += spawnLocation.y;
-    });
-    this.spawners = this.spawners.concat(map.getObjectLayer('spawners')['objects']);
+    if(map.getObjectLayer('spawners') != null) {
+      map.getObjectLayer('spawners')['objects'].forEach(spawner => {
+        spawner.x += spawnLocation.x;
+        spawner.y += spawnLocation.y;
+      });
+      this.spawners = this.spawners.concat(map.getObjectLayer('spawners')['objects']);
+    }
   }
 
   setDifficulty(difficulty) {
