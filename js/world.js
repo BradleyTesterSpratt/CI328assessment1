@@ -1,34 +1,20 @@
 class World {
   constructor(game) {
     this.game = game;
+    this.setDifficulty('normal');
+    this.setLevelSize('medium');
     this.bulletFactory = new EntityFactory(game, 'bullet_img');
     this.spiritWorld = ['physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne'];
     this.enemies = game.physics.add.group();
     this.ghostGates = game.physics.add.group();
-    this.groundMap = game.make.tilemap({ key: 'outsideMap' });
-    this.groundTiles = this.groundMap.addTilesetImage('outside', 'outsideTiles');
-    //spawn Player before building the map to prevent a ghost gate appearing in the same space
-    this.spawnPlayer(game, this.groundMap); 
-    this.buildingMap = game.make.tilemap({ key: 'simpleRoom'});
-    // let randTileNum = (parseInt(Math.random() * 2) + 1).toString()
-    // this.buildingTiles = this.buildingMap.addTilesetImage(`room${randTileNum}`, `industrialTiles${randTileNum}`);
-    this.buildingTiles = this.buildingMap.addTilesetImage('room2', 'industrialTiles2');
-    this.mapSets = [
-      {
-        'map': this.groundMap,
-        'tiles': this.groundTiles
-      },
-      {
-        'map': this.buildingMap,
-        'tiles': this.buildingTiles
-      }
-    ];
+    this.playerSpawned = false;
     this.walls = game.physics.add.group({
       allowGravity: false,
       immovable: true
     });
-    this.buildMap();
-    this.setDifficulty('normal')
+    this.buildMap(game);
+    this.setUpGates(this.numOfGates);
+    this.game.physics.world.setBounds(0, 0, this.mapSize.x, this.mapSize.y, true, true, true, true);
     const wallhitSpark = game.add.sprite(0, 0, 'wandSpark');
     wallhitSpark.setDepth(20);
     wallhitSpark.setScale(0.5, 0.5);
@@ -38,6 +24,12 @@ class World {
     this.wallHit = false;
   }
   
+  makeMapTileSet(game, mapKey, mapTileSetRef, tileKey) {
+    let map = game.make.tilemap({ key: mapKey });
+    let tiles = map.addTilesetImage(mapTileSetRef, tileKey);
+    return {'map': map, 'tiles': tiles};
+  }
+
   spawnPlayer(game, map) {
     let playerSpawner = parseInt(Math.random() * map.getObjectLayer('spawners')['objects'].length);
     this.player = new Player(
@@ -46,71 +38,182 @@ class World {
       map.getObjectLayer('spawners')['objects'][playerSpawner].y
     );
     map.getObjectLayer('spawners')['objects'].splice(playerSpawner, 1);
+    this.playerSpawned = true;
   }
 
-  buildMap() {
-    this.simpleBuildingSpots = [];
+  buildModularBuilding() {}
+
+  buildMap(game) {
     this.spawners = [];
-    this.mapSets.forEach(set => {
-      let map = set.map;
-      let tiles = set.tiles;
-      let spawnLocation = {x: 0, y: 0};
-      if(map.properties[0] != null && map.properties[0].name == 'baseMap') {
-        map.getObjectLayer('simpleBuilding')['objects'].forEach(spot => {
+    this.mapSize = {x: 0, y: 0};
+    this.simpleBuildingSpots = [];
+    this.modularBuildings = {};
+
+    //add base maps
+    let buildingCount = 0;
+    this.levelMap.forEach(row => {
+      this.mapSize.x = 0;
+      let availableSpace = row;
+      while (availableSpace > 0) {
+        let randNum = parseInt(Math.random() * Constants.baseMaps.length);
+        while (!(Constants.baseMaps[randNum].size <= availableSpace)) {
+          randNum = parseInt(Math.random() * Constants.baseMaps.length)
+        }
+        let set = Constants.baseMaps[randNum];
+        // this.mapSets.push(this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey));
+        let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
+        if(mapSet.map.properties[0] != null && mapSet.map.properties[0].name == 'baseMap') {
+          let simpleBuildings = mapSet.map.getObjectLayer('simpleBuilding');
+          if(simpleBuildings != null) {
+            simpleBuildings['objects'].forEach(spot => {
+              buildingCount += 1;
+            });
+          }
+          let modularBuilding = mapSet.map.getObjectLayer('modularBuilding');
+          if(modularBuilding != null) {
+            //initialise these if they do not exist
+            this.modularBuildingCount >= 0 ? this.modularBuildingCount += 1 : this.modularBuildingCount = 0;
+            let buildingName = `building${this.modularBuildingCount}`;
+            if (!(buildingName in this.modularBuildings)) {this.modularBuildings[buildingName] = {}};
+            let building = this.modularBuildings[buildingName];
+            modularBuilding['objects'].forEach(spot => {
+              let column, row;
+              spot.x += this.mapSize.x;
+              spot.y += this.mapSize.y - 61;
+              spot.properties.forEach(prop => {
+                if (prop.name == 'column') {
+                  column = prop.value
+                } else if (prop.name == 'row') {
+                  row = prop.value
+                };
+              });
+              let rowKey = `row_${row}`;
+              if (!(rowKey in building)) {building[rowKey] = {}};
+              building[rowKey][`column_${column}`] = spot;
+            });
+          }
+        }
+        this.playerSpawned ? '' : this.spawnPlayer(game, mapSet.map);
+        this.placeMap(mapSet, this.mapSize);
+        this.mapSize.x = this.mapSize.x + (mapSet.map.tileWidth * mapSet.map.width);
+        availableSpace = parseInt(availableSpace - set.size);
+      }
+      this.mapSize.y = this.mapSize.y + 1568;
+
+    })
+    for (let i = 0; i < buildingCount; i ++) {
+      let randNum = parseInt(Math.random() * Constants.simpleBuildingMaps.length);
+      let set = Constants.simpleBuildingMaps[randNum];
+      let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
+      this.placeMap(mapSet);
+    }
+    for (const entry in this.modularBuildings) {
+      let building = this.modularBuildings[entry];
+      console.log(building);
+      for (const entry in building) {
+        let row = building[entry];
+        console.log(row);
+        for (const entry in row) {
+          let spot = row[entry];
+          let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
+          let set = Constants.modularBuildingMaps[randNum];
+          let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
+          let spawnLocation = {x: spot.x, y: spot.y};
+          this.placeMap(mapSet, spawnLocation);
+        }
+
+      }
+    }
+      // let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
+      // let set = Constants.modularBuildingMaps[randNum];
+      // let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
+      // this.placeMap(mapSet);
+    // })
+    this.game.physics.world.setBounds(0, 0, this.mapSize.x, this.mapSize.y, true, true, true, true);
+  }
+
+  placeMap(mapSet, spawnLocation = {x: 0, y: 0}) {
+    let map = mapSet.map;
+    let tiles = mapSet.tiles;
+    if(map.properties[0] != null && map.properties[0].name == 'baseMap') {
+      let simpleBuildings = map.getObjectLayer('simpleBuilding');
+      if(simpleBuildings != null) {
+        simpleBuildings['objects'].forEach(spot => {
+          spot.x += this.mapSize.x;
+          spot.y += this.mapSize.y;
           this.simpleBuildingSpots.push(spot);
         });
-      } else if (map.properties[0] != null && map.properties[0].name == 'simpleBuilding') {
-        let spot = this.simpleBuildingSpots[0];
-        let mapHeight = map.tileHeight * map.height;
-        spawnLocation.x = spot.x;
-        //spawn at the bottom of the area so that the first door is on the road.
-        spawnLocation.y = spot.y + spot.height - mapHeight + 3;
       }
-      map.createStaticLayer('background', tiles, spawnLocation.x, spawnLocation.y);
-      let foreground = map.createStaticLayer('foreground', tiles, spawnLocation.x, spawnLocation.y);
-      if(foreground != null) { foreground.setDepth(100) };
-      if(map.getObjectLayer('wallObjects') != null) {
-        let wallObjects = map.getObjectLayer('wallObjects')['objects'];
-        wallObjects.forEach(wallObject => {
-          let wall = this.walls.create(wallObject.x + 16 + spawnLocation.x, wallObject.y + 16 + spawnLocation.y, '').setOrigin(0, 0);
-          wall.visible = false;
-          wall.body.height = wallObject.height;
-          wall.body.width = wallObject.width;
-        });
-      }
+    } else if (map.properties[0] != null && map.properties[0].name == 'simpleBuilding') {
+      let spot = this.simpleBuildingSpots[0];
+      let mapHeight = map.tileHeight * map.height;
+      let mapWidth = map.tileWidth * map.width;
+      spawnLocation.x = spot.x + (spot.width - mapWidth)/2;
+      //spawn at the bottom of the area so that the first door is on the road.
+      spawnLocation.y = spot.y + spot.height - mapHeight + 3;
+      this.simpleBuildingSpots.shift();
+    }
+    map.createStaticLayer('background', tiles, spawnLocation.x, spawnLocation.y);
+    let foreground = map.createStaticLayer('foreground', tiles, spawnLocation.x, spawnLocation.y);
+    if(foreground != null) { foreground.setDepth(100) };
+    if(map.getObjectLayer('wallObjects') != null) {
+      let wallObjects = map.getObjectLayer('wallObjects')['objects'];
+      wallObjects.forEach(wallObject => {
+        let wall = this.walls.create(wallObject.x + 16 + spawnLocation.x, wallObject.y + 16 + spawnLocation.y, '').setOrigin(0, 0);
+        wall.visible = false;
+        wall.body.height = wallObject.height;
+        wall.body.width = wallObject.width;
+      });
+    }
+    if(map.getObjectLayer('spawners') != null) {
       map.getObjectLayer('spawners')['objects'].forEach(spawner => {
         spawner.x += spawnLocation.x;
         spawner.y += spawnLocation.y;
       });
       this.spawners = this.spawners.concat(map.getObjectLayer('spawners')['objects']);
-    })
-    this.mapSize = {
-      x: this.groundMap.tileWidth * this.groundMap.width,
-      y: this.groundMap.tileHeight * this.groundMap.height
-    };
-    this.game.physics.world.setBounds(0, 0, this.mapSize.x, this.mapSize.y, true, true, true, true);
+    }
   }
-
 
   setDifficulty(difficulty) {
     switch(difficulty) {
       case (difficulty == 'easy'):
-        this.setUpGates(2);
+        this.numOfGates = 2;
         this.spawnDelay = 300;
         this.spawnTimer = 300;
         break;
       case (difficulty == 'hard'):
-        this.setUpGates(6);
+        this.numOfGates = 6;
         this.spawnDelay = 150;
         this.spawnTimer = 150;
         break;
       default:
-        this.setUpGates(4);
+        //normal
+        this.numOfGates = 4;
         this.spawnDelay = 200;
         this.spawnTimer = 200;
     }
   }
 
+  setLevelSize(size) {
+    switch(size) {
+      case (size == 'tiny'):
+        this.levelMap = [1];  
+        break;
+      case (size == 'small'):
+        this.levelMap = [2];  
+        break;
+      case (size == 'large'):
+        this.levelMap = [3, 3, 3];  
+        break;
+      default:
+        //medium
+        this.levelMap = [2, 2];
+    }
+  }
+
+  levelSpaceCheck(needed, available) {
+    return (needed <= available);
+  }
   randomiseSpark(int) {
     let tint = 0x000000;
     switch (int) {
