@@ -9,11 +9,9 @@ class MainScene extends Phaser.Scene {
   preload() {
     console.log("preload()");
     // this.score = 0;
-    // this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
     this.load.image('industrialTiles1', 'assets/tiles/room1.png');
     this.load.image('industrialTiles2', 'assets/tiles/room2.png');
     this.load.image('outsideTiles', 'assets/tiles/outside.png');
-    // this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
     this.load.tilemapTiledJSON('outsideMap1', 'assets/tilemaps/outside.json');
     this.load.tilemapTiledJSON('outsideMap2', 'assets/tilemaps/outside2.json');
     this.load.tilemapTiledJSON('outsideMap3', 'assets/tilemaps/outside3.json');
@@ -51,9 +49,6 @@ class MainScene extends Phaser.Scene {
     const game = this;
     this.gameInput.leftClick(function() { game.startGame(); });
     this.animationSetUp();
-    // this.input.on('pointerdown', 
-    //   start = true;
-    // });
     this.pointer = this.input.activePointer;
     this.physics.add.overlap(this.player.playerBody, this.world.enemies, this.onCollisionPlayerEnemy);
     this.physics.add.overlap(this.world.bulletFactory.group, this.world.enemies, this.onCollisionBulletEnemy);
@@ -178,7 +173,6 @@ class MainScene extends Phaser.Scene {
   addStreamPoints(curve, noOfPoints) {
     let array = curve;
     array = array.getDistancePoints(noOfPoints);
-    // let i = 0;
     for (let i = 1; i < array.length-1; i++) {
       let random = (Math.floor((Math.random()*5)+1));
       let plusOrMinus = Math.random() < 0.5 ? -1 : 1;

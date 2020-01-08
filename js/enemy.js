@@ -165,7 +165,6 @@ class Enemy {
 
   perFrameUpdate() {
     if (this.active == true) {
-      // if (this.hasCollided == true) { this.hasCollided = false} ;
       if (this.isLeashed == false) {
         if (this.currentHP < this.maxHP) {
           this.currentHP += 1;

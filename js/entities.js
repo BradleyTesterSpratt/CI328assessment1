@@ -16,7 +16,6 @@ class EntityFactory {
       this.nextBulletTime = 0;
     }
 
-    //  To avoid them being allowed to fire too fast we set a time limit
     if (this.game.time.now > this.nextBulletTime) {
       const sprite = this.group.create(x-1, y-2)
       this.setUpEntity(sprite);
@@ -52,12 +51,4 @@ class EntityFactory {
       console.log(err);
     }
   }
-
-  // spawnAsEnemy(x, y) {
-    // const sprite = this.group.create(x, y + 30);
-    // this.setUpEntity(sprite);
-    // sprite.setVelocity(Phaser.Math.Between(35, 55), Phaser.Math.Between(45, 100));
-    // sprite.setOrigin(1.0, 1.0);
-    // sprite.addControl(new EnemyControl());
-  // }
 }

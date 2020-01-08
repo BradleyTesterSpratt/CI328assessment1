@@ -35,9 +35,8 @@ class Input {
 }
 
 class UI {
+  //this needs to be updated to follow the camera
   constructor(game) {
-    // this.cameras.main.follow(this.player);
-
     this.startGameText = game.add.text(phaser.config.width / 2, phaser.config.height / 2, 'Click to Start', {
       font: '30px Arial',
       fill: '#fff'

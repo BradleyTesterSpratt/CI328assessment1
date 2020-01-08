@@ -47,8 +47,6 @@ class World {
     this.mapSize = {x: 0, y: 0};
     this.simpleBuildingSpots = [];
     this.modularBuildings = {};
-
-    //add base maps
     let buildingCount = 0;
     this.levelMap.forEach(row => {
       this.mapSize.x = 0;
@@ -69,7 +67,6 @@ class World {
           }
           let modularBuilding = mapSet.map.getObjectLayer('modularBuilding');
           if(modularBuilding != null) {
-            //initialise these if they do not exist
             this.modularBuildingCount >= 0 ? this.modularBuildingCount += 1 : this.modularBuildingCount = 0;
             let buildingName = `building${this.modularBuildingCount}`;
             if (!(buildingName in this.modularBuildings)) {this.modularBuildings[buildingName] = []};
@@ -180,49 +177,6 @@ class World {
     }
     return {'piece': piece, 'entrances': entrances};
   }
-      // console.log('piece.directions: ', set.connections)
-      // let connectionCount = 0;
-      // set.connections.forEach(direction => {
-      //   connectionCount += 1;
-      //   console.log(connectionCount, "direction: ",direction);
-      //   let search;
-      //     switch(true) {
-      //       case direction == 'north':
-      //         search = { direction: direction, column: plot.column, row: plot.row - 1};            
-      //         break;
-      //       case direction == 'east':
-      //         search = { direction: direction, column: plot.column + 1, row: plot.row};            
-      //         break;
-      //       case direction == 'south':
-      //         search = { direction: direction, column: plot.column, row: plot.row + 1};            
-      //         break;
-      //       case direction == 'west':
-      //         search = { direction: direction, column: plot.column - 1, row: plot.row};            
-      //         break;
-      //       default:
-      //         console.log('no direction provided')
-      //     }
-          // let neighborPlot = this.findPlotByColumnAndRow(building, search.column, search.row);
-      //     if (typeof neighborPlot == 'undefined') {
-      //       console.log('undef')
-      //       // isSuitable = true;
-      //       suitableCount += 1;
-      //     } else {
-      //       console.log('opposiite: ', opposites[direction])
-      //       if (this.checkConnectingAccess(neighborPlot, opposites[direction]) == true) {
-      //         console.log('neighbor: ', neighborPlot.openDirections);
-      //         suitableCount += 1;
-      //       }
-      //     }
-      //   });
-        // console.log(suitableCount, set.connections.length)
-        // isSuitable = suitableCount == set.connections.length? true : false;
-        // console.log('suitable: ', isSuitable)
-        // piece = set;
-    // }
-    // return piece;
-  // }
-  
   findPlotByColumnAndRow(building, column, row) {
     let matchingPlot;
 
@@ -235,10 +189,6 @@ class World {
 
     return matchingPlot;
   }
-
-  // checkConnectingAccess(plot, accessDirection) {
-  //   return plot.openDirections.includes(accessDirection);
-  // }
 
   placeMap(mapSet, spawnLocation = {x: 0, y: 0}) {
     let map = mapSet.map;
