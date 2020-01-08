@@ -1,5 +1,6 @@
 class World {
   constructor(game, difficulty, levelSize) {
+    this.totalAttempts = 0;
     this.game = game;
     this.setDifficulty(difficulty);
     this.setLevelSize(levelSize);
@@ -122,7 +123,7 @@ class World {
       let piece = result.piece;
       entrances = result.entrances;
       let mapSet = this.makeMapTileSet(this.game, piece.mapKey, piece.mapTileSetRef, piece.tileKey);
-      this.placeMap(mapSet, {x: plot.x, y: plot.y});
+      this.placeMap(mapSet, {x: plot.x, y: plot.y}, plot.row);
       plot.openDirections = [];
       piece.connections.forEach(direction => {
         plot.openDirections.push(direction);
@@ -146,6 +147,8 @@ class World {
       {'direction': 'west',  plot: this.findPlotByColumnAndRow(building, plot.column - 1, plot.row)}
     ]
     let isSuitable = false;
+    let pieceCount = Constants.modularBuildingMaps.length
+    let randNum = parseInt(Math.random() * pieceCount);
     while (!isSuitable) {
       let entranceCount = entrances;
       let entranceAdded = false;
@@ -161,7 +164,9 @@ class World {
           neededConnections.push(neighbor.direction);
         }
       });
-      let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
+      randNum += 1;
+      //skip 0 as we only want to assign a empty plot if none of the others are valid
+      if (randNum > pieceCount - 1) { randNum = 1;}
       let set = Constants.modularBuildingMaps[randNum];
       if(neededConnections.length == set.connections.length) {
         isSuitable = neededConnections.every(direction => set.connections.includes(direction));
@@ -169,28 +174,28 @@ class World {
       piece = set;
       if (isSuitable) {
         entrances = entranceCount;
-      } else if (attempts > 50) {
+      } else if (attempts > pieceCount) {
         piece = Constants.modularBuildingMaps[0];
         isSuitable = true;
       }
       attempts += 1;
     }
+    this.totalAttempts += attempts;
     return {'piece': piece, 'entrances': entrances};
   }
+
   findPlotByColumnAndRow(building, column, row) {
     let matchingPlot;
-
     building.forEach(plot => {
       if (plot.row == row && plot.column == column) 
         {
           matchingPlot = plot;
         }
     })
-
     return matchingPlot;
   }
 
-  placeMap(mapSet, spawnLocation = {x: 0, y: 0}) {
+  placeMap(mapSet, spawnLocation = {x: 0, y: 0}, backgroundDepth = 0) {
     let map = mapSet.map;
     let tiles = mapSet.tiles;
     if(map.properties[0] != null && map.properties[0].name == 'baseMap') {
@@ -211,7 +216,8 @@ class World {
       spawnLocation.y = spot.y + spot.height - mapHeight + 3;
       this.simpleBuildingSpots.shift();
     }
-    map.createStaticLayer('background', tiles, spawnLocation.x, spawnLocation.y);
+    let background = map.createStaticLayer('background', tiles, spawnLocation.x, spawnLocation.y);
+    background.setDepth(backgroundDepth);
     let foreground = map.createStaticLayer('foreground', tiles, spawnLocation.x, spawnLocation.y);
     if(foreground != null) { foreground.setDepth(100) };
     if(map.getObjectLayer('wallObjects') != null) {

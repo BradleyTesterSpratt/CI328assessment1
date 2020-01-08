@@ -42,6 +42,12 @@ class MainScene extends Phaser.Scene {
   create() {
     this.start = false;
     this.world = new World(this, 'normal', 'medium');
+    /**
+     * scene will not load correctly if it attempts to choose a modular piece too many times
+     * if row depth isn't corrected, it will load without the restart
+     * but inner building walls may overlap
+     */
+    if (this.world.totalAttempts > 100) { this.scene.restart(); };
     this.gameInput = new Input(this);
     this.ui = new UI(this);
     this.audio = new Audio(this);
