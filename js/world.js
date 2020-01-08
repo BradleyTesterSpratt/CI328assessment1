@@ -1,11 +1,13 @@
 class World {
   constructor(game, difficulty, levelSize) {
     this.totalAttempts = 0;
+    this.spawnTimer = 0;
     this.game = game;
     this.setDifficulty(difficulty);
     this.setLevelSize(levelSize);
     this.bulletFactory = new EntityFactory(game, 'bullet_img');
-    this.spiritWorld = ['physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne', 'physTypeOne'];
+    this.spiritWorld = [];
+    this.populateSpiritWorld(this.spiritWorldSize + this.initialSpawnedEnemies);
     this.enemies = game.physics.add.group();
     this.ghostGates = game.physics.add.group();
     this.playerSpawned = false;
@@ -25,6 +27,14 @@ class World {
     this.wallHit = false;
   }
 
+  populateSpiritWorld(numberOfEnemies) {
+    for(let i = 0; i < numberOfEnemies; i++) {
+      let randNum = parseInt(Math.random() * Constants.enemyTypes.length);
+      console.log(randNum, Constants.enemyTypes[randNum]);
+      this.spiritWorld.push(Constants.enemyTypes[randNum]);
+    }
+  }
+
   makeMapTileSet(game, mapKey, mapTileSetRef, tileKey) {
     let map = game.make.tilemap({ key: mapKey });
     let tiles = map.addTilesetImage(mapTileSetRef, tileKey);
@@ -42,6 +52,9 @@ class World {
     this.playerSpawned = true;
   }
 
+  spawnInitialEnemies() {
+    for (let i = 0; i < this.initialSpawnedEnemies; i ++) { this.spawnEnemy(); };
+  }
 
   buildMap(game) {
     this.spawners = [];
@@ -55,7 +68,7 @@ class World {
       while (availableSpace > 0) {
         let randNum = parseInt(Math.random() * Constants.baseMaps.length);
         while (!(Constants.baseMaps[randNum].size <= availableSpace)) {
-          randNum = parseInt(Math.random() * Constants.baseMaps.length)
+          randNum = parseInt(Math.random() * Constants.baseMaps.length);
         }
         let set = Constants.baseMaps[randNum];
         let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
@@ -147,7 +160,7 @@ class World {
       {'direction': 'west',  plot: this.findPlotByColumnAndRow(building, plot.column - 1, plot.row)}
     ]
     let isSuitable = false;
-    let pieceCount = Constants.modularBuildingMaps.length
+    let pieceCount = Constants.modularBuildingMaps.length;
     let randNum = parseInt(Math.random() * pieceCount);
     while (!isSuitable) {
       let entranceCount = entrances;
@@ -243,35 +256,39 @@ class World {
       case (difficulty == 'easy'):
         this.numOfGates = 2;
         this.spawnDelay = 300;
-        this.spawnTimer = 300;
+        this.spiritWorldSize = 20;
         break;
       case (difficulty == 'hard'):
         this.numOfGates = 6;
         this.spawnDelay = 150;
-        this.spawnTimer = 150;
+        this.spiritWorldSize = 10;
         break;
       default:
         //normal
         this.numOfGates = 4;
         this.spawnDelay = 200;
-        this.spawnTimer = 200;
+        this.spiritWorldSize = 15;
     }
   }
 
   setLevelSize(size) {
     switch(true) {
       case (size == 'tiny'):
-        this.levelMap = [1];  
+        this.levelMap = [1];
+        this.initialSpawnedEnemies = 4;
         break;
       case (size == 'small'):
         this.levelMap = [2];  
+        this.initialSpawnedEnemies = 6;
         break;
       case (size == 'large'):
         this.levelMap = [3, 3, 3];  
+        this.initialSpawnedEnemies = 10;
         break;
       default:
         //medium
         this.levelMap = [2, 2];
+        this.initialSpawnedEnemies = 8;
     }
   }
 

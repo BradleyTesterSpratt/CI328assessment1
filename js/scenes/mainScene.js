@@ -77,11 +77,8 @@ class MainScene extends Phaser.Scene {
     this.hitEnemy = null;
     this.collidedBullet = null;
     this.bulletCheck = 0.0;
-    this.cameras.main.startFollow(this.player.playerBody);
-    // this one doesn't work
-    // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
-    // this one doesn't keep the player centered
-    // this.cameras.main.setDeadzone(700,500);
+    this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
+    this.cameras.main.setZoom(0.15);
   }
 
   pauseGameForInput() {
@@ -171,6 +168,13 @@ class MainScene extends Phaser.Scene {
     console.log("startGame()");
     //trap will not deploy if the player is in it's collider, this resets it
     this.player.deployTrap(this.player.playerBody.x, this.player.playerBody.y)
+    for (let i = 0; i < this.world.initialSpawnedEnemies; i ++) { this.world.spawnEnemy(); };
+    this.cameras.main.zoomTo(0.75,1000);
+    this.cameras.main.startFollow(this.player.playerBody);
+    // this one doesn't work
+    // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
+    // this one doesn't keep the player centered
+    // this.cameras.main.setDeadzone(700,500);
     this.setScore(0);
     this.configureInput(this);
     this.resumeGameFromInput();

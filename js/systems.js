@@ -96,4 +96,5 @@ class Constants {
     {mapKey: 'industrialWSEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north', 'south', 'east', 'west']},
     {mapKey: 'industrialWSN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north', 'south', 'west']}
   ]
+  static enemyTypes = [ 'physTypeOne']
 }
