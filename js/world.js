@@ -23,7 +23,7 @@ class World {
     this.wallHitSpark.visible = false;
     this.wallHit = false;
   }
-  
+
   makeMapTileSet(game, mapKey, mapTileSetRef, tileKey) {
     let map = game.make.tilemap({ key: mapKey });
     let tiles = map.addTilesetImage(mapTileSetRef, tileKey);
@@ -41,7 +41,6 @@ class World {
     this.playerSpawned = true;
   }
 
-  buildModularBuilding() {}
 
   buildMap(game) {
     this.spawners = [];
@@ -60,7 +59,6 @@ class World {
           randNum = parseInt(Math.random() * Constants.baseMaps.length)
         }
         let set = Constants.baseMaps[randNum];
-        // this.mapSets.push(this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey));
         let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
         if(mapSet.map.properties[0] != null && mapSet.map.properties[0].name == 'baseMap') {
           let simpleBuildings = mapSet.map.getObjectLayer('simpleBuilding');
@@ -74,22 +72,20 @@ class World {
             //initialise these if they do not exist
             this.modularBuildingCount >= 0 ? this.modularBuildingCount += 1 : this.modularBuildingCount = 0;
             let buildingName = `building${this.modularBuildingCount}`;
-            if (!(buildingName in this.modularBuildings)) {this.modularBuildings[buildingName] = {}};
+            if (!(buildingName in this.modularBuildings)) {this.modularBuildings[buildingName] = []};
             let building = this.modularBuildings[buildingName];
-            modularBuilding['objects'].forEach(spot => {
-              let column, row;
-              spot.x += this.mapSize.x;
-              spot.y += this.mapSize.y - 61;
-              spot.properties.forEach(prop => {
+            modularBuilding['objects'].forEach(plot => {
+              plot.x += this.mapSize.x;
+              plot.y += this.mapSize.y - 61;
+              plot.openDirections = ['north', 'south', 'east', 'west'];
+              plot.properties.forEach(prop => {
                 if (prop.name == 'column') {
-                  column = prop.value
+                  plot.column = prop.value;
                 } else if (prop.name == 'row') {
-                  row = prop.value
+                  plot.row = prop.value;
                 };
               });
-              let rowKey = `row_${row}`;
-              if (!(rowKey in building)) {building[rowKey] = {}};
-              building[rowKey][`column_${column}`] = spot;
+              building.push(plot)
             });
           }
         }
@@ -99,7 +95,6 @@ class World {
         availableSpace = parseInt(availableSpace - set.size);
       }
       this.mapSize.y = this.mapSize.y + 1568;
-
     })
     for (let i = 0; i < buildingCount; i ++) {
       let randNum = parseInt(Math.random() * Constants.simpleBuildingMaps.length);
@@ -107,28 +102,143 @@ class World {
       let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
       this.placeMap(mapSet);
     }
-    for (const entry in this.modularBuildings) {
-      let building = this.modularBuildings[entry];
-      for (const entry in building) {
-        let row = building[entry];
-        for (const entry in row) {
-          let spot = row[entry];
-          let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
-          let set = Constants.modularBuildingMaps[randNum];
-          let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
-          let spawnLocation = {x: spot.x, y: spot.y};
-          this.placeMap(mapSet, spawnLocation);
-        }
-
-      }
+    for (const building in this.modularBuildings) {
+      this.buildModularBuilding(this.modularBuildings[building]);
     }
-      // let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
-      // let set = Constants.modularBuildingMaps[randNum];
-      // let mapSet = this.makeMapTileSet(game, set.mapKey, set.mapTileSetRef, set.tileKey);
-      // this.placeMap(mapSet);
-    // })
     this.game.physics.world.setBounds(0, 0, this.mapSize.x, this.mapSize.y, true, true, true, true);
   }
+
+  buildModularBuilding(building) {
+    let entrances = 0;
+    let plotIndexes = [];
+    for (let i = 0; i < building.length; i++) {
+      plotIndexes.push(i);
+    }
+    let randPlotIndexes = [];
+    while(plotIndexes.length > 0) {
+      let randNum = parseInt(Math.random() * plotIndexes.length);
+      randPlotIndexes.push(plotIndexes.splice(randNum, 1).pop());
+    }
+    while (randPlotIndexes.length > 0) {
+      let plot = building[randPlotIndexes.pop()];
+      let result = this.selectModularPiece(plot, building, entrances);
+      let piece = result.piece;
+      entrances = result.entrances;
+      let mapSet = this.makeMapTileSet(this.game, piece.mapKey, piece.mapTileSetRef, piece.tileKey);
+      this.placeMap(mapSet, {x: plot.x, y: plot.y});
+      plot.openDirections = [];
+      piece.connections.forEach(direction => {
+        plot.openDirections.push(direction);
+      })
+    }
+  }
+
+  selectModularPiece(plot, building, entrances) {
+    let attempts = 0;
+    let piece;
+    let opposites = {
+      'north': 'south',
+      'south': 'north',
+      'east': 'west',
+      'west': 'east'
+    };
+    let neighborPlots = [
+      {'direction': 'north', plot: this.findPlotByColumnAndRow(building, plot.column, plot.row - 1)},
+      {'direction': 'east',  plot: this.findPlotByColumnAndRow(building, plot.column + 1, plot.row)},
+      {'direction': 'south',  plot: this.findPlotByColumnAndRow(building, plot.column, plot.row + 1)},
+      {'direction': 'west',  plot: this.findPlotByColumnAndRow(building, plot.column - 1, plot.row)}
+    ]
+    let isSuitable = false;
+    while (!isSuitable) {
+      let entranceCount = entrances;
+      let entranceAdded = false;
+      let neededConnections = []
+      neighborPlots.forEach(neighbor => {
+        if (typeof neighbor.plot === 'undefined') {
+          if (entranceCount < 2 && !entranceAdded) {
+            neededConnections.push(neighbor.direction);
+            entranceCount += 1;
+            entranceAdded = true;
+          };
+        } else if (neighbor.plot.openDirections.includes(opposites[neighbor.direction])) {
+          neededConnections.push(neighbor.direction);
+        }
+      });
+      let randNum = parseInt(Math.random() * Constants.modularBuildingMaps.length);
+      let set = Constants.modularBuildingMaps[randNum];
+      if(neededConnections.length == set.connections.length) {
+        isSuitable = neededConnections.every(direction => set.connections.includes(direction));
+      }
+      piece = set;
+      if (isSuitable) {
+        entrances = entranceCount;
+      } else if (attempts > 50) {
+        piece = Constants.modularBuildingMaps[0];
+        isSuitable = true;
+      }
+      attempts += 1;
+    }
+    return {'piece': piece, 'entrances': entrances};
+  }
+      // console.log('piece.directions: ', set.connections)
+      // let connectionCount = 0;
+      // set.connections.forEach(direction => {
+      //   connectionCount += 1;
+      //   console.log(connectionCount, "direction: ",direction);
+      //   let search;
+      //     switch(true) {
+      //       case direction == 'north':
+      //         search = { direction: direction, column: plot.column, row: plot.row - 1};            
+      //         break;
+      //       case direction == 'east':
+      //         search = { direction: direction, column: plot.column + 1, row: plot.row};            
+      //         break;
+      //       case direction == 'south':
+      //         search = { direction: direction, column: plot.column, row: plot.row + 1};            
+      //         break;
+      //       case direction == 'west':
+      //         search = { direction: direction, column: plot.column - 1, row: plot.row};            
+      //         break;
+      //       default:
+      //         console.log('no direction provided')
+      //     }
+          // let neighborPlot = this.findPlotByColumnAndRow(building, search.column, search.row);
+      //     if (typeof neighborPlot == 'undefined') {
+      //       console.log('undef')
+      //       // isSuitable = true;
+      //       suitableCount += 1;
+      //     } else {
+      //       console.log('opposiite: ', opposites[direction])
+      //       if (this.checkConnectingAccess(neighborPlot, opposites[direction]) == true) {
+      //         console.log('neighbor: ', neighborPlot.openDirections);
+      //         suitableCount += 1;
+      //       }
+      //     }
+      //   });
+        // console.log(suitableCount, set.connections.length)
+        // isSuitable = suitableCount == set.connections.length? true : false;
+        // console.log('suitable: ', isSuitable)
+        // piece = set;
+    // }
+    // return piece;
+  // }
+  
+  findPlotByColumnAndRow(building, column, row) {
+    let matchingPlot;
+
+    building.forEach(plot => {
+      if (plot.row == row && plot.column == column) 
+        {
+          matchingPlot = plot;
+        }
+    })
+
+    return matchingPlot;
+  }
+
+  // checkConnectingAccess(plot, accessDirection) {
+  //   return plot.openDirections.includes(accessDirection);
+  // }
 
   placeMap(mapSet, spawnLocation = {x: 0, y: 0}) {
     let map = mapSet.map;
