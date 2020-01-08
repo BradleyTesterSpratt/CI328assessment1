@@ -1,5 +1,5 @@
 class Enemy {
-  constructor(game, location, sprite, speed, escapeSpeed, hitPoints, type, isPhysical, scale, behaviour) {
+  constructor(game, location, sprite, speed, escapeSpeed, hitPoints, type, isPhysical, scale, behaviour = 'dumb') {
     this.game = game;
     this.baseSpeed = speed;
     this.speed = speed;
@@ -23,7 +23,7 @@ class Enemy {
     this.baseColliderSize = {x: this.enemySprite.width, y: this.enemySprite.height};
     this.decisionDelay = 0.0;
     //this needs chaning when more behaviours added
-    this.behaviour = behaviour || 'dumb';
+    this.behaviour = behaviour;
     this.behaviourRandomNumber = 4;
     this.hasHitWall = false;
     this.enemySprite.enemy = this;
@@ -165,7 +165,6 @@ class Enemy {
 
   perFrameUpdate() {
     if (this.active == true) {
-      // if (this.hasCollided == true) { this.hasCollided = false} ;
       if (this.isLeashed == false) {
         if (this.currentHP < this.maxHP) {
           this.currentHP += 1;

@@ -7,7 +7,6 @@ class Player {
     this.baseSpeed = 5;
     this.speed = 5;
     this.slimes = [];
-    // this.hasCollided = false;
     this.fireDelay = 0.0;
     this.moveInputDelay = 0.0;
     this.wandEnd = {x: 0, y: 0};
@@ -39,7 +38,6 @@ class Player {
     this.setMove = this.setMove.bind(this);
     this.deployTrap = this.deployTrap.bind(this);
     this.grabTrap = this.grabTrap.bind(this);
-    //the trap will not deploy     
   }
 
   generateSprites(spawnLocationX, spawnLocationY) {
@@ -264,12 +262,7 @@ class Player {
       this.firing = false;
       this.fireDelay = 0.0;
     }
-    // if (this.hasCollided == true) {this.slimeDelay += 0.016};
-    // if (this.slimeDelay > 2) {
-    //   this.slimeDelay = 0.0;
-    //   this.hasCollided = false;
-    // }
-    
+
     this.move();
     this.moveInputDelay += 0.016;
     if (this.moveInputDelay > 0.16) {

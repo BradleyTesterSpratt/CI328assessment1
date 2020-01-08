@@ -29,6 +29,28 @@
         }, 
         {
          "draworder":"topdown",
+         "id":4,
+         "name":"spawners",
+         "objects":[
+                {
+                 "height":64,
+                 "id":7,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":288,
+                 "y":256
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":3,
          "name":"wallObjects",
          "objects":[

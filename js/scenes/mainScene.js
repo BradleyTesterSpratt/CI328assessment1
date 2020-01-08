@@ -9,13 +9,12 @@ class MainScene extends Phaser.Scene {
   preload() {
     console.log("preload()");
     // this.score = 0;
-    // this.load.image('testTiles', 'assets/tiles/sciFiTiles.png');
     this.load.image('industrialTiles1', 'assets/tiles/room1.png');
     this.load.image('industrialTiles2', 'assets/tiles/room2.png');
     this.load.image('outsideTiles', 'assets/tiles/outside.png');
-    // this.load.tilemapTiledJSON('testMap', 'assets/tilemaps/testMap.json');
     this.load.tilemapTiledJSON('outsideMap1', 'assets/tilemaps/outside.json');
     this.load.tilemapTiledJSON('outsideMap2', 'assets/tilemaps/outside2.json');
+    this.load.tilemapTiledJSON('outsideMap3', 'assets/tilemaps/outside3.json');
     this.load.tilemapTiledJSON('simpleRoom1', 'assets/tilemaps/simpleRoom.json');
     this.load.tilemapTiledJSON('simpleRoom2', 'assets/tilemaps/simpleRoom2.json');
     Constants.modularBuildingMaps.forEach(map => {
@@ -42,7 +41,13 @@ class MainScene extends Phaser.Scene {
 
   create() {
     this.start = false;
-    this.world = new World(this, 'normal', 'large');
+    this.world = new World(this, 'normal', 'medium');
+    /**
+     * scene will not load correctly if it attempts to choose a modular piece too many times
+     * if row depth isn't corrected, it will load without the restart
+     * but inner building walls may overlap
+     */
+    if (this.world.totalAttempts > 100) { this.scene.restart(); };
     this.gameInput = new Input(this);
     this.ui = new UI(this);
     this.audio = new Audio(this);
@@ -50,9 +55,6 @@ class MainScene extends Phaser.Scene {
     const game = this;
     this.gameInput.leftClick(function() { game.startGame(); });
     this.animationSetUp();
-    // this.input.on('pointerdown', 
-    //   start = true;
-    // });
     this.pointer = this.input.activePointer;
     this.physics.add.overlap(this.player.playerBody, this.world.enemies, this.onCollisionPlayerEnemy);
     this.physics.add.overlap(this.world.bulletFactory.group, this.world.enemies, this.onCollisionBulletEnemy);
@@ -75,11 +77,8 @@ class MainScene extends Phaser.Scene {
     this.hitEnemy = null;
     this.collidedBullet = null;
     this.bulletCheck = 0.0;
-    this.cameras.main.startFollow(this.player.playerBody);
-    // this one doesn't work
-    // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
-    // this one doesn't keep the player centered
-    // this.cameras.main.setDeadzone(700,500);
+    this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
+    this.cameras.main.setZoom(0.15);
   }
 
   pauseGameForInput() {
@@ -169,6 +168,13 @@ class MainScene extends Phaser.Scene {
     console.log("startGame()");
     //trap will not deploy if the player is in it's collider, this resets it
     this.player.deployTrap(this.player.playerBody.x, this.player.playerBody.y)
+    for (let i = 0; i < this.world.initialSpawnedEnemies; i ++) { this.world.spawnEnemy(); };
+    this.cameras.main.zoomTo(0.75,1000);
+    this.cameras.main.startFollow(this.player.playerBody);
+    // this one doesn't work
+    // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
+    // this one doesn't keep the player centered
+    // this.cameras.main.setDeadzone(700,500);
     this.setScore(0);
     this.configureInput(this);
     this.resumeGameFromInput();
@@ -177,7 +183,6 @@ class MainScene extends Phaser.Scene {
   addStreamPoints(curve, noOfPoints) {
     let array = curve;
     array = array.getDistancePoints(noOfPoints);
-    // let i = 0;
     for (let i = 1; i < array.length-1; i++) {
       let random = (Math.floor((Math.random()*5)+1));
       let plusOrMinus = Math.random() < 0.5 ? -1 : 1;

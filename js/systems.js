@@ -35,9 +35,8 @@ class Input {
 }
 
 class UI {
+  //this needs to be updated to follow the camera
   constructor(game) {
-    // this.cameras.main.follow(this.player);
-
     this.startGameText = game.add.text(phaser.config.width / 2, phaser.config.height / 2, 'Click to Start', {
       font: '30px Arial',
       fill: '#fff'
@@ -78,20 +77,24 @@ class Constants {
   static baseMaps = [
     {mapKey: 'outsideMap1', mapTileSetRef: 'outside', tileKey: 'outsideTiles', size: 1},
     {mapKey: 'outsideMap2', mapTileSetRef: 'outside', tileKey: 'outsideTiles', size: 2},
+    {mapKey: 'outsideMap3', mapTileSetRef: 'outside', tileKey: 'outsideTiles', size: 2},
   ]
   static simpleBuildingMaps = [
     {mapKey: 'simpleRoom1', mapTileSetRef: 'room2', tileKey: 'industrialTiles2'},
     {mapKey: 'simpleRoom2', mapTileSetRef: 'room1', tileKey: 'industrialTiles1'}
   ]
   static modularBuildingMaps = [
-    {mapKey: 'industrialEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: true, s: false, w: false}},
-    {mapKey: 'industrialN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: false, s: false, w: false}},
-    {mapKey: 'industrialS', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: false, e: false, s: true, w: false}},
-    {mapKey: 'industrialSE', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: false, e: true, s: true, w: false}},
-    {mapKey: 'industrialWEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: true, s: false, w: true}},
-    {mapKey: 'industrialWN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: false, s: false, w: true}},
-    {mapKey: 'industrialWS', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: false, e: true, s: true, w: false}},
-    {mapKey: 'industrialWSE', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: true, s: false, w: false}},
-    {mapKey: 'industrialWSEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: {n: true, e: true, s: true, w: true}}
+    {mapKey: 'industrialEmpty', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: []},
+    {mapKey: 'industrialEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north', 'east']},
+    {mapKey: 'industrialN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north']},
+    {mapKey: 'industrialS', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['south']},
+    {mapKey: 'industrialSE', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['south', 'east']},
+    {mapKey: 'industrialWEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['west', 'east', 'north']},
+    {mapKey: 'industrialWN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['west', 'north']},
+    {mapKey: 'industrialWS', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['west', 'south']},
+    {mapKey: 'industrialWSE', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['west', 'south', 'east']},
+    {mapKey: 'industrialWSEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north', 'south', 'east', 'west']},
+    {mapKey: 'industrialWSN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north', 'south', 'west']}
   ]
+  static enemyTypes = [ 'physTypeOne']
 }
