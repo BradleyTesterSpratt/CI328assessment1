@@ -2,42 +2,10 @@ class MainScene extends Phaser.Scene {
   constructor() {
     super('mainScene');
   }
-  /**
-   * The first thing to be called.
-   * Loads assets.
-   */
+
   preload() {
-    console.log("preload()");
-    // this.score = 0;
-    this.load.image('industrialTiles1', 'assets/tiles/room1.png');
-    this.load.image('industrialTiles2', 'assets/tiles/room2.png');
-    this.load.image('outsideTiles', 'assets/tiles/outside.png');
-    this.load.tilemapTiledJSON('outsideMap1', 'assets/tilemaps/outside.json');
-    this.load.tilemapTiledJSON('outsideMap2', 'assets/tilemaps/outside2.json');
-    this.load.tilemapTiledJSON('outsideMap3', 'assets/tilemaps/outside3.json');
-    this.load.tilemapTiledJSON('simpleRoom1', 'assets/tilemaps/simpleRoom.json');
-    this.load.tilemapTiledJSON('simpleRoom2', 'assets/tilemaps/simpleRoom2.json');
-    Constants.modularBuildingMaps.forEach(map => {
-      this.load.tilemapTiledJSON(map.mapKey, `assets/tilemaps/${map.mapKey}.json`);
-    });
-    this.load.image('bullet_img', 'assets/bullet.png');
-
-    this.load.atlasXML('ghostGate', 'assets/sprites/gates.png', 'assets/sprites/gates.xml');
-    this.load.atlasXML('firstSlime', 'assets/sprites/slimeA.png', 'assets/sprites/slimeA.xml');
-    this.load.atlasXML('secondSlime', 'assets/sprites/slimeB.png', 'assets/sprites/slimeB.xml');
-    this.load.atlasXML('thirdSlime', 'assets/sprites/slimeC.png', 'assets/sprites/slimeC.xml');
-    this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
-    this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
-    this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
-    this.load.atlasXML('wandSparks', 'assets/wandSparks.png', 'assets/wandSparks.xml');
-    this.load.atlasXML('trap', 'assets/sprites/trap.png', 'assets/sprites/trap.xml');
-
-    this.load.audio('intro', 'assets/audio/start.mp3');
-    this.load.audio('bg', 'assets/audio/start.mp3');
-    this.load.audio('explode', 'assets/audio/explode.mp3');
-    this.load.audio('fly', 'assets/audio/fly.mp3');
-    this.load.audio('shoot', 'assets/audio/shoot.mp3');
-  }
+    console.log("main scene");
+ }
 
   create() {
     this.start = false;
@@ -53,8 +21,7 @@ class MainScene extends Phaser.Scene {
     this.audio = new Audio(this);
     this.player = this.world.player;
     const game = this;
-    this.gameInput.leftClick(function() { game.startGame(); });
-    this.animationSetUp();
+    this.gameInput.add('SPACE', function() { game.startGame(); });
     this.pointer = this.input.activePointer;
     this.physics.add.overlap(this.player.playerBody, this.world.enemies, this.onCollisionPlayerEnemy);
     this.physics.add.overlap(this.world.bulletFactory.group, this.world.enemies, this.onCollisionBulletEnemy);
@@ -79,86 +46,21 @@ class MainScene extends Phaser.Scene {
     this.bulletCheck = 0.0;
     this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
     this.cameras.main.setZoom(0.15);
+    game.input.setPollAlways();
   }
 
   pauseGameForInput() {
     this.paused = true;
+    this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
+    this.cameras.main.setZoom(0.15);
     this.ui.showStartText();
   }
 
   resumeGameFromInput() {
     this.ui.disableStartText();
+    this.cameras.main.zoomTo(0.75,1000);
+    this.cameras.main.startFollow(this.player.playerBody);
     this.paused = false;
-  }
-
-  //This will not work correctly if each frame doesn't have the .png suffix
-  //refactor to add the suffix into the function requirements?
-  createAnimation(key, repeat, frameRate, spriteSheet, animationName, yoyo) {
-    this.anims.create(
-      {
-        key: key,
-        repeat: repeat,
-        frameRate: frameRate,
-        yoyo: (yoyo || false),
-        frames: this.anims.generateFrameNames(spriteSheet, {
-          prefix: animationName,
-          suffix: '.png',
-          //phaser3 will only load sprites it finds, so using 1-999 means it will catch all
-          start: 1,
-          end: 999
-        })
-      });
-  }
-
-  //This require's all ghost sprites to use the same naming convention in the .xml file
-  generateGhostAnimation(sprite)
-  {
-    this.createAnimation(`${sprite}WalkLeft`, -1, 5, sprite, 'side_walk_');
-    this.createAnimation(`${sprite}WalkRight`, -1, 5, sprite, 'right_walk_');
-    this.createAnimation(`${sprite}WalkBackLeft`, -1, 5, sprite, 'back_side_walk_');
-    this.createAnimation(`${sprite}WalkBackRight`, -1, 5, sprite, 'back_right_walk_');
-    this.createAnimation(`${sprite}WalkBack`, -1, 5, sprite, 'back_walk_');
-    this.createAnimation(`${sprite}WalkForward`, -1, 5, sprite, 'front_walk_');
-    this.createAnimation(`${sprite}IdleForward`, -1, 5, sprite, 'front_stand_');
-    this.createAnimation(`${sprite}IdleBack`, -1, 5, sprite, 'back_stand_');
-    this.createAnimation(`${sprite}Hit`, -1, 5, sprite, 'front_hurt_');
-    this.createAnimation(`${sprite}LeftHit`, -1, 5, sprite, 'side_hurt_');
-    this.createAnimation(`${sprite}RightHit`, -1, 5, sprite, 'right_hurt_');
-    this.createAnimation(`${sprite}BackHit`, -1, 5, sprite, 'back_hurt_');
-  }
-
-  animationSetUp()
-  {
-    this.playerAnimations();
-    this.gateAnimations();
-    this.generateGhostAnimation('physTypeOne');
-  }
-
-  playerAnimations()
-  {
-    this.createAnimation('walkLeft', -1, 5, 'buster_sp', 'frontWalkLeft');
-    this.createAnimation('walkRight', -1, 5, 'buster_sp', 'frontWalkRight');
-    this.createAnimation('walkForward', -1, 5, 'buster_sp', 'frontWalk');
-    this.createAnimation('idleForward', -1, 5, 'buster_sp', 'frontIdle');
-    this.createAnimation('hitForward', -1, 5, 'buster_sp', 'frontHit');
-    this.createAnimation('walkBackLeft', -1, 5, 'buster_sp', 'backWalkLeft');
-    this.createAnimation('walkBackRight', -1, 5, 'buster_sp', 'backWalkRight');
-    this.createAnimation('walkBack', -1, 5, 'buster_sp', 'backWalk');
-    this.createAnimation('idleBack', -1, 5, 'buster_sp', 'backIdle');
-    this.createAnimation('hitBack', -1, 5, 'buster_sp', 'backHit');
-    this.createAnimation('slimeDripA', -1, 2, 'firstSlime', 'drip');
-    this.createAnimation('slimeDripB', -1, 2, 'secondSlime', 'drip');
-    this.createAnimation('slimeDripC', -1, 2, 'thirdSlime', 'drip');
-    this.createAnimation('wandSpark', -1, 20, 'wandSparks', 'spark_');
-    this.createAnimation('trapOut', -1, 5, 'trap', 'trap_out_');
-    this.createAnimation('trapClosed', -1, 5, 'trap', 'trap_closed_');
-  }
-
-  gateAnimations()
-  {
-    this.createAnimation('slimeGate', -1, 1.5, 'ghostGate', 'slime_', true);
-    this.createAnimation('glowGate', -1, 5, 'ghostGate', 'glow_', true);
-    this.createAnimation('closedGate', -1, 5, 'ghostGate', 'closed_');
   }
 
   startGame() {
@@ -169,8 +71,6 @@ class MainScene extends Phaser.Scene {
     //trap will not deploy if the player is in it's collider, this resets it
     this.player.deployTrap(this.player.playerBody.x, this.player.playerBody.y)
     for (let i = 0; i < this.world.initialSpawnedEnemies; i ++) { this.world.spawnEnemy(); };
-    this.cameras.main.zoomTo(0.75,1000);
-    this.cameras.main.startFollow(this.player.playerBody);
     // this one doesn't work
     // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
     // this one doesn't keep the player centered
@@ -261,16 +161,17 @@ class MainScene extends Phaser.Scene {
   }
 
   configureInput(game) {
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.A, function() { game.player.setMove('left'); });
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.D, function() { game.player.setMove('right'); });
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.W, function() { game.player.setMove('up'); });
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.S, function() { game.player.setMove('down'); });
-    this.gameInput.add(Phaser.Input.Keyboard.KeyCodes.SPACE, function() {
+    this.gameInput.add('A', function() { game.player.setMove('left'); });
+    this.gameInput.add('D', function() { game.player.setMove('right'); });
+    this.gameInput.add('W', function() { game.player.setMove('up'); });
+    this.gameInput.add('S', function() { game.player.setMove('down'); });
+    this.gameInput.add('P', function() { if (!game.paused) { game.pauseGameForInput()}});
+    this.gameInput.add('SPACE', function() { if (game.paused) { game.resumeGameFromInput()}});
+    this.gameInput.leftClick(function() {
       game.player.firing = true;
       game.world.spawnBullet(game.player.wandEnd.x, game.player.wandEnd.y, game.pointer.worldX, game.pointer.worldY);
       // audio.shoot.play();
     });
-
   }
   aimFromPlayerToPointer() {
     let radian = Phaser.Math.Angle.BetweenPoints(this.player.playerBody, {x: this.pointer.worldX, y: this.pointer.worldY});

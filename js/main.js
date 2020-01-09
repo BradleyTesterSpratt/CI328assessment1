@@ -19,7 +19,10 @@ function main() {
         debug: true
       }
     },
-    scene: MainScene
+    scene: [
+      PreloaderScene,
+      MainScene
+    ]
   };
 
   phaser = new Phaser.Game(config);

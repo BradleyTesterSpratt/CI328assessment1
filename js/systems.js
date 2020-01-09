@@ -18,7 +18,7 @@ class Input {
   }
 
   add(key, action) {
-    this.keyMap.set(this.game.input.keyboard.addKey(key), action);
+    this.keyMap.set(this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes[key]), action);
   }
 
   leftClick(action) {
@@ -38,7 +38,8 @@ class UI {
   //this needs to be updated to follow the camera
   constructor(game) {
     this.startGameText = game.add.text(phaser.config.width / 2, phaser.config.height / 2, 'Click to Start', {
-      font: '30px Arial',
+      // this.startGameText = game.add.text(game.world.mapSize.x / 2, game.world.mapSize.y / 2, 'Press SPACEBAR to Start', {
+      font: '200px Arial',
       fill: '#fff'
     });
     this.startGameText.setOrigin(0.5, 0.5);

@@ -30,7 +30,6 @@ class World {
   populateSpiritWorld(numberOfEnemies) {
     for(let i = 0; i < numberOfEnemies; i++) {
       let randNum = parseInt(Math.random() * Constants.enemyTypes.length);
-      console.log(randNum, Constants.enemyTypes[randNum]);
       this.spiritWorld.push(Constants.enemyTypes[randNum]);
     }
   }
