@@ -3,13 +3,18 @@ class MainScene extends Phaser.Scene {
     super('mainScene');
   }
 
+  init(config) {
+    this.difficulty = config.difficulty;
+    this.levelSize = config.levelSize;
+  }
+
   preload() {
     console.log("main scene");
- }
-
+  }
+  
   create() {
-    this.start = false;
-    this.world = new World(this, 'normal', 'medium');
+    
+    this.world = new World(this, this.difficulty, this.levelSize);
     /**
      * scene will not load correctly if it attempts to choose a modular piece too many times
      * if row depth isn't corrected, it will load without the restart
@@ -46,6 +51,7 @@ class MainScene extends Phaser.Scene {
     this.bulletCheck = 0.0;
     this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
     this.cameras.main.setZoom(0.15);
+    //the pointer position does not behave correctly without this
     game.input.setPollAlways();
   }
 

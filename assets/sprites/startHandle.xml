@@ -1,0 +1,4 @@
+<TextureAtlas imagePath='startHandle.png'>
+  <SubTexture name='mouseOver.png' x='0' y='0' width='139' height='85'/>
+  <SubTexture name='unselected.png' x='139' y='0' width='139' height='85'/>
+</TextureAtlas>

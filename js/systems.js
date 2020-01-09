@@ -98,4 +98,5 @@ class Constants {
     {mapKey: 'industrialWSN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north', 'south', 'west']}
   ]
   static enemyTypes = [ 'physTypeOne']
+  static levelSizes = ['Tiny', 'Small', 'Medium', 'Large']
 }

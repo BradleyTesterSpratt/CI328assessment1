@@ -2,10 +2,13 @@ class PreloaderScene extends Phaser.Scene {
   constructor() {
     super('preloader');
   }
+
   preload() {
     this.load.image('industrialTiles1', 'assets/tiles/room1.png');
     this.load.image('industrialTiles2', 'assets/tiles/room2.png');
     this.load.image('outsideTiles', 'assets/tiles/outside.png');
+    this.load.image('menuBrickTiles', 'assets/sprites/menuBGTile.png');
+    this.load.image('containmentUnit', 'assets/sprites/menuBackdrop.png');
     this.load.tilemapTiledJSON('outsideMap1', 'assets/tilemaps/outside.json');
     this.load.tilemapTiledJSON('outsideMap2', 'assets/tilemaps/outside2.json');
     this.load.tilemapTiledJSON('outsideMap3', 'assets/tilemaps/outside3.json');
@@ -16,6 +19,11 @@ class PreloaderScene extends Phaser.Scene {
     });
     this.load.image('bullet_img', 'assets/bullet.png');
 
+    this.load.atlasXML('levelSizeButton', 'assets/sprites/levelSizeButton.png', 'assets/sprites/levelSizeButton.xml');
+    this.load.atlasXML('redLight', 'assets/sprites/redLight.png', 'assets/sprites/redLight.xml');
+    this.load.atlasXML('amberLight', 'assets/sprites/amberLight.png', 'assets/sprites/amberLight.xml');
+    this.load.atlasXML('greenLight', 'assets/sprites/greenLight.png', 'assets/sprites/greenLight.xml');
+    this.load.atlasXML('startHandle', 'assets/sprites/startHandle.png', 'assets/sprites/startHandle.xml');
     this.load.atlasXML('ghostGate', 'assets/sprites/gates.png', 'assets/sprites/gates.xml');
     this.load.atlasXML('firstSlime', 'assets/sprites/slimeA.png', 'assets/sprites/slimeA.xml');
     this.load.atlasXML('secondSlime', 'assets/sprites/slimeB.png', 'assets/sprites/slimeB.xml');
@@ -36,8 +44,7 @@ class PreloaderScene extends Phaser.Scene {
   create() {
     console.log('preloader scene');
     this.animationSetUp();
-
-    phaser.scene.start('mainScene');
+    phaser.scene.start('title');
   }
 
   //This will not work correctly if each frame doesn't have the .png suffix

@@ -18,6 +18,7 @@
     <script src="js/enemyGate.js"></script>
     <script src="js/scenes/mainScene.js"></script>
     <script src="js/scenes/preloaderScene.js"></script>
+    <script src="js/scenes/titleScene.js"></script>
 
     <!-- Remove borders around the game window -->
     <style type="text/css">
@@ -30,7 +31,9 @@
 
 <!-- Define entry point -->
 <script type="text/javascript">
-    window.onload = main;
+    window.onload = function(event) {
+        main(window.innerWidth, window.innerHeight);
+    }
 </script>
 
 </body>
