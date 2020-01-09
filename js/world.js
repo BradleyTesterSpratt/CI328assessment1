@@ -30,7 +30,6 @@ class World {
   populateSpiritWorld(numberOfEnemies) {
     for(let i = 0; i < numberOfEnemies; i++) {
       let randNum = parseInt(Math.random() * Constants.enemyTypes.length);
-      console.log(randNum, Constants.enemyTypes[randNum]);
       this.spiritWorld.push(Constants.enemyTypes[randNum]);
     }
   }
@@ -252,13 +251,13 @@ class World {
   }
 
   setDifficulty(difficulty) {
-    switch(true) {
-      case (difficulty == 'easy'):
+    switch(difficulty) {
+      case 'easy':
         this.numOfGates = 2;
         this.spawnDelay = 300;
         this.spiritWorldSize = 20;
         break;
-      case (difficulty == 'hard'):
+      case 'hard':
         this.numOfGates = 6;
         this.spawnDelay = 150;
         this.spiritWorldSize = 10;
@@ -272,16 +271,16 @@ class World {
   }
 
   setLevelSize(size) {
-    switch(true) {
-      case (size == 'tiny'):
+    switch(size) {
+      case 'tiny':
         this.levelMap = [1];
         this.initialSpawnedEnemies = 4;
         break;
-      case (size == 'small'):
+      case size == 'small':
         this.levelMap = [2];  
         this.initialSpawnedEnemies = 6;
         break;
-      case (size == 'large'):
+      case size == 'large':
         this.levelMap = [3, 3, 3];  
         this.initialSpawnedEnemies = 10;
         break;

@@ -1,0 +1,5 @@
+<TextureAtlas imagePath='redLight.png'>
+  <SubTexture name='selected.png' x='0' y='0' width='74' height='87'/>
+  <SubTexture name='unselected.png' x='74' y='0' width='74' height='87'/>
+  <SubTexture name='mouseOver.png' x='0' y='87' width='74' height='87'/>
+</TextureAtlas>

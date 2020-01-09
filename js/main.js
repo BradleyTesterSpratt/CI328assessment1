@@ -6,20 +6,24 @@ let input;
 let ui;
 let audio;
 
-function main() {
+function main(width, height) {
   console.log("main()");
   var config = {
     type: Phaser.AUTO,
     parent: 'my-game',
-    width: 800,
-    height: 600,
+    width: width,
+    height: height,
     physics: {
       default: 'arcade',
       arcade: {
-        debug: true
+        debug: false
       }
     },
-    scene: MainScene
+    scene: [
+      PreloaderScene,
+      TitleScene,
+      MainScene
+    ]
   };
 
   phaser = new Phaser.Game(config);

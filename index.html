@@ -2,7 +2,7 @@
 <html lang="en"> 
 <head> 
 	<meta charset="UTF-8" />
-	<title>CI328 Assignment One</title>
+	<title>P.I.E.</title>
 
     <!-- Load phaser -->
 	<script type="text/javascript" src="libs/phaser.min.js"></script>
@@ -17,6 +17,8 @@
     <script src="js/world.js"></script>
     <script src="js/enemyGate.js"></script>
     <script src="js/scenes/mainScene.js"></script>
+    <script src="js/scenes/preloaderScene.js"></script>
+    <script src="js/scenes/titleScene.js"></script>
 
     <!-- Remove borders around the game window -->
     <style type="text/css">
@@ -29,7 +31,9 @@
 
 <!-- Define entry point -->
 <script type="text/javascript">
-    window.onload = main;
+    window.onload = function(event) {
+        main(window.innerWidth, window.innerHeight);
+    }
 </script>
 
 </body>
