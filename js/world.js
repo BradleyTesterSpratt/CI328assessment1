@@ -254,18 +254,18 @@ class World {
     switch(difficulty) {
       case 'easy':
         this.numOfGates = 2;
-        this.spawnDelay = 300;
+        this.spawnDelay = 250;
         this.spiritWorldSize = 20;
         break;
       case 'hard':
         this.numOfGates = 6;
-        this.spawnDelay = 150;
+        this.spawnDelay = 100;
         this.spiritWorldSize = 10;
         break;
       default:
         //normal
         this.numOfGates = 4;
-        this.spawnDelay = 200;
+        this.spawnDelay = 150;
         this.spiritWorldSize = 15;
     }
   }

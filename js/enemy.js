@@ -62,10 +62,6 @@ class Enemy {
     }
   }
 
-  onDeath(callback) {
-    //this.enemySprite.events.onKilled.add(callback);
-  }
-
   left() {
     if (this.isLeashed) {return this.hurt()};
     this.moving = 'left';

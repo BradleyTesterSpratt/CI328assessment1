@@ -13,11 +13,10 @@ class MainScene extends Phaser.Scene {
   }
   
   create() {
-    console.log(this.difficulty, this.levelSize)
     this.world = new World(this, this.difficulty, this.levelSize);
     /**
      * scene will not load correctly if it attempts to choose a modular piece too many times
-     * if row depth isn't corrected, it will load without the restart
+     * as a result of row depth correction, it could load without the restart
      * but inner building walls may overlap
      */
     if (this.world.totalAttempts > 100) { this.scene.restart(); };
@@ -56,7 +55,7 @@ class MainScene extends Phaser.Scene {
     game.input.setPollAlways();
     this.background = this.add.tileSprite(this.world.mapSize.x/2, this.world.mapSize.y/2 ,this.world.mapSize.x * 1.25, this.world.mapSize.y * 1.25, "slimeTiles");
     this.background.setDepth(-10);
-
+    this.victoryTime = 0;
   }
 
   pauseGameForInput() {
@@ -167,6 +166,8 @@ class MainScene extends Phaser.Scene {
         this.world.wallHit = false;
         this.bulletCheck = 0.0;
       }
+      this.victoryTime += 0.16;
+      this.victoryCheck();
     }
   }
 
@@ -252,9 +253,17 @@ class MainScene extends Phaser.Scene {
     }
   }
 
-  gameOver() {
-    console.log("gameOver()");
-    this.world.cleanup();
-    this.pauseGameForInput();
+  victoryCheck() {
+    if (this.world.checkForOpenGates() == 0 && this.world.enemies.children.size == 0) {
+      //we use victory time as the game time still counts while paused.
+      this.paused = true;
+      phaser.scene.start('victory', 
+      {
+        difficulty: this.difficulty,
+        levelSize: this.levelSize,
+        time: this.victoryTime
+      })
+      phaser.scene.stop('mainScene');
+    }
   }
 }

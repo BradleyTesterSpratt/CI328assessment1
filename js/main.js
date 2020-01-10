@@ -22,7 +22,8 @@ function main(width, height) {
     scene: [
       PreloaderScene,
       TitleScene,
-      MainScene
+      MainScene,
+      VictoryScene
     ]
   };
 

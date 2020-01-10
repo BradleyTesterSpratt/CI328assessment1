@@ -110,7 +110,7 @@ class TitleScene extends Phaser.Scene {
     return button;
   }
 
-  startGame(config) {
+  startGame() {
     phaser.scene.start('mainScene', {
       difficulty: this.difficulty.toLowerCase(),
       levelSize: this.levelSize.toLowerCase()

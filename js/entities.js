@@ -22,8 +22,8 @@ class EntityFactory {
       
       sprite.setOrigin(0.5, 0.5);
       sprite.setScale(0.05, 0.05);
-      this.game.physics.moveToObject(sprite, new Phaser.Math.Vector2(destX, destY), 750);
-      this.nextBulletTime = this.game.time.now + 75;
+      this.game.physics.moveToObject(sprite, new Phaser.Math.Vector2(destX, destY), 1500);
+      this.nextBulletTime = this.game.time.now + 250;
     }
   }
 

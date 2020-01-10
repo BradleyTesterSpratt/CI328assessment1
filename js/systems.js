@@ -37,10 +37,12 @@ class Input {
 class UI {
   //this needs to be updated to follow the camera
   constructor(game, mapSize) {
-    this.startGameText = game.add.text(mapSize.x / 2, mapSize.y / 2, 'Click to Start', {
-      // this.startGameText = game.add.text(game.world.mapSize.x / 2, game.world.mapSize.y / 2, 'Press SPACEBAR to Start', {
+    this.startGameText = game.add.text(mapSize.x / 2, 
+      mapSize.y / 2, 
+      'Default Controls\n\nSPACE to Start\nW to move Up\nS to move Down\nA to move Left\nD to move Right\nP to zoom out', 
+      {
       font: '200px Arial',
-      fill: 'black'
+      fill: 'white'
     });
     this.startGameText.setOrigin(0.5, 0.5);
     this.startGameText.setDepth(100);
