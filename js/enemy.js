@@ -22,7 +22,7 @@ class Enemy {
     this.isLeashed = false;
     this.baseColliderSize = {x: this.enemySprite.width, y: this.enemySprite.height};
     this.decisionDelay = 0.0;
-    //this needs chaning when more behaviours added
+    //this needs changing when more behaviours added
     this.behaviour = behaviour;
     this.behaviourRandomNumber = 4;
     this.hasHitWall = false;
@@ -46,6 +46,8 @@ class Enemy {
     this.enemySprite.y -= 15;
     this.hurt();
     this.active = false;
+    //turn off the body to prevent sliming player when he grabs the trap
+    this.enemySprite.body.enable = false;
   }
 
   updateColliderScale(scale) {
