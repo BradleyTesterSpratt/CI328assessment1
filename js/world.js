@@ -276,11 +276,11 @@ class World {
         this.levelMap = [1];
         this.initialSpawnedEnemies = 4;
         break;
-      case size == 'small':
+      case 'small':
         this.levelMap = [2];  
         this.initialSpawnedEnemies = 6;
         break;
-      case size == 'large':
+      case 'large':
         this.levelMap = [3, 3, 3];  
         this.initialSpawnedEnemies = 10;
         break;

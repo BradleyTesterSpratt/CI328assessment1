@@ -13,7 +13,7 @@ class MainScene extends Phaser.Scene {
   }
   
   create() {
-    
+    console.log(this.difficulty, this.levelSize)
     this.world = new World(this, this.difficulty, this.levelSize);
     /**
      * scene will not load correctly if it attempts to choose a modular piece too many times
