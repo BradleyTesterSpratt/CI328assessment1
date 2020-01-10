@@ -184,7 +184,8 @@ class Enemy {
       this.enemySprite.scaleX = (this.enemySprite.scaleX * 0.95);
       this.enemySprite.scaleY = (this.enemySprite.scaleY * 0.95);
       if (this.enemySprite.scaleX <= 0.01) {
-        this.enemySprite.destroy();
+        this.enemySprite.destroy()
+        this.game.world.updateGhostsText();
       }
     }
   }

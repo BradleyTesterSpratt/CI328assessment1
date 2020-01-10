@@ -36,32 +36,48 @@ class Input {
 
 class UI {
   //this needs to be updated to follow the camera
-  constructor(game) {
-    this.startGameText = game.add.text(phaser.config.width / 2, phaser.config.height / 2, 'Click to Start', {
+  constructor(game, mapSize) {
+    this.startGameText = game.add.text(mapSize.x / 2, mapSize.y / 2, 'Click to Start', {
       // this.startGameText = game.add.text(game.world.mapSize.x / 2, game.world.mapSize.y / 2, 'Press SPACEBAR to Start', {
       font: '200px Arial',
-      fill: '#fff'
+      fill: 'black'
     });
     this.startGameText.setOrigin(0.5, 0.5);
     this.startGameText.setDepth(100);
 
-    this.scoreText = game.add.text(10, 10, 'Score: 0', {
+    this.ghostsText = game.add.text(0, -30, 'Ghosts Present: 0', {
       font: '34px Arial',
       fill: '#fff'
     });
-    this.scoreText.setDepth(100);
+    this.ghostsText.setDepth(100);
+    this.ghostsText.setScrollFactor(0);
+
+    this.gatesText = game.add.text(0, -5, 'Open Gates: 0', {
+      font: '34px Arial',
+      fill: '#fff'
+    });
+    this.gatesText.setDepth(100);
+    this.gatesText.setScrollFactor(0);
   }
 
-  updateScoreText(newScore) {
-    this.scoreText.setText('Score: ' + newScore);
+  updateGhostsText(newCount) {
+    this.ghostsText.setText('Ghosts Present: ' + newCount);
+  }
+
+  updateGatesText(newCount) {
+    this.gatesText.setText('Open Gates: ' + newCount);
   }
 
   showStartText() {
     this.startGameText.visible = true;
+    this.gatesText.visible = false;
+    this.ghostsText.visible = false;
   }
 
   disableStartText() {
     this.startGameText.visible = false;
+    this.gatesText.visible = true;
+    this.ghostsText.visible = true;
   }
 }
 

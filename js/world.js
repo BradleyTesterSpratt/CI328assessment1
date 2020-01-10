@@ -320,6 +320,7 @@ class World {
 
   spawnEnemy() {
     if (this.spiritWorld.length <= 0) {
+      //call game over scene
       return console.log('game over');  
     }
     let enemy = this.spiritWorld.pop();
@@ -339,6 +340,15 @@ class World {
         console.log('no Type');
         break;
     }
+    this.updateGhostsText();
+  }
+
+  updateGhostsText() {
+    this.game.ui.updateGhostsText(this.enemies.children.size);
+  }
+
+  updateGatesText() {
+    this.game.ui.updateGatesText(this.checkForOpenGates());
   }
 
   setUpGates(numOfGates) {
@@ -378,13 +388,13 @@ class World {
   }
 
   checkForOpenGates() {
-    let result = false;
+    let count = 0;
     this.ghostGates.children.entries.forEach(gate => {
       if (gate.self.open == true) { 
-        result = true;
+        count += 1;
       }
     });
-    return result;
+    return count;
   }
 
   update() {
@@ -396,7 +406,7 @@ class World {
     });
     this.spawnTimer += 0.16;
     if (this.spawnTimer > this.spawnDelay) {
-      if (this.checkForOpenGates() == true) {
+      if (this.checkForOpenGates() > 0) {
         this.spawnEnemy();
         this.spawnTimer = 0;
       }

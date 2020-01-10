@@ -6,7 +6,7 @@ class TitleScene extends Phaser.Scene {
   create() {
     console.log('title screen');
     this.levelSize = 'Medium'
-    this.background = this.add.tileSprite(phaser.config.width/2, phaser.config.height/2 ,phaser.config.width, phaser.config.height, "menuBrickTiles");
+    this.add.tileSprite(phaser.config.width/2, phaser.config.height/2 ,phaser.config.width, phaser.config.height, "menuBrickTiles");
     this.containmentUnit = this.add.sprite(100, phaser.config.height/2, 'containmentUnit');
     this.containmentUnit.y = this.containmentUnit.y - this.containmentUnit.height/2;
     //origin to 0 so that the button positions can be found in the photo editor and then used as offset

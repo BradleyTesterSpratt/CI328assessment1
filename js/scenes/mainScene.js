@@ -22,7 +22,7 @@ class MainScene extends Phaser.Scene {
      */
     if (this.world.totalAttempts > 100) { this.scene.restart(); };
     this.gameInput = new Input(this);
-    this.ui = new UI(this);
+    this.ui = new UI(this, this.world.mapSize);
     this.audio = new Audio(this);
     this.player = this.world.player;
     const game = this;
@@ -36,6 +36,7 @@ class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player.playerBody, this.world.ghostGates, this.onCollisionPlayerGate);
     this.physics.add.overlap(this.world.bulletFactory.group, this.world.ghostGates, this.onCollisionBulletGate);
     this.physics.add.overlap(this.player.playerBody, this.player.trap, this.onCollisionPlayerTrap);
+    this.ui.updateGatesText(this.world.checkForOpenGates());
     this.pauseGameForInput();
     this.path = { t: 0, vec: new Phaser.Math.Vector2() };
     this.stream1 = this.add.graphics().setDepth(50);
@@ -53,6 +54,9 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.setZoom(0.15);
     //the pointer position does not behave correctly without this
     game.input.setPollAlways();
+    this.background = this.add.tileSprite(this.world.mapSize.x/2, this.world.mapSize.y/2 ,this.world.mapSize.x * 1.25, this.world.mapSize.y * 1.25, "slimeTiles");
+    this.background.setDepth(-10);
+
   }
 
   pauseGameForInput() {
@@ -60,6 +64,7 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
     this.cameras.main.setZoom(0.15);
     this.ui.showStartText();
+
   }
 
   resumeGameFromInput() {
@@ -81,7 +86,6 @@ class MainScene extends Phaser.Scene {
     // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
     // this one doesn't keep the player centered
     // this.cameras.main.setDeadzone(700,500);
-    this.setScore(0);
     this.configureInput(this);
     this.resumeGameFromInput();
   }
@@ -212,21 +216,24 @@ class MainScene extends Phaser.Scene {
   }
 
   onCollisionBulletWall(bullet, wall) {
-    bullet.scene.collidedBullet = {
+    let scene = bullet.scene;
+    scene.collidedBullet = {
       x: bullet.x,
       y: bullet.y
     }
-    bullet.scene.world.wallHitSpark.x = bullet.x;
-    bullet.scene.world.wallHitSpark.y = bullet.y;
-    bullet.scene.world.wallHit = true;
+    scene.world.wallHitSpark.x = bullet.x;
+    scene.world.wallHitSpark.y = bullet.y;
+    scene.world.wallHit = true;
     bullet.destroy();
   }
 
   onCollisionBulletGate(bullet, gate) {
+    let scene = bullet.scene;
     if (gate.self.open == true) {
-      bullet.scene.hitEnemy = gate;
+      scene.hitEnemy = gate;
       bullet.destroy();
       gate.self.damageGate(1);
+      scene.world.updateGatesText();
     }
   }
 
@@ -243,11 +250,6 @@ class MainScene extends Phaser.Scene {
       //unshift adds to the beginning of an array, so that the most recent ghost caught is the last to spawn
       scene.world.spiritWorld.unshift(enemy.enemy.type);
     }
-  }
-
-  setScore(value) {
-    this.score = value;
-    this.ui.updateScoreText(value);
   }
 
   gameOver() {
