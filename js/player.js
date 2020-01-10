@@ -87,7 +87,6 @@ class Player {
   }
 
   collideGhost(slimeInfo) {
-    // this.hasCollided = true;
     let availableSlime = null;
     this.slimes.forEach(slime => {
       if(slime.visible == false) {

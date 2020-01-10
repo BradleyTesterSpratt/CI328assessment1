@@ -20,7 +20,9 @@ class EnemyGate {
     if (this.isAttacked == false) {
       this.hp = this.hp - streamStrength;
       this.isAttacked = true;
-      if (this.hp <= 0) { this.alternateGate() };
+      if (this.hp <= 0) { 
+        this.alternateGate();
+      };
     }
   }
 

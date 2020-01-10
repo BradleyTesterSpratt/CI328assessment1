@@ -8,6 +8,7 @@ class PreloaderScene extends Phaser.Scene {
     this.load.image('industrialTiles2', 'assets/tiles/room2.png');
     this.load.image('outsideTiles', 'assets/tiles/outside.png');
     this.load.image('menuBrickTiles', 'assets/sprites/menuBGTile.png');
+    this.load.image('slimeTiles', 'assets/sprites/slimeBGTile.png');
     this.load.image('containmentUnit', 'assets/sprites/menuBackdrop.png');
     this.load.tilemapTiledJSON('outsideMap1', 'assets/tilemaps/outside.json');
     this.load.tilemapTiledJSON('outsideMap2', 'assets/tilemaps/outside2.json');

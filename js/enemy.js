@@ -22,7 +22,7 @@ class Enemy {
     this.isLeashed = false;
     this.baseColliderSize = {x: this.enemySprite.width, y: this.enemySprite.height};
     this.decisionDelay = 0.0;
-    //this needs chaning when more behaviours added
+    //this needs changing when more behaviours added
     this.behaviour = behaviour;
     this.behaviourRandomNumber = 4;
     this.hasHitWall = false;
@@ -46,6 +46,8 @@ class Enemy {
     this.enemySprite.y -= 15;
     this.hurt();
     this.active = false;
+    //turn off the body to prevent sliming player when he grabs the trap
+    this.enemySprite.body.enable = false;
   }
 
   updateColliderScale(scale) {
@@ -60,10 +62,6 @@ class Enemy {
       this.hasCollided = true;
       return {'colour': this.slimeColour, 'debuff': this.slimeStat}; 
     }
-  }
-
-  onDeath(callback) {
-    //this.enemySprite.events.onKilled.add(callback);
   }
 
   left() {
@@ -184,7 +182,8 @@ class Enemy {
       this.enemySprite.scaleX = (this.enemySprite.scaleX * 0.95);
       this.enemySprite.scaleY = (this.enemySprite.scaleY * 0.95);
       if (this.enemySprite.scaleX <= 0.01) {
-        this.enemySprite.destroy();
+        this.enemySprite.destroy()
+        this.game.world.updateGhostsText();
       }
     }
   }

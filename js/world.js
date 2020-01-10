@@ -1,5 +1,6 @@
 class World {
   constructor(game, difficulty, levelSize) {
+    this.loss = false;
     this.totalAttempts = 0;
     this.spawnTimer = 0;
     this.game = game;
@@ -254,19 +255,19 @@ class World {
     switch(difficulty) {
       case 'easy':
         this.numOfGates = 2;
-        this.spawnDelay = 300;
-        this.spiritWorldSize = 20;
+        this.spawnDelay = 250;
+        this.spiritWorldSize = 12;
         break;
       case 'hard':
         this.numOfGates = 6;
-        this.spawnDelay = 150;
-        this.spiritWorldSize = 10;
+        this.spawnDelay = 100;
+        this.spiritWorldSize = 3;
         break;
       default:
         //normal
         this.numOfGates = 4;
-        this.spawnDelay = 200;
-        this.spiritWorldSize = 15;
+        this.spawnDelay = 150;
+        this.spiritWorldSize = 6;
     }
   }
 
@@ -320,25 +321,35 @@ class World {
 
   spawnEnemy() {
     if (this.spiritWorld.length <= 0) {
-      return console.log('game over');  
+      this.loss = true;      
+    } else {
+      let enemy = this.spiritWorld.pop();
+      let spawnGate = this.findRandomGate();
+      while (spawnGate.self.open == false) {
+        spawnGate = this.findRandomGate();
+      }
+      let spawnLocation = {
+        x: spawnGate.x,
+        y: spawnGate.y
+      }
+      switch(enemy) {
+        case('physTypeOne'):
+        this.addEnemyToGroup(new TypeOne(this.game, spawnLocation));
+          break;
+        default: 
+          console.log('no Type');
+          break;
+      }
+      this.updateGhostsText();
     }
-    let enemy = this.spiritWorld.pop();
-    let spawnGate = this.findRandomGate();
-    while (spawnGate.self.open == false) {
-      spawnGate = this.findRandomGate();
-    }
-    let spawnLocation = {
-      x: spawnGate.x,
-      y: spawnGate.y
-    }
-    switch(enemy) {
-      case('physTypeOne'):
-      this.addEnemyToGroup(new TypeOne(this.game, spawnLocation));
-        break;
-      default: 
-        console.log('no Type');
-        break;
-    }
+  }
+
+  updateGhostsText() {
+    this.game.ui.updateGhostsText(this.enemies.children.size);
+  }
+
+  updateGatesText() {
+    this.game.ui.updateGatesText(this.checkForOpenGates());
   }
 
   setUpGates(numOfGates) {
@@ -378,13 +389,13 @@ class World {
   }
 
   checkForOpenGates() {
-    let result = false;
+    let count = 0;
     this.ghostGates.children.entries.forEach(gate => {
       if (gate.self.open == true) { 
-        result = true;
+        count += 1;
       }
     });
-    return result;
+    return count;
   }
 
   update() {
@@ -396,7 +407,7 @@ class World {
     });
     this.spawnTimer += 0.16;
     if (this.spawnTimer > this.spawnDelay) {
-      if (this.checkForOpenGates() == true) {
+      if (this.checkForOpenGates() > 0) {
         this.spawnEnemy();
         this.spawnTimer = 0;
       }

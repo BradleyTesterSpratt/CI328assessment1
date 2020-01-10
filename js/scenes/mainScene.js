@@ -13,16 +13,15 @@ class MainScene extends Phaser.Scene {
   }
   
   create() {
-    console.log(this.difficulty, this.levelSize)
     this.world = new World(this, this.difficulty, this.levelSize);
     /**
      * scene will not load correctly if it attempts to choose a modular piece too many times
-     * if row depth isn't corrected, it will load without the restart
+     * as a result of row depth correction, it could load without the restart
      * but inner building walls may overlap
      */
     if (this.world.totalAttempts > 100) { this.scene.restart(); };
     this.gameInput = new Input(this);
-    this.ui = new UI(this);
+    this.ui = new UI(this, this.world.mapSize);
     this.audio = new Audio(this);
     this.player = this.world.player;
     const game = this;
@@ -36,6 +35,7 @@ class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player.playerBody, this.world.ghostGates, this.onCollisionPlayerGate);
     this.physics.add.overlap(this.world.bulletFactory.group, this.world.ghostGates, this.onCollisionBulletGate);
     this.physics.add.overlap(this.player.playerBody, this.player.trap, this.onCollisionPlayerTrap);
+    this.ui.updateGatesText(this.world.checkForOpenGates());
     this.pauseGameForInput();
     this.path = { t: 0, vec: new Phaser.Math.Vector2() };
     this.stream1 = this.add.graphics().setDepth(50);
@@ -53,6 +53,9 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.setZoom(0.15);
     //the pointer position does not behave correctly without this
     game.input.setPollAlways();
+    this.background = this.add.tileSprite(this.world.mapSize.x/2, this.world.mapSize.y/2 ,this.world.mapSize.x * 1.25, this.world.mapSize.y * 1.25, "slimeTiles");
+    this.background.setDepth(-10);
+    this.victoryTime = 0;
   }
 
   pauseGameForInput() {
@@ -60,6 +63,7 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
     this.cameras.main.setZoom(0.15);
     this.ui.showStartText();
+
   }
 
   resumeGameFromInput() {
@@ -81,7 +85,6 @@ class MainScene extends Phaser.Scene {
     // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
     // this one doesn't keep the player centered
     // this.cameras.main.setDeadzone(700,500);
-    this.setScore(0);
     this.configureInput(this);
     this.resumeGameFromInput();
   }
@@ -163,6 +166,8 @@ class MainScene extends Phaser.Scene {
         this.world.wallHit = false;
         this.bulletCheck = 0.0;
       }
+      this.victoryTime += 0.16;
+      this.victoryCheck();
     }
   }
 
@@ -212,21 +217,24 @@ class MainScene extends Phaser.Scene {
   }
 
   onCollisionBulletWall(bullet, wall) {
-    bullet.scene.collidedBullet = {
+    let scene = bullet.scene;
+    scene.collidedBullet = {
       x: bullet.x,
       y: bullet.y
     }
-    bullet.scene.world.wallHitSpark.x = bullet.x;
-    bullet.scene.world.wallHitSpark.y = bullet.y;
-    bullet.scene.world.wallHit = true;
+    scene.world.wallHitSpark.x = bullet.x;
+    scene.world.wallHitSpark.y = bullet.y;
+    scene.world.wallHit = true;
     bullet.destroy();
   }
 
   onCollisionBulletGate(bullet, gate) {
+    let scene = bullet.scene;
     if (gate.self.open == true) {
-      bullet.scene.hitEnemy = gate;
+      scene.hitEnemy = gate;
       bullet.destroy();
       gate.self.damageGate(1);
+      scene.world.updateGatesText();
     }
   }
 
@@ -245,14 +253,28 @@ class MainScene extends Phaser.Scene {
     }
   }
 
-  setScore(value) {
-    this.score = value;
-    this.ui.updateScoreText(value);
-  }
-
-  gameOver() {
-    console.log("gameOver()");
-    this.world.cleanup();
-    this.pauseGameForInput();
+  victoryCheck() {
+    if (this.world.checkForOpenGates() == 0 && this.world.enemies.children.size == 0) {
+      //we use victory time as the game time still counts while paused.
+      this.paused = true;
+      phaser.scene.start('victory', 
+      {
+        difficulty: this.difficulty,
+        levelSize: this.levelSize,
+        time: this.victoryTime,
+        victory: true
+      })
+      phaser.scene.stop('mainScene');
+    } else if (this.world.loss) {
+      this.paused = true;
+      phaser.scene.start('victory', 
+      {
+        difficulty: this.difficulty,
+        levelSize: this.levelSize,
+        time: 0,
+        victory: false
+      });
+      phaser.scene.stop('mainScene');
+    }
   }
 }
