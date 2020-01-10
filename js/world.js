@@ -1,5 +1,6 @@
 class World {
   constructor(game, difficulty, levelSize) {
+    this.loss = false;
     this.totalAttempts = 0;
     this.spawnTimer = 0;
     this.game = game;
@@ -255,18 +256,18 @@ class World {
       case 'easy':
         this.numOfGates = 2;
         this.spawnDelay = 250;
-        this.spiritWorldSize = 20;
+        this.spiritWorldSize = 12;
         break;
       case 'hard':
         this.numOfGates = 6;
         this.spawnDelay = 100;
-        this.spiritWorldSize = 10;
+        this.spiritWorldSize = 3;
         break;
       default:
         //normal
         this.numOfGates = 4;
         this.spawnDelay = 150;
-        this.spiritWorldSize = 15;
+        this.spiritWorldSize = 6;
     }
   }
 
@@ -320,27 +321,27 @@ class World {
 
   spawnEnemy() {
     if (this.spiritWorld.length <= 0) {
-      //call game over scene
-      return console.log('game over');  
+      this.loss = true;      
+    } else {
+      let enemy = this.spiritWorld.pop();
+      let spawnGate = this.findRandomGate();
+      while (spawnGate.self.open == false) {
+        spawnGate = this.findRandomGate();
+      }
+      let spawnLocation = {
+        x: spawnGate.x,
+        y: spawnGate.y
+      }
+      switch(enemy) {
+        case('physTypeOne'):
+        this.addEnemyToGroup(new TypeOne(this.game, spawnLocation));
+          break;
+        default: 
+          console.log('no Type');
+          break;
+      }
+      this.updateGhostsText();
     }
-    let enemy = this.spiritWorld.pop();
-    let spawnGate = this.findRandomGate();
-    while (spawnGate.self.open == false) {
-      spawnGate = this.findRandomGate();
-    }
-    let spawnLocation = {
-      x: spawnGate.x,
-      y: spawnGate.y
-    }
-    switch(enemy) {
-      case('physTypeOne'):
-      this.addEnemyToGroup(new TypeOne(this.game, spawnLocation));
-        break;
-      default: 
-        console.log('no Type');
-        break;
-    }
-    this.updateGhostsText();
   }
 
   updateGhostsText() {

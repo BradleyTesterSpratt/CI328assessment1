@@ -261,8 +261,19 @@ class MainScene extends Phaser.Scene {
       {
         difficulty: this.difficulty,
         levelSize: this.levelSize,
-        time: this.victoryTime
+        time: this.victoryTime,
+        victory: true
       })
+      phaser.scene.stop('mainScene');
+    } else if (this.world.loss) {
+      this.paused = true;
+      phaser.scene.start('victory', 
+      {
+        difficulty: this.difficulty,
+        levelSize: this.levelSize,
+        time: 0,
+        victory: false
+      });
       phaser.scene.stop('mainScene');
     }
   }
