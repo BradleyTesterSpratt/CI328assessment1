@@ -1,19 +1,11 @@
 class Audio {
   constructor(game) {
-    this.intro = game.sound.add('intro');
-    //this.intro.play();
-    this.bg = game.sound.add('bg', true);
-    //this.bg.play();
-    this.explode = game.sound.add('explode');
-    this.fly = game.sound.add('fly');
-    this.shoot = game.sound.add('shoot');
   }
 }
 
 class Input {
   constructor(game) {
     this.game = game;
-
     this.keyMap = new Map();
   }
 
@@ -35,7 +27,6 @@ class Input {
 }
 
 class UI {
-  //this needs to be updated to follow the camera
   constructor(game, mapSize) {
     this.startGameText = game.add.text(mapSize.x / 2, 
       mapSize.y / 2, 
@@ -46,14 +37,12 @@ class UI {
     });
     this.startGameText.setOrigin(0.5, 0.5);
     this.startGameText.setDepth(100);
-
     this.ghostsText = game.add.text(0, -30, 'Ghosts Present: 0', {
       font: '34px Arial',
       fill: '#fff'
     });
     this.ghostsText.setDepth(100);
     this.ghostsText.setScrollFactor(0);
-
     this.gatesText = game.add.text(0, -5, 'Open Gates: 0', {
       font: '34px Arial',
       fill: '#fff'
@@ -115,6 +104,6 @@ class Constants {
     {mapKey: 'industrialWSEN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north', 'south', 'east', 'west']},
     {mapKey: 'industrialWSN', mapTileSetRef: 'room2', tileKey: 'industrialTiles2', connections: ['north', 'south', 'west']}
   ]
-  static enemyTypes = [ 'physTypeOne']
+  static enemyTypes = ['physTypeOne']
   static levelSizes = ['Tiny', 'Small', 'Medium', 'Large']
 }

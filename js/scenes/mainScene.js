@@ -8,10 +8,6 @@ class MainScene extends Phaser.Scene {
     this.levelSize = config.levelSize;
   }
 
-  preload() {
-    console.log("main scene");
-  }
-  
   create() {
     this.world = new World(this, this.difficulty, this.levelSize);
     /**
@@ -75,16 +71,14 @@ class MainScene extends Phaser.Scene {
 
   startGame() {
     if (!this.paused)
-      return;
-    
-    console.log("startGame()");
-    //trap will not deploy if the player is in it's collider, this resets it
+      return;    
+    /**
+     * trap will not deploy if the player is in it's collider
+     * the collider initially starts taking up a large section of the screen
+     * deploying it at start forces the player to grab it instantly, shrinking the collider
+     */
     this.player.deployTrap(this.player.playerBody.x, this.player.playerBody.y)
     for (let i = 0; i < this.world.initialSpawnedEnemies; i ++) { this.world.spawnEnemy(); };
-    // this one doesn't work
-    // this.cameras.main.setBounds;(400, 300, (this.world.mapSize.x - 400), (this.world.mapSize.y - 300));
-    // this one doesn't keep the player centered
-    // this.cameras.main.setDeadzone(700,500);
     this.configureInput(this);
     this.resumeGameFromInput();
   }

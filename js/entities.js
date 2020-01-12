@@ -48,7 +48,6 @@ class EntityFactory {
       });
     }
     catch(err) {
-      console.log(err);
     }
   }
 }

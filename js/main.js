@@ -7,7 +7,6 @@ let ui;
 let audio;
 
 function main(width, height) {
-  console.log("main()");
   var config = {
     type: Phaser.AUTO,
     parent: 'my-game',

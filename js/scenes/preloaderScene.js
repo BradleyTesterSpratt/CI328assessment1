@@ -4,12 +4,10 @@ class PreloaderScene extends Phaser.Scene {
   }
 
   preload() {
+    //load tilesets and maps
     this.load.image('industrialTiles1', 'assets/tiles/room1.png');
     this.load.image('industrialTiles2', 'assets/tiles/room2.png');
     this.load.image('outsideTiles', 'assets/tiles/outside.png');
-    this.load.image('menuBrickTiles', 'assets/sprites/menuBGTile.png');
-    this.load.image('slimeTiles', 'assets/sprites/slimeBGTile.png');
-    this.load.image('containmentUnit', 'assets/sprites/menuBackdrop.png');
     this.load.tilemapTiledJSON('outsideMap1', 'assets/tilemaps/outside.json');
     this.load.tilemapTiledJSON('outsideMap2', 'assets/tilemaps/outside2.json');
     this.load.tilemapTiledJSON('outsideMap3', 'assets/tilemaps/outside3.json');
@@ -18,32 +16,35 @@ class PreloaderScene extends Phaser.Scene {
     Constants.modularBuildingMaps.forEach(map => {
       this.load.tilemapTiledJSON(map.mapKey, `assets/tilemaps/${map.mapKey}.json`);
     });
-    this.load.image('bullet_img', 'assets/bullet.png');
 
+    //load main menu assets
+    this.load.image('menuBrickTiles', 'assets/images/menuBGTile.png');
+    this.load.image('containmentUnit', 'assets/images/menuBackdrop.png');
     this.load.atlasXML('levelSizeButton', 'assets/sprites/levelSizeButton.png', 'assets/sprites/levelSizeButton.xml');
     this.load.atlasXML('redLight', 'assets/sprites/redLight.png', 'assets/sprites/redLight.xml');
     this.load.atlasXML('amberLight', 'assets/sprites/amberLight.png', 'assets/sprites/amberLight.xml');
     this.load.atlasXML('greenLight', 'assets/sprites/greenLight.png', 'assets/sprites/greenLight.xml');
     this.load.atlasXML('startHandle', 'assets/sprites/startHandle.png', 'assets/sprites/startHandle.xml');
+
+    //load player assets
     this.load.atlasXML('ghostGate', 'assets/sprites/gates.png', 'assets/sprites/gates.xml');
     this.load.atlasXML('firstSlime', 'assets/sprites/slimeA.png', 'assets/sprites/slimeA.xml');
     this.load.atlasXML('secondSlime', 'assets/sprites/slimeB.png', 'assets/sprites/slimeB.xml');
     this.load.atlasXML('thirdSlime', 'assets/sprites/slimeC.png', 'assets/sprites/slimeC.xml');
-    this.load.atlasXML('physTypeOne', 'assets/physicalClassOne.png', 'assets/physicalClassOne.xml');
-    this.load.atlasXML('buster_sp', 'assets/buster.png', 'assets/buster.xml')
-    this.load.atlasXML('wand_sp', 'assets/wand.png', 'assets/wand.xml')
-    this.load.atlasXML('wandSparks', 'assets/wandSparks.png', 'assets/wandSparks.xml');
+    this.load.image('bullet_img', 'assets/sprites/bullet.png');
+    this.load.atlasXML('buster_sp', 'assets/sprites/buster.png', 'assets/sprites/buster.xml')
+    this.load.atlasXML('wand_sp', 'assets/sprites/wand.png', 'assets/sprites/wand.xml')
+    this.load.atlasXML('wandSparks', 'assets/sprites/wandSparks.png', 'assets/sprites/wandSparks.xml');
     this.load.atlasXML('trap', 'assets/sprites/trap.png', 'assets/sprites/trap.xml');
 
-    this.load.audio('intro', 'assets/audio/start.mp3');
-    this.load.audio('bg', 'assets/audio/start.mp3');
-    this.load.audio('explode', 'assets/audio/explode.mp3');
-    this.load.audio('fly', 'assets/audio/fly.mp3');
-    this.load.audio('shoot', 'assets/audio/shoot.mp3');
+    //load enemy assets
+    this.load.atlasXML('physTypeOne', 'assets/sprites/physicalClassOne.png', 'assets/sprites/physicalClassOne.xml');
+
+    //load game background
+    this.load.image('slimeTiles', 'assets/images/slimeBGTile.png');
   }
 
   create() {
-    console.log('preloader scene');
     this.animationSetUp();
     phaser.scene.start('title');
   }

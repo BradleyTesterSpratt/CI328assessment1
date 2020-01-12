@@ -337,6 +337,7 @@ class World {
         this.addEnemyToGroup(new TypeOne(this.game, spawnLocation));
           break;
         default: 
+          //this should never be called
           console.log('no Type');
           break;
       }
