@@ -26,20 +26,61 @@ class Enemy {
     this.behaviour = behaviour;
     this.behaviourRandomNumber = 4;
     this.hasHitWall = false;
-    this.enemySprite.enemy = this;
     this.hitWall = this.hitWall.bind(this);
     this.active = true;
     this.slimeDelay = 0.0;
     this.hasCollided = false;
   }
 
-  collideBullet(streamStrength) {
-    this.updateColliderScale(1.5);
-    if (this.isLeashed == false) {
-      this.currentHP = this.currentHP - streamStrength;
-      this.isLeashed = true;
+  update() {
+    this.speed -= 0.05;
+    if (this.speed < this.baseSpeed) {
+      this.enemySprite.alpha = 1.0;
+      this.speed = this.baseSpeed;
     }
-    return {'hp': this.currentHP, 'x': this.enemySprite.x , 'y': this.enemySprite.y};
+    this.decisionDelay += 0.016;
+    if (this.decisionDelay > 1) {
+      this.perFrameUpdate();
+    }
+    if (this.active == true) {
+      if (this.behaviour == 'dumb') {this.dumbBehaviour(this.behaviourRandomNumber)}
+      if (this.hasHitWall == false) {this.moving = 'idle'}
+    }
+    if (this.hasCollided == true) {this.slimeDelay += 0.016};
+    if (this.slimeDelay > 2) {
+      this.slimeDelay = 0.0;
+      this.hasCollided = false;
+    }
+  }
+
+  /**
+   * code we want to run onc eper frame, not per tick
+   */
+  perFrameUpdate() {
+    if (this.active == true) {
+      if (this.isLeashed == false) {
+        if (this.currentHP < this.maxHP) {
+          this.currentHP += 1;
+        }
+      }
+      if (this.isLeashed == true) {
+        this.isLeashed = false;
+        let rand = this.getRandomNumber(4);
+        this.speed = this.speed + ((rand+3) * ((rand+1)/10));
+      } else {
+        this.updateColliderScale(1);
+      }
+      this.decisionDelay = 0.0;
+      this.behaviourRandomNumber = this.getRandomNumber(4);
+      if (this.isLeashed && this.behaviour == 'dumb') {this.behaviourRandomNumber = parseInt(Math.random()*3)};
+    } else {
+      this.enemySprite.scaleX = (this.enemySprite.scaleX * 0.95);
+      this.enemySprite.scaleY = (this.enemySprite.scaleY * 0.95);
+      if (this.enemySprite.scaleX <= 0.01) {
+        this.enemySprite.destroy()
+        this.game.world.updateGhostsText();
+      }
+    }
   }
 
   trap() {
@@ -50,18 +91,13 @@ class Enemy {
     this.enemySprite.body.enable = false;
   }
 
+  /**
+   * we want the collider to be larger when the player has the ghost leashed
+   * otherwise the ghpost will unleash too easily ruining player experience
+   */
   updateColliderScale(scale) {
     this.enemySprite.setSize(this.baseColliderSize.x * scale, this.baseColliderSize.y * scale);
     scale == 1 ? this.enemySprite.setOrigin(0.5, 0.5) : this.enemySprite.setOrigin(0.5/scale, 0.5/scale);
-  }
-
-  collidePlayer() {
-    if (this.hasCollided == false) {
-      this.speed = this.escapeSpeed;
-      this.enemySprite.alpha = 0.5;
-      this.hasCollided = true;
-      return {'colour': this.slimeColour, 'debuff': this.slimeStat}; 
-    }
   }
 
   left() {
@@ -136,56 +172,8 @@ class Enemy {
     }
   }
 
-  update() {
-    this.speed -= 0.05;
-    if (this.speed < this.baseSpeed) {
-      this.enemySprite.alpha = 1.0;
-      this.speed = this.baseSpeed;
-    }
-    this.decisionDelay += 0.016;
-    if (this.decisionDelay > 1) {
-      this.perFrameUpdate();
-    }
-    if (this.active == true) {
-      if (this.behaviour == 'dumb') {this.dumbBehaviour(this.behaviourRandomNumber)}
-      if (this.hasHitWall == false) {this.moving = 'idle'}
-    }
-    if (this.hasCollided == true) {this.slimeDelay += 0.016};
-    if (this.slimeDelay > 2) {
-      this.slimeDelay = 0.0;
-      this.hasCollided = false;
-    }
-}
-
   getRandomNumber(highestValue) {
     return parseInt(Math.random()*highestValue);
-  }
-
-  perFrameUpdate() {
-    if (this.active == true) {
-      if (this.isLeashed == false) {
-        if (this.currentHP < this.maxHP) {
-          this.currentHP += 1;
-        }
-      }
-      if (this.isLeashed == true) {
-        this.isLeashed = false;
-        let rand = this.getRandomNumber(4);
-        this.speed = this.speed + ((rand+3) * ((rand+1)/10));
-      } else {
-        this.updateColliderScale(1);
-      }
-      this.decisionDelay = 0.0;
-      this.behaviourRandomNumber = this.getRandomNumber(4);
-      if (this.isLeashed && this.behaviour == 'dumb') {this.behaviourRandomNumber = parseInt(Math.random()*3)};
-    } else {
-      this.enemySprite.scaleX = (this.enemySprite.scaleX * 0.95);
-      this.enemySprite.scaleY = (this.enemySprite.scaleY * 0.95);
-      if (this.enemySprite.scaleX <= 0.01) {
-        this.enemySprite.destroy()
-        this.game.world.updateGhostsText();
-      }
-    }
   }
 
   dumbBehaviour(randomNumber) {
@@ -224,6 +212,24 @@ class Enemy {
       default:
         this.idle();
     }
+  }
+
+  collidePlayer() {
+    if (this.hasCollided == false) {
+      this.speed = this.escapeSpeed;
+      this.enemySprite.alpha = 0.5;
+      this.hasCollided = true;
+      return {'colour': this.slimeColour, 'debuff': this.slimeStat}; 
+    }
+  }
+
+  collideBullet(streamStrength) {
+    this.updateColliderScale(1.5);
+    if (this.isLeashed == false) {
+      this.currentHP = this.currentHP - streamStrength;
+      this.isLeashed = true;
+    }
+    return {'hp': this.currentHP, 'x': this.enemySprite.x , 'y': this.enemySprite.y};
   }
 }
 

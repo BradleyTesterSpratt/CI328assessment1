@@ -3,6 +3,7 @@ class VictoryScene extends Phaser.Scene {
     super('victory');
   }
 
+  //values passed in when the scene is called
   init(results) {
     this.difficulty = results.difficulty;
     this.levelSize = results.levelSize;
@@ -28,6 +29,7 @@ class VictoryScene extends Phaser.Scene {
     }
   }
 
+  //need to call update otherwise the space bar input will never be recognised
   update() {
     this.gameInput.update();
   }

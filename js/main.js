@@ -1,11 +1,4 @@
-let game;
-let phaser;
-let world;
-
-let input;
-let ui;
-let audio;
-
+//width and height is provided by the user viewport
 function main(width, height) {
   var config = {
     type: Phaser.AUTO,

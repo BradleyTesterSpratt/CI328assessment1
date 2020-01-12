@@ -10,6 +10,14 @@ class TypeOne extends Enemy {
     this.hasCollided = false;
   }
 
+  update() {
+    super.update();
+  }
+
+  perFrameUpdate() {
+    super.perFrameUpdate();
+  }
+
   randomColour() {
     let rand = (parseInt(Math.random() * 3));
     switch(rand) {
@@ -23,13 +31,5 @@ class TypeOne extends Enemy {
         this.slimeColour = Constants.colour.pinkSlime;
         break;
     }
-
-  }
-  update() {
-    super.update();
-  }
-
-  perFrameUpdate() {
-    super.perFrameUpdate();
   }
 }

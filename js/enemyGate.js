@@ -12,6 +12,14 @@ class EnemyGate {
     this.isAttacked = false;
   }
 
+  update() {
+    if (this.isAttacked) { this.damageCooldown += 0.16 };
+    if (this.damageCooldown > 2) {
+      this.damageCooldown = 0;
+      this.isAttacked = false;
+    }
+  }
+
   setAnimation() {
     this.open ? this.gate.anims.play(`${this.type}Gate`, true) : this.gate.anims.play('closedGate', true)
   }
@@ -26,15 +34,12 @@ class EnemyGate {
     }
   }
 
+  /**
+   * currently there are no events that cause a gate to be reopened
+   * this was implemented this way for future updates
+   * i.e. certain ghosts or bosses may be able to open a gate.
+   */
   alternateGate() {
     this.open = !this.open;
-  }
-
-  update() {
-    if (this.isAttacked) { this.damageCooldown += 0.16 };
-    if (this.damageCooldown > 2) {
-      this.damageCooldown = 0;
-      this.isAttacked = false;
-    }
   }
 }
