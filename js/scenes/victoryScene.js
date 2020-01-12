@@ -19,13 +19,13 @@ class VictoryScene extends Phaser.Scene {
     });
     if(this.victory) {
       this.getDifficultyScore();
-      this.baseScoreText = this.addText(100, phaser.canvas.width/2 - 50, `Base Score: ${this.baseScore}`, 30, 'white');
-      this.levelMultiplyerText = this.addText(100, phaser.canvas.width/2 - 25, `Level Size Multiplyer: ${this.getLevelSizeMultiplyer()}`, 30, 'white');
-      this.totalScoreText = this.addText(100, phaser.canvas.width/2 + 25, `Total Score: ${this.calculateTotalScore()}`, 40, 'lightblue');
-      this.titleMenuText = this.addText(100, phaser.canvas.width/2 + 60, 'Press SPACE to return to the Title Screen', 30, 'white');  
+      this.baseScoreText = this.addText(100, phaser.config.height/2 - 50, `Base Score: ${this.baseScore}`, 30, 'white');
+      this.levelMultiplyerText = this.addText(100, phaser.config.height/2 - 25, `Level Size Multiplyer: ${this.getLevelSizeMultiplyer()}`, 30, 'white');
+      this.totalScoreText = this.addText(100, phaser.config.height/2 + 25, `Total Score: ${this.calculateTotalScore()}`, 40, 'lightblue');
+      this.titleMenuText = this.addText(100, phaser.config.height/2 + 60, 'Press SPACE to return to the Title Screen', 30, 'white');  
     } else {
-      this.gameOverText = this.addText(100, phaser.canvas.width/2 + 25, 'Game Over!', 40, 'darkred');
-      this.titleMenuText = this.addText(100, phaser.canvas.width/2 + 60, 'Press SPACE to return to the Title Screen', 30, 'white');  
+      this.gameOverText = this.addText(100, phaser.config.height/2 + 25, 'Game Over!', 40, 'darkred');
+      this.titleMenuText = this.addText(100, phaser.config.height/2 + 60, 'Press SPACE to return to the Title Screen', 30, 'white');  
     }
   }
 
