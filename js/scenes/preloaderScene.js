@@ -49,51 +49,38 @@ class PreloaderScene extends Phaser.Scene {
     phaser.scene.start('title');
   }
 
-  //This will not work correctly if each frame doesn't have the .png suffix
-  //refactor to add the suffix into the function requirements?
-  createAnimation(key, repeat, frameRate, spriteSheet, animationName, yoyo) {
-    this.anims.create(
-      {
-        key: key,
-        repeat: repeat,
-        frameRate: frameRate,
-        yoyo: (yoyo || false),
-        frames: this.anims.generateFrameNames(spriteSheet, {
-          prefix: animationName,
-          suffix: '.png',
-          //phaser3 will only load sprites it finds, so using 1-999 means it will catch all
-          start: 1,
-          end: 999
-        })
-      });
-  }
-
-  //This require's all ghost sprites to use the same naming convention in the .xml file
-  generateGhostAnimation(sprite)
-  {
-    this.createAnimation(`${sprite}WalkLeft`, -1, 5, sprite, 'side_walk_');
-    this.createAnimation(`${sprite}WalkRight`, -1, 5, sprite, 'right_walk_');
-    this.createAnimation(`${sprite}WalkBackLeft`, -1, 5, sprite, 'back_side_walk_');
-    this.createAnimation(`${sprite}WalkBackRight`, -1, 5, sprite, 'back_right_walk_');
-    this.createAnimation(`${sprite}WalkBack`, -1, 5, sprite, 'back_walk_');
-    this.createAnimation(`${sprite}WalkForward`, -1, 5, sprite, 'front_walk_');
-    this.createAnimation(`${sprite}IdleForward`, -1, 5, sprite, 'front_stand_');
-    this.createAnimation(`${sprite}IdleBack`, -1, 5, sprite, 'back_stand_');
-    this.createAnimation(`${sprite}Hit`, -1, 5, sprite, 'front_hurt_');
-    this.createAnimation(`${sprite}LeftHit`, -1, 5, sprite, 'side_hurt_');
-    this.createAnimation(`${sprite}RightHit`, -1, 5, sprite, 'right_hurt_');
-    this.createAnimation(`${sprite}BackHit`, -1, 5, sprite, 'back_hurt_');
-  }
-
   animationSetUp()
   {
     this.playerAnimations();
     this.gateAnimations();
+    /**
+     * after adding more ghosts types they should be added as constants
+     * the constants list of enenmy types can then be iterated over
+     */
     this.generateGhostAnimation('physTypeOne');
   }
 
-  playerAnimations()
-  {
+  /**
+   * This will not work correctly if each frame doesn't have the .png suffix
+   * refactor to add the suffix into the function requirements?
+   */
+  createAnimation(key, repeat, frameRate, spriteSheet, animationName, yoyo) {
+    this.anims.create({
+      key: key,
+      repeat: repeat,
+      frameRate: frameRate,
+      yoyo: (yoyo || false),
+      frames: this.anims.generateFrameNames(spriteSheet, {
+        prefix: animationName,
+        suffix: '.png',
+        //phaser3 will only load sprites it finds, so using 1-999 means it will catch all
+        start: 1,
+        end: 999
+      })
+    });
+  }
+
+  playerAnimations() {
     this.createAnimation('walkLeft', -1, 5, 'buster_sp', 'frontWalkLeft');
     this.createAnimation('walkRight', -1, 5, 'buster_sp', 'frontWalkRight');
     this.createAnimation('walkForward', -1, 5, 'buster_sp', 'frontWalk');
@@ -112,10 +99,25 @@ class PreloaderScene extends Phaser.Scene {
     this.createAnimation('trapClosed', -1, 5, 'trap', 'trap_closed_');
   }
 
-  gateAnimations()
-  {
+  gateAnimations() {
     this.createAnimation('slimeGate', -1, 1.5, 'ghostGate', 'slime_', true);
     this.createAnimation('glowGate', -1, 5, 'ghostGate', 'glow_', true);
     this.createAnimation('closedGate', -1, 5, 'ghostGate', 'closed_');
+  }
+
+  //This require's all ghost sprites to use the same naming convention in the .xml file
+  generateGhostAnimation(sprite) {
+    this.createAnimation(`${sprite}WalkLeft`, -1, 5, sprite, 'side_walk_');
+    this.createAnimation(`${sprite}WalkRight`, -1, 5, sprite, 'right_walk_');
+    this.createAnimation(`${sprite}WalkBackLeft`, -1, 5, sprite, 'back_side_walk_');
+    this.createAnimation(`${sprite}WalkBackRight`, -1, 5, sprite, 'back_right_walk_');
+    this.createAnimation(`${sprite}WalkBack`, -1, 5, sprite, 'back_walk_');
+    this.createAnimation(`${sprite}WalkForward`, -1, 5, sprite, 'front_walk_');
+    this.createAnimation(`${sprite}IdleForward`, -1, 5, sprite, 'front_stand_');
+    this.createAnimation(`${sprite}IdleBack`, -1, 5, sprite, 'back_stand_');
+    this.createAnimation(`${sprite}Hit`, -1, 5, sprite, 'front_hurt_');
+    this.createAnimation(`${sprite}LeftHit`, -1, 5, sprite, 'side_hurt_');
+    this.createAnimation(`${sprite}RightHit`, -1, 5, sprite, 'right_hurt_');
+    this.createAnimation(`${sprite}BackHit`, -1, 5, sprite, 'back_hurt_');
   }
 }

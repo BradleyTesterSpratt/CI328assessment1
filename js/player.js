@@ -40,6 +40,44 @@ class Player {
     this.grabTrap = this.grabTrap.bind(this);
   }
 
+  update () {
+    this.processDebuffs();
+    this.firstSlime.anims.play('slimeDripA', true);
+    this.secondSlime.anims.play('slimeDripB', true);
+    this.thirdSlime.anims.play('slimeDripC', true);
+    this.wandSpark.anims.play('wandSpark', true, parseInt(Math.random()*42));
+    this.updateSlimes();
+    if (this.firing == true) {
+      this.fireDelay += 0.016;
+      this.wandSpark.visible = true;
+      this.randomiseSpark(parseInt(Math.random()*3));
+    } else { 
+      this.wandSpark.visible = false;
+    }
+    if (this.fireDelay > 1) {
+      this.firing = false;
+      this.fireDelay = 0.0;
+    }
+    this.move();
+    this.moveInputDelay += 0.016;
+    if (this.moveInputDelay > 0.16) {
+      this.hasMovedInput = false;
+      if (this.hasHitWall == false) {this.moving = 'idle'}
+      this.moveInputDelay = 0.0;
+      this.hasHitWall = false;
+    }
+    this.updateWand(this.game.aimFromPlayerToPointer());
+    this.wandEnd.x = this.playerBody.x + this.wandOffset.x;
+    this.wandEnd.y = this.playerBody.y + this.wandOffset.y;
+    this.wandSpark.x = this.wandEnd.x;
+    this.wandSpark.y = this.wandEnd.y;
+    if (this.trapHeld) {
+      this.trap.x = this.playerBody.x + this.beltOffset.x;
+      this.trap.y = this.playerBody.y + this.beltOffset.y;
+      this.trap.anims.play('trapClosed', true);
+    }
+  }
+
   generateSprites(spawnLocationX, spawnLocationY) {
     const playerSprite = this.game.physics.add.sprite(spawnLocationX, spawnLocationY, 'buster_sp');
     playerSprite.setScale(0.40, 0.40);
@@ -88,6 +126,7 @@ class Player {
 
   collideGhost(slimeInfo) {
     let availableSlime = null;
+    //see if there is space for another slime on the player.
     this.slimes.forEach(slime => {
       if(slime.visible == false) {
         availableSlime = slime;
@@ -104,6 +143,25 @@ class Player {
   cleanSlime(slime) {
     slime.visible = false;
     slime.debuff = 'none';
+  }
+
+  move() {
+    switch(this.moving) {
+      case 'up':
+        this.up();
+        break;
+      case 'down':
+        this.down();
+        break;
+      case 'left':
+        this.left();
+        break;
+      case 'right':
+        this.right();
+        break;
+      default:
+        this.idle();
+    }
   }
 
   left() {
@@ -134,6 +192,7 @@ class Player {
     this.playerBody.y -= this.speed;
     this.playerWand.y = this.playerBody.y;
     this.facing = 1;
+    //change depths so that the accessories are correctly obscured
     this.playerWand.setDepth(5)
     this.trap.setDepth(5)
     this.playerBody.anims.play('walkBack', true);
@@ -144,29 +203,11 @@ class Player {
     this.playerBody.y += this.speed;
     this.playerWand.y = this.playerBody.y;
     this.facing = 0;
+    //change depths so that the accessories are correctly visible
     this.playerWand.setDepth(20)
     this.trap.setDepth(11)
     this.playerBody.anims.play('walkForward', true);
     this.hasMovedInput = true;
-  }
-
-  move() {
-    switch(this.moving) {
-      case 'up':
-        this.up();
-        break;
-      case 'down':
-        this.down();
-        break;
-      case 'left':
-        this.left();
-        break;
-      case 'right':
-        this.right();
-        break;
-      default:
-        this.idle();
-    }
   }
 
   idle() {
@@ -240,45 +281,6 @@ class Player {
         break;
       default:
         this.moving = 'idle';
-    }
-  }
-
-  update () {
-    this.processDebuffs();
-    this.firstSlime.anims.play('slimeDripA', true);
-    this.secondSlime.anims.play('slimeDripB', true);
-    this.thirdSlime.anims.play('slimeDripC', true);
-    this.wandSpark.anims.play('wandSpark', true, parseInt(Math.random()*42));
-    this.updateSlimes();
-    if (this.firing == true) {
-      this.fireDelay += 0.016;
-      this.wandSpark.visible = true;
-      this.randomiseSpark(parseInt(Math.random()*3));
-    } else { 
-      this.wandSpark.visible = false;
-    }
-    if (this.fireDelay > 1) {
-      this.firing = false;
-      this.fireDelay = 0.0;
-    }
-
-    this.move();
-    this.moveInputDelay += 0.016;
-    if (this.moveInputDelay > 0.16) {
-      this.hasMovedInput = false;
-      if (this.hasHitWall == false) {this.moving = 'idle'}
-      this.moveInputDelay = 0.0;
-      this.hasHitWall = false;
-    }
-    this.updateWand(this.game.aimFromPlayerToPointer());
-    this.wandEnd.x = this.playerBody.x + this.wandOffset.x;
-    this.wandEnd.y = this.playerBody.y + this.wandOffset.y;
-    this.wandSpark.x = this.wandEnd.x;
-    this.wandSpark.y = this.wandEnd.y;
-    if (this.trapHeld) {
-      this.trap.x = this.playerBody.x + this.beltOffset.x;
-      this.trap.y = this.playerBody.y + this.beltOffset.y;
-      this.trap.anims.play('trapClosed', true);
     }
   }
 

@@ -4,6 +4,7 @@ class TitleScene extends Phaser.Scene {
   }
 
   create() {
+    //needs a default level size
     this.levelSize = 'Medium'
     this.add.tileSprite(phaser.config.width/2, phaser.config.height/2 ,phaser.config.width, phaser.config.height, "menuBrickTiles");
     this.containmentUnit = this.add.sprite(100, phaser.config.height/2, 'containmentUnit');
@@ -26,26 +27,6 @@ class TitleScene extends Phaser.Scene {
     });
     newText.setOrigin(0.5, 0.5);
     return newText;
-  }
-
-  updateButtonPurposeText(text) {
-    this.buttonPurposeDisplay.setText(text);
-    this.buttonPurposeDisplay.setRotation(Math.random() * 1);
-    this.buttonPurposeDisplay.visible = true;
-  }
-
-  updateDifficultyText() {
-    this.difficultyDisplay.setText(this.difficulty);
-    switch(this.difficulty) {
-      case 'Easy':
-        this.difficultyDisplay.setShadow(5, 5, 'red', 15).setFill('red');
-        break;
-      case 'Hard':
-        this.difficultyDisplay.setShadow(5, 5, 'lime', 15).setFill('lime');
-        break;
-      default:
-        this.difficultyDisplay.setShadow(5, 5, 'darkorange', 15).setFill('darkorange');
-    }
   }
 
   setUpButtons() {
@@ -108,13 +89,24 @@ class TitleScene extends Phaser.Scene {
     }
     return button;
   }
+  updateButtonPurposeText(text) {
+    this.buttonPurposeDisplay.setText(text);
+    this.buttonPurposeDisplay.setRotation(Math.random() * 1);
+    this.buttonPurposeDisplay.visible = true;
+  }
 
-  startGame() {
-    phaser.scene.start('mainScene', {
-      difficulty: this.difficulty.toLowerCase(),
-      levelSize: this.levelSize.toLowerCase()
-    });
-    phaser.scene.stop('title');
+  updateDifficultyText() {
+    this.difficultyDisplay.setText(this.difficulty);
+    switch(this.difficulty) {
+      case 'Easy':
+        this.difficultyDisplay.setShadow(5, 5, 'red', 15).setFill('red');
+        break;
+      case 'Hard':
+        this.difficultyDisplay.setShadow(5, 5, 'lime', 15).setFill('lime');
+        break;
+      default:
+        this.difficultyDisplay.setShadow(5, 5, 'darkorange', 15).setFill('darkorange');
+    }
   }
 
   changeDifficulty(difficulty) {
@@ -147,4 +139,11 @@ class TitleScene extends Phaser.Scene {
     this.sizeDisplay.setText(this.levelSize);
   }
   
+  startGame() {
+    phaser.scene.start('mainScene', {
+      difficulty: this.difficulty.toLowerCase(),
+      levelSize: this.levelSize.toLowerCase()
+    });
+    phaser.scene.stop('title');
+  }
 }

@@ -1,3 +1,6 @@
+/**
+ * class provided as part of the assignment example
+ */
 class Control {
   onUpdate(sprite) {}
 }
@@ -48,6 +51,7 @@ class EntityFactory {
       });
     }
     catch(err) {
+      //error needs to be caught to prevent crashing, safe to ignore
     }
   }
 }

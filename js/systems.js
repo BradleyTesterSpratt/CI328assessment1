@@ -1,3 +1,7 @@
+/**
+ * class as provided in example
+ * not removed as it would be used for a future update
+ */
 class Audio {
   constructor(game) {
   }
@@ -42,6 +46,7 @@ class UI {
       fill: '#fff'
     });
     this.ghostsText.setDepth(100);
+    //setScrollFactor keeps the text following the camera.
     this.ghostsText.setScrollFactor(0);
     this.gatesText = game.add.text(0, -5, 'Open Gates: 0', {
       font: '34px Arial',

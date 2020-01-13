@@ -3,6 +3,7 @@ class MainScene extends Phaser.Scene {
     super('mainScene');
   }
 
+  //values passed in when the scene is called
   init(config) {
     this.difficulty = config.difficulty;
     this.levelSize = config.levelSize;
@@ -54,12 +55,31 @@ class MainScene extends Phaser.Scene {
     this.victoryTime = 0;
   }
 
+  update() {
+    this.gameInput.update();
+    if (!this.paused) {
+      //must process streams before updating the player
+      this.processStreams(this.player.firing);
+      this.world.update();
+      if (this.hitEnemy != null || this.collidedBullet != null) {
+        this.bulletCheck += 0.02;
+      }
+      if (this.bulletCheck > 1) {
+        this.hitEnemy = null;
+        this.collidedBullet = null;
+        this.world.wallHit = false;
+        this.bulletCheck = 0.0;
+      }
+      this.victoryTime += 0.16;
+      this.victoryCheck();
+    }
+  }
+
   pauseGameForInput() {
     this.paused = true;
     this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
     this.cameras.main.setZoom(0.15);
     this.ui.showStartText();
-
   }
 
   resumeGameFromInput() {
@@ -83,21 +103,20 @@ class MainScene extends Phaser.Scene {
     this.resumeGameFromInput();
   }
 
-  addStreamPoints(curve, noOfPoints) {
-    let array = curve;
-    array = array.getDistancePoints(noOfPoints);
-    for (let i = 1; i < array.length-1; i++) {
-      let random = (Math.floor((Math.random()*5)+1));
-      let plusOrMinus = Math.random() < 0.5 ? -1 : 1;
-      random = random * plusOrMinus;
-      array[i].x = array[i].x + random;
-      random = (Math.floor((Math.random()*5)+1));
-      random = random * plusOrMinus;
-      array[i].y = array[i].y + random;
-    }
-    return array;
+  configureInput(game) {
+    this.gameInput.add('A', function() { game.player.setMove('left'); });
+    this.gameInput.add('D', function() { game.player.setMove('right'); });
+    this.gameInput.add('W', function() { game.player.setMove('up'); });
+    this.gameInput.add('S', function() { game.player.setMove('down'); });
+    this.gameInput.add('P', function() { if (!game.paused) { game.pauseGameForInput()}});
+    this.gameInput.add('SPACE', function() { if (game.paused) { game.resumeGameFromInput()}});
+    this.gameInput.leftClick(function() {
+      game.player.firing = true;
+      game.world.spawnBullet(game.player.wandEnd.x, game.player.wandEnd.y, game.pointer.worldX, game.pointer.worldY);
+    });
   }
 
+  //decide how streams should be handled
   processStreams(shouldFire) {  
     if (this.collidedBullet != null) {
       this.streamDest.x = this.collidedBullet.x;
@@ -133,9 +152,30 @@ class MainScene extends Phaser.Scene {
     curve.getPoint(this.path.t, this.path.vec);
   }
 
+  /**
+   * this adds additional points between the current curve points,
+   * then randomly offsets each new point from its current postition,
+   * creating the randomness of the curve.
+   */
+  addStreamPoints(curve, noOfPoints) {
+    let array = curve;
+    array = array.getDistancePoints(noOfPoints);
+    for (let i = 1; i < array.length-1; i++) {
+      let random = (Math.floor((Math.random()*5)+1));
+      let plusOrMinus = Math.random() < 0.5 ? -1 : 1;
+      random = random * plusOrMinus;
+      array[i].x = array[i].x + random;
+      random = (Math.floor((Math.random()*5)+1));
+      random = random * plusOrMinus;
+      array[i].y = array[i].y + random;
+    }
+    return array;
+  }
+
   deployTrap(destX, destY) {
     let curve = new Phaser.Curves.Spline([
       this.player.playerBody.x, this.player.playerBody.y,
+      //offset the final 2 points in hopes that the trap cable doesn't overlap the trap
       destX-40, destY+40,
       destX-10, destY+20
     ]);
@@ -145,39 +185,6 @@ class MainScene extends Phaser.Scene {
     curve.getPoint(this.path.t, this.path.vec);
   }
 
-  update() {
-    this.gameInput.update();
-    if (!this.paused) {
-      //must process streams before updating the player
-      this.processStreams(this.player.firing);
-      this.world.update();
-      if (this.hitEnemy != null || this.collidedBullet != null) {
-        this.bulletCheck += 0.02;
-      }
-      if (this.bulletCheck > 1) {
-        this.hitEnemy = null;
-        this.collidedBullet = null;
-        this.world.wallHit = false;
-        this.bulletCheck = 0.0;
-      }
-      this.victoryTime += 0.16;
-      this.victoryCheck();
-    }
-  }
-
-  configureInput(game) {
-    this.gameInput.add('A', function() { game.player.setMove('left'); });
-    this.gameInput.add('D', function() { game.player.setMove('right'); });
-    this.gameInput.add('W', function() { game.player.setMove('up'); });
-    this.gameInput.add('S', function() { game.player.setMove('down'); });
-    this.gameInput.add('P', function() { if (!game.paused) { game.pauseGameForInput()}});
-    this.gameInput.add('SPACE', function() { if (game.paused) { game.resumeGameFromInput()}});
-    this.gameInput.leftClick(function() {
-      game.player.firing = true;
-      game.world.spawnBullet(game.player.wandEnd.x, game.player.wandEnd.y, game.pointer.worldX, game.pointer.worldY);
-      // audio.shoot.play();
-    });
-  }
   aimFromPlayerToPointer() {
     let radian = Phaser.Math.Angle.BetweenPoints(this.player.playerBody, {x: this.pointer.worldX, y: this.pointer.worldY});
     let degrees = Phaser.Math.RadToDeg(radian);
@@ -211,6 +218,11 @@ class MainScene extends Phaser.Scene {
   }
 
   onCollisionBulletWall(bullet, wall) {
+    /** 
+     * using the 'this' keyword causes odd crashes and errors
+     * each object has a reference to the scene it is part of
+     * so get the scene using the parent reference instead
+     */
     let scene = bullet.scene;
     scene.collidedBullet = {
       x: bullet.x,
