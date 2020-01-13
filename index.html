@@ -32,9 +32,15 @@
 
 <!-- Define entry point -->
 <script type="text/javascript">
-    window.onload = function(event) {
-        main(window.innerWidth, window.innerHeight);
+    function isMobileDevice() {
+        //code provided by stackflow user Blackbam, link in documentation
+        return window.matchMedia("(pointer: coarse)").matches;
     }
+    window.onload = function(event) {
+        isMobileDevice = isMobileDevice();
+        main(window.innerWidth, window.innerHeight, isMobileDevice);
+    }
+    
 </script>
 
 </body>

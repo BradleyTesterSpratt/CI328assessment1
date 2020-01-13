@@ -32,10 +32,8 @@ class Input {
 
 class UI {
   constructor(game, mapSize) {
-    this.startGameText = game.add.text(mapSize.x / 2, 
-      mapSize.y / 2, 
-      'Default Controls\n\nSPACE to Start\nW to move Up\nS to move Down\nA to move Left\nD to move Right\nP to zoom out', 
-      {
+    let text = phaser.isMobileDevice ? 'Touch to fire\nPress Pause to resume' : 'Default Controls\n\nSPACE to Start\nW to move Up\nS to move Down\nA to move Left\nD to move Right\nP to zoom out';
+    this.startGameText = game.add.text(mapSize.x / 2, mapSize.y / 2, text, {
       font: '200px Arial',
       fill: 'white'
     });

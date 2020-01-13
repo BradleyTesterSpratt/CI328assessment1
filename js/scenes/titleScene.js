@@ -4,6 +4,8 @@ class TitleScene extends Phaser.Scene {
   }
 
   create() {
+    //if playing on mobile Zoom out in hopes that all the main menu can be seen
+    if (phaser.isMobileDevice) {this.cameras.main.setZoom(0.75);}
     //needs a default level size
     this.levelSize = 'Medium'
     this.add.tileSprite(phaser.config.width/2, phaser.config.height/2 ,phaser.config.width, phaser.config.height, "menuBrickTiles");
@@ -17,7 +19,6 @@ class TitleScene extends Phaser.Scene {
     this.setUpButtons();
     this.difficultyDisplay = this.addText(303, 90, 'Normal', 40, 'darkorange');
     this.changeDifficulty('normal');
-
   }
 
   addText(x, y, text, size, fill = '#fff') {

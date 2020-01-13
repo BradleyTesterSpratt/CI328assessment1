@@ -42,6 +42,13 @@ class PreloaderScene extends Phaser.Scene {
 
     //load game background
     this.load.image('slimeTiles', 'assets/images/slimeBGTile.png');
+
+    //load touch buttons for mobile
+    this.load.image('up', 'assets/sprites/up.png');
+    this.load.image('down', 'assets/sprites/down.png');
+    this.load.image('left', 'assets/sprites/left.png');
+    this.load.image('right', 'assets/sprites/right.png');
+    this.load.image('pause', 'assets/sprites/pause.png');
   }
 
   create() {

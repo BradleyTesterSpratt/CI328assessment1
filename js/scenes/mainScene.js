@@ -22,7 +22,12 @@ class MainScene extends Phaser.Scene {
     this.audio = new Audio(this);
     this.player = this.world.player;
     const game = this;
-    this.gameInput.add('SPACE', function() { game.startGame(); });
+    if (phaser.isMobileDevice) {
+      this.input.on('pointerdown', function() {game.startGame(); });
+      this.configureInput(this);
+    } else {
+      this.gameInput.add('SPACE', function() { game.startGame(); });
+    }
     this.pointer = this.input.activePointer;
     this.physics.add.overlap(this.player.playerBody, this.world.enemies, this.onCollisionPlayerEnemy);
     this.physics.add.overlap(this.world.bulletFactory.group, this.world.enemies, this.onCollisionBulletEnemy);
@@ -33,6 +38,7 @@ class MainScene extends Phaser.Scene {
     this.physics.add.overlap(this.world.bulletFactory.group, this.world.ghostGates, this.onCollisionBulletGate);
     this.physics.add.overlap(this.player.playerBody, this.player.trap, this.onCollisionPlayerTrap);
     this.ui.updateGatesText(this.world.checkForOpenGates());
+    this.gameStarted = false;
     this.pauseGameForInput();
     this.path = { t: 0, vec: new Phaser.Math.Vector2() };
     this.stream1 = this.add.graphics().setDepth(50);
@@ -80,6 +86,7 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.centerOn(this.world.mapSize.x/2, this.world.mapSize.y/2);
     this.cameras.main.setZoom(0.15);
     this.ui.showStartText();
+    if (phaser.isMobileDevice) { this.pauseButton.x = 10; };
   }
 
   resumeGameFromInput() {
@@ -87,10 +94,11 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.zoomTo(0.75,1000);
     this.cameras.main.startFollow(this.player.playerBody);
     this.paused = false;
+    if (phaser.isMobileDevice) { this.pauseButton.x = this.cameras.main.width - 10; };
   }
 
   startGame() {
-    if (!this.paused)
+    if (!this.paused && !this.gameStarted)
       return;    
     /**
      * trap will not deploy if the player is in it's collider
@@ -99,17 +107,54 @@ class MainScene extends Phaser.Scene {
      */
     this.player.deployTrap(this.player.playerBody.x, this.player.playerBody.y)
     for (let i = 0; i < this.world.initialSpawnedEnemies; i ++) { this.world.spawnEnemy(); };
-    this.configureInput(this);
+    this.gameStarted = true;
+    if (!phaser.isMobileDevice) { this.configureInput(this); };
     this.resumeGameFromInput();
   }
 
   configureInput(game) {
-    this.gameInput.add('A', function() { game.player.setMove('left'); });
-    this.gameInput.add('D', function() { game.player.setMove('right'); });
-    this.gameInput.add('W', function() { game.player.setMove('up'); });
-    this.gameInput.add('S', function() { game.player.setMove('down'); });
-    this.gameInput.add('P', function() { if (!game.paused) { game.pauseGameForInput()}});
-    this.gameInput.add('SPACE', function() { if (game.paused) { game.resumeGameFromInput()}});
+    if (phaser.isMobileDevice) {
+      let dPadLoc = {x: 25, y: this.cameras.main.height -50};
+      const upButton = this.add.sprite(dPadLoc.x, dPadLoc.y - 40, 'up');
+      upButton.on('pointerover', () => { 
+        game.player.setMove('up');
+      });
+      const downButton = this.add.sprite(dPadLoc.x, dPadLoc.y + 40, 'down');
+      downButton.on('pointerover', () => { 
+        game.player.setMove('down');
+      });
+      const leftButton = this.add.sprite(dPadLoc.x - 40, dPadLoc.y, 'left');
+      leftButton.on('pointerover', () => { 
+        game.player.setMove('left');
+      });
+      const rightButton = this.add.sprite(dPadLoc.x + 40, dPadLoc.y, 'right');
+      rightButton.on('pointerover', () => { 
+        game.player.setMove('right');
+      });
+      const pauseButton = this.add.sprite(this.cameras.main.width - 10, 10, 'pause');
+      pauseButton.on('pointerdown', () => { 
+        !game.paused ? game.pauseGameForInput() : game.resumeGameFromInput();
+      });
+      let buttons = [upButton, downButton, rightButton, leftButton, pauseButton];
+      buttons.forEach(button => {
+        button.setOrigin(0.5, 0.5);
+        button.setInteractive();
+        button.setScrollFactor(0);
+        button.setDepth(100);
+      });
+      game.upButton = upButton;
+      game.downButton = downButton;
+      game.rightButton = rightButton;
+      game.leftButton = leftButton;
+      game.pauseButton = pauseButton;
+    } else {
+      this.gameInput.add('A', function() { game.player.setMove('left'); });
+      this.gameInput.add('D', function() { game.player.setMove('right'); });
+      this.gameInput.add('W', function() { game.player.setMove('up'); });
+      this.gameInput.add('S', function() { game.player.setMove('down'); });
+      this.gameInput.add('P', function() { if (!game.paused) { game.pauseGameForInput()}});
+      this.gameInput.add('SPACE', function() { if (game.paused) { game.resumeGameFromInput()}});
+    }
     this.gameInput.leftClick(function() {
       game.player.firing = true;
       game.world.spawnBullet(game.player.wandEnd.x, game.player.wandEnd.y, game.pointer.worldX, game.pointer.worldY);
